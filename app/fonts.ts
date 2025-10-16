@@ -5,17 +5,17 @@ export const satoshi = localFont({
     {
       path: './fonts/Satoshi-Regular.woff2',
       weight: '400',
-      style: 'normal',
+      style: 'normal'
     },
     {
       path: './fonts/Satoshi-Medium.woff2',
       weight: '500',
-      style: 'normal',
+      style: 'normal'
     },
     {
       path: './fonts/Satoshi-Bold.woff2',
       weight: '700',
-      style: 'normal',
+      style: 'normal'
     }
   ],
   variable: '--font-satoshi',
