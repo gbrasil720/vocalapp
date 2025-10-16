@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { openAPI } from 'better-auth/plugins'
+import { lastLoginMethod, openAPI } from 'better-auth/plugins'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
 
@@ -24,5 +24,5 @@ export const auth = betterAuth({
       verification: schema.verification
     }
   }),
-  plugins: [openAPI()]
+  plugins: [openAPI(), lastLoginMethod()]
 })
