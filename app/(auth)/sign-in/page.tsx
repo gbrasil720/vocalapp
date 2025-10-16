@@ -6,6 +6,14 @@ import { useRouter } from 'next/navigation'
 import { memo, useMemo, useState } from 'react'
 import Hyperspeed from '@/components/Hyperspeed'
 import { Button } from '@/components/ui/button'
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from '@/components/ui/field'
+import { authClient } from '@/lib/auth-client'
 
 // Memoized Hyperspeed component to prevent re-renders
 const MemoizedHyperspeed = memo(() => {
@@ -57,10 +65,6 @@ MemoizedHyperspeed.displayName = 'MemoizedHyperspeed'
 
 export default function SignIn() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -74,53 +78,67 @@ export default function SignIn() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  const validateForm = () => {
+  const validateForm = (email: string, password: string) => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.email.trim()) {
+    if (!email.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Please enter a valid email address'
     }
 
-    if (!formData.password) {
+    if (!password) {
       newErrors.password = 'Password is required'
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return newErrors
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
 
-    if (!validateForm()) {
+    const newErrors = validateForm(email, password)
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
       showToast('error', 'Please fix the errors above')
       return
     }
 
+    setErrors({})
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      showToast('success', 'Welcome back to vocal.app!')
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-    } catch {
-      showToast('error', 'Failed to sign in. Please check your credentials.')
+      await authClient.signIn.email(
+        {
+          email,
+          password
+        },
+        {
+          onSuccess: () => {
+            showToast('success', 'Welcome back to vocal.app!')
+            setTimeout(() => {
+              router.push('/dashboard')
+            }, 1000)
+          },
+          onError: (ctx) => {
+            const errorMessage =
+              ctx.error.message ||
+              'Failed to sign in. Please check your credentials.'
+            showToast('error', errorMessage)
+            setErrors({ submit: errorMessage })
+          }
+        }
+      )
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      showToast('error', errorMessage)
+      setErrors({ submit: errorMessage })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
@@ -241,78 +259,66 @@ export default function SignIn() {
             {/* Form */}
             <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Email Field */}
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-300 mb-2"
-                  >
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        handleInputChange('email', e.target.value)
-                      }
-                      className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                        errors.email
-                          ? 'border-red-500/50 focus:ring-red-500/30'
-                          : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
-                      }`}
-                      placeholder="john@example.com"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-                  )}
-                </div>
+                <FieldGroup>
+                  {/* Email Field */}
+                  <Field>
+                    <FieldLabel htmlFor="email">Email Address</FieldLabel>
+                    <FieldContent>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
+                            errors.email
+                              ? 'border-red-500/50 focus:ring-red-500/30'
+                              : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
+                          }`}
+                          placeholder="john@example.com"
+                          required
+                        />
+                      </div>
+                      {errors.email && <FieldError>{errors.email}</FieldError>}
+                    </FieldContent>
+                  </Field>
 
-                {/* Password Field */}
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-300 mb-2"
-                  >
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={formData.password}
-                      onChange={(e) =>
-                        handleInputChange('password', e.target.value)
-                      }
-                      className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                        errors.password
-                          ? 'border-red-500/50 focus:ring-red-500/30'
-                          : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
-                      }`}
-                      placeholder="Enter your password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
+                  {/* Password Field */}
+                  <Field>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <FieldContent>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          id="password"
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
+                            errors.password
+                              ? 'border-red-500/50 focus:ring-red-500/30'
+                              : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
+                          }`}
+                          placeholder="Enter your password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                      {errors.password && (
+                        <FieldError>{errors.password}</FieldError>
                       )}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-red-400 text-sm mt-1">
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
+                    </FieldContent>
+                  </Field>
+                </FieldGroup>
 
                 {/* Forgot Password Link */}
                 <div className="flex justify-end">
@@ -391,7 +397,7 @@ export default function SignIn() {
               {/* Sign Up Link */}
               <div className="mt-6 text-center">
                 <p className="text-gray-400">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link
                     href="/sign-up"
                     className="text-[#03b3c3] hover:text-[#d856bf] transition-colors duration-200 font-medium"

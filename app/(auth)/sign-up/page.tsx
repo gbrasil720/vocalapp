@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { memo, useEffect, useMemo, useState } from 'react'
 import Hyperspeed from '@/components/Hyperspeed'
 import { Button } from '@/components/ui/button'
+import { authClient } from '@/lib/auth-client'
 
 // Memoized Hyperspeed component to prevent re-renders
 const MemoizedHyperspeed = memo(() => {
@@ -79,13 +80,6 @@ const passwordRequirements: PasswordRequirement[] = [
 
 export default function SignUp() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [requirements, setRequirements] = useState(passwordRequirements)
@@ -95,30 +89,31 @@ export default function SignUp() {
     type: 'success' | 'error' | 'info'
     message: string
   } | null>(null)
+  const [password, setPassword] = useState('')
 
   // Password strength calculation
   useEffect(() => {
     const newRequirements = passwordRequirements.map((req) => {
       switch (req.text) {
         case 'At least 8 characters':
-          return { ...req, met: formData.password.length >= 8 }
+          return { ...req, met: password.length >= 8 }
         case 'Contains uppercase letter':
-          return { ...req, met: /[A-Z]/.test(formData.password) }
+          return { ...req, met: /[A-Z]/.test(password) }
         case 'Contains lowercase letter':
-          return { ...req, met: /[a-z]/.test(formData.password) }
+          return { ...req, met: /[a-z]/.test(password) }
         case 'Contains number':
-          return { ...req, met: /\d/.test(formData.password) }
+          return { ...req, met: /\d/.test(password) }
         case 'Contains special character':
           return {
             ...req,
-            met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
+            met: /[!@#$%^&*(),.?":{}|<>]/.test(password)
           }
         default:
           return req
       }
     })
     setRequirements(newRequirements)
-  }, [formData.password])
+  }, [password])
 
   const getPasswordStrength = () => {
     const metCount = requirements.filter((req) => req.met).length
@@ -132,69 +127,94 @@ export default function SignUp() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  const validateForm = () => {
+  const validateForm = (formData: FormData) => {
     const newErrors: Record<string, string> = {}
+    const firstName = formData.get('firstName') as string
+    const lastName = formData.get('lastName') as string
+    const email = formData.get('email') as string
+    const pwd = formData.get('password') as string
+    const confirmPwd = formData.get('confirmPassword') as string
 
-    if (!formData.firstName.trim()) {
+    if (!firstName?.trim()) {
       newErrors.firstName = 'First name is required'
     }
 
-    if (!formData.lastName.trim()) {
+    if (!lastName?.trim()) {
       newErrors.lastName = 'Last name is required'
     }
 
-    if (!formData.email.trim()) {
+    if (!email?.trim()) {
       newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Please enter a valid email address'
     }
 
-    if (!formData.password) {
+    if (!pwd) {
       newErrors.password = 'Password is required'
     } else if (requirements.some((req) => !req.met)) {
       newErrors.password = 'Password does not meet requirements'
     }
 
-    if (!formData.confirmPassword) {
+    if (!confirmPwd) {
       newErrors.confirmPassword = 'Please confirm your password'
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (pwd !== confirmPwd) {
       newErrors.confirmPassword = 'Passwords do not match'
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return newErrors
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const formData = new FormData(e.currentTarget)
 
-    if (!validateForm()) {
+    const newErrors = validateForm(formData)
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
       showToast('error', 'Please fix the errors above')
       return
     }
 
+    setErrors({})
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const firstName = formData.get('firstName') as string
+      const lastName = formData.get('lastName') as string
+      const email = formData.get('email') as string
+      const pwd = formData.get('password') as string
 
-      showToast('success', 'Account created successfully! Welcome to vocal.app')
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-    } catch {
-      showToast('error', 'Failed to create account. Please try again.')
+      await authClient.signUp.email(
+        {
+          email,
+          password: pwd,
+          name: `${firstName} ${lastName}`
+        },
+        {
+          onSuccess: () => {
+            showToast(
+              'success',
+              'Account created successfully! Welcome to vocal.app'
+            )
+            setTimeout(() => {
+              router.push('/dashboard')
+            }, 1000)
+          },
+          onError: (ctx) => {
+            const errorMessage =
+              ctx.error.message || 'Failed to create account. Please try again.'
+            showToast('error', errorMessage)
+            setErrors({ submit: errorMessage })
+          }
+        }
+      )
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      showToast('error', errorMessage)
+      setErrors({ submit: errorMessage })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
 
@@ -335,10 +355,7 @@ export default function SignUp() {
                       <input
                         id="firstName"
                         type="text"
-                        value={formData.firstName}
-                        onChange={(e) =>
-                          handleInputChange('firstName', e.target.value)
-                        }
+                        name="firstName"
                         className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
                           errors.firstName
                             ? 'border-red-500/50 focus:ring-red-500/30'
@@ -366,10 +383,7 @@ export default function SignUp() {
                       <input
                         id="lastName"
                         type="text"
-                        value={formData.lastName}
-                        onChange={(e) =>
-                          handleInputChange('lastName', e.target.value)
-                        }
+                        name="lastName"
                         className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
                           errors.lastName
                             ? 'border-red-500/50 focus:ring-red-500/30'
@@ -399,10 +413,7 @@ export default function SignUp() {
                     <input
                       id="email"
                       type="email"
-                      value={formData.email}
-                      onChange={(e) =>
-                        handleInputChange('email', e.target.value)
-                      }
+                      name="email"
                       className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
                         errors.email
                           ? 'border-red-500/50 focus:ring-red-500/30'
@@ -429,10 +440,8 @@ export default function SignUp() {
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      value={formData.password}
-                      onChange={(e) =>
-                        handleInputChange('password', e.target.value)
-                      }
+                      name="password"
+                      onChange={(e) => setPassword(e.target.value)}
                       className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
                         errors.password
                           ? 'border-red-500/50 focus:ring-red-500/30'
@@ -454,7 +463,7 @@ export default function SignUp() {
                   </div>
 
                   {/* Password Strength Indicator */}
-                  {formData.password && (
+                  {password && (
                     <div className="mt-2">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -516,10 +525,7 @@ export default function SignUp() {
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
-                      value={formData.confirmPassword}
-                      onChange={(e) =>
-                        handleInputChange('confirmPassword', e.target.value)
-                      }
+                      name="confirmPassword"
                       className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
                         errors.confirmPassword
                           ? 'border-red-500/50 focus:ring-red-500/30'

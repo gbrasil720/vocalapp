@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { memo, useMemo, useState } from 'react'
 import Hyperspeed from '@/components/Hyperspeed'
 import { Button } from '@/components/ui/button'
+import { authClient } from '@/lib/auth-client'
 
 // Memoized Hyperspeed component to prevent re-renders
 const MemoizedHyperspeed = memo(() => {
@@ -55,9 +56,9 @@ const MemoizedHyperspeed = memo(() => {
 MemoizedHyperspeed.displayName = 'MemoizedHyperspeed'
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const [sentEmail, setSentEmail] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<{
     type: 'success' | 'error' | 'info'
@@ -69,7 +70,7 @@ export default function ForgotPassword() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  const validateForm = () => {
+  const validateForm = (email: string) => {
     const newErrors: Record<string, string> = {}
 
     if (!email.trim()) {
@@ -78,38 +79,52 @@ export default function ForgotPassword() {
       newErrors.email = 'Please enter a valid email address'
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return newErrors
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
 
-    if (!validateForm()) {
+    const newErrors = validateForm(email)
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
       showToast('error', 'Please enter a valid email address')
       return
     }
 
+    setErrors({})
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      setIsEmailSent(true)
-      showToast('success', 'Reset link sent to your email!')
-    } catch {
-      showToast('error', 'Failed to send reset link. Please try again.')
+      await authClient.forgetPassword(
+        {
+          email,
+          redirectURL: `${window.location.origin}/reset-password`
+        },
+        {
+          onSuccess: () => {
+            setSentEmail(email)
+            setIsEmailSent(true)
+            showToast('success', 'Reset link sent to your email!')
+          },
+          onError: (ctx) => {
+            const errorMessage =
+              ctx.error.message ||
+              'Failed to send reset link. Please try again.'
+            showToast('error', errorMessage)
+            setErrors({ submit: errorMessage })
+          }
+        }
+      )
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+      showToast('error', errorMessage)
+      setErrors({ submit: errorMessage })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleInputChange = (value: string) => {
-    setEmail(value)
-    // Clear error when user starts typing
-    if (errors.email) {
-      setErrors((prev) => ({ ...prev, email: '' }))
     }
   }
 
@@ -178,9 +193,9 @@ export default function ForgotPassword() {
               </h2>
 
               <p className="text-white/90 text-lg leading-relaxed mb-8">
-                Don't worry, it happens to the best of us. Enter your email
-                address and we'll send you a link to reset your password and get
-                back to transcribing.
+                Don&apos;t worry, it happens to the best of us. Enter your email
+                address and we&apos;ll send you a link to reset your password
+                and get back to transcribing.
               </p>
 
               {/* Features */}
@@ -233,35 +248,25 @@ export default function ForgotPassword() {
             <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8">
               {!isEmailSent ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Email Field */}
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-300 mb-2"
-                    >
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => handleInputChange(e.target.value)}
-                        className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                          errors.email
-                            ? 'border-red-500/50 focus:ring-red-500/30'
-                            : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
-                        }`}
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    {errors.email && (
-                      <p className="text-red-400 text-sm mt-1">
-                        {errors.email}
-                      </p>
-                    )}
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      name="email"
+                      className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
+                        errors.email
+                          ? 'border-red-500/50 focus:ring-red-500/30'
+                          : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
+                      }`}
+                      placeholder="john@example.com"
+                    />
                   </div>
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email}</p>
+                  )}
+                  {errors.submit && (
+                    <p className="text-red-500 text-sm">{errors.submit}</p>
+                  )}
 
                   {/* Submit Button */}
                   <Button
@@ -289,14 +294,14 @@ export default function ForgotPassword() {
                       Check Your Email
                     </h3>
                     <p className="text-gray-400">
-                      We've sent a password reset link to{' '}
-                      <span className="text-[#03b3c3]">{email}</span>
+                      We&apos;ve sent a password reset link to{' '}
+                      <span className="text-[#03b3c3]">{sentEmail}</span>
                     </p>
                   </div>
                   <div className="space-y-3">
                     <Button
                       onClick={() => {
-                        setEmail('')
+                        setSentEmail('')
                         setIsEmailSent(false)
                       }}
                       className="w-full py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#c247ac] hover:to-[#d856bf] text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
