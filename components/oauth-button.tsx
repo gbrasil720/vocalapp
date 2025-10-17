@@ -32,7 +32,7 @@ export function OAuthButton() {
       type="button"
       variant="outline"
       onClick={signIn}
-      className="cursor-pointer w-full py-3 bg-white/5 border-white/20 hover:bg-white/10 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+      className="cursor-pointer w-full py-5 bg-white/5 border-white/20 hover:bg-white/10 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
     >
       <GoogleIcon />
       Continue with Google

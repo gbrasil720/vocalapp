@@ -9,7 +9,13 @@ import { authClient } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 import { signInSchema } from '@/schemas/auth.schemas'
 import { Button } from '../ui/button'
-import { Field, FieldContent, FieldGroup, FieldLabel } from '../ui/field'
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from '../ui/field'
 import { Input } from '../ui/input'
 import { Spinner } from '../ui/spinner'
 
@@ -35,12 +41,10 @@ export function SignInForm() {
         {
           onSuccess: () => {
             toast.success('Signed in successfully! Redirecting to dashboard...')
+            router.push('/dashboard')
           },
           onError: (error) => {
             toast.error(error.error.message)
-          },
-          onSettled: () => {
-            router.push('/dashboard')
           }
         }
       )
@@ -53,7 +57,7 @@ export function SignInForm() {
         e.preventDefault()
         form.handleSubmit()
       }}
-      className="space-y-6"
+      className="space-y-3"
       id="sign-in-form"
     >
       <FieldGroup>
@@ -64,7 +68,12 @@ export function SignInForm() {
               field.state.meta.isTouched && !field.state.meta.isValid
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
+                <FieldLabel
+                  htmlFor={field.name}
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Email Address
+                </FieldLabel>
                 <FieldContent>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -83,6 +92,15 @@ export function SignInForm() {
                       autoComplete="off"
                     />
                   </div>
+                  {isInvalid && (
+                    <FieldError
+                      errors={[
+                        {
+                          message: field.state.meta.errors[0]?.message
+                        }
+                      ]}
+                    />
+                  )}
                 </FieldContent>
               </Field>
             )
@@ -95,7 +113,12 @@ export function SignInForm() {
               field.state.meta.isTouched && !field.state.meta.isValid
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                <FieldLabel
+                  htmlFor={field.name}
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Password
+                </FieldLabel>
                 <FieldContent>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -107,7 +130,7 @@ export function SignInForm() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       className={cn(
-                        'w-full pl-10 pr-12 py-6 placeholder:text-md bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200',
+                        'w-full pl-10 pr-12 py-6 placeholder:text-sm bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200',
                         isInvalid && 'border-red-500/50 focus:ring-red-500/30'
                       )}
                       placeholder="Enter your password"
@@ -134,6 +157,15 @@ export function SignInForm() {
                       )}
                     </Button>
                   </div>
+                  {isInvalid && (
+                    <FieldError
+                      errors={[
+                        {
+                          message: field.state.meta.errors[0]?.message
+                        }
+                      ]}
+                    />
+                  )}
                 </FieldContent>
               </Field>
             )
