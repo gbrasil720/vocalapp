@@ -18,7 +18,6 @@ function SuccessContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#1a0a1a] to-[#0a0a0a] flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        {/* Success Icon */}
         <div className="flex justify-center mb-8">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-[#d856bf] to-[#03b3c3] rounded-full blur-2xl opacity-50 animate-pulse" />
@@ -26,9 +25,7 @@ function SuccessContent() {
           </div>
         </div>
 
-        {/* Main Card */}
         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl">
-          {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent mb-4">
               Payment Successful!
@@ -38,7 +35,6 @@ function SuccessContent() {
             </p>
           </div>
 
-          {/* Order Details */}
           {checkoutId && (
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
               <div className="flex items-center gap-3 mb-4">
@@ -64,7 +60,6 @@ function SuccessContent() {
             </div>
           )}
 
-          {/* Features / What's Next */}
           <div className="space-y-4 mb-8">
             <h3 className="text-lg font-semibold text-white mb-4">
               What happens next?
@@ -111,7 +106,6 @@ function SuccessContent() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               href="/dashboard"
@@ -129,7 +123,6 @@ function SuccessContent() {
           </div>
         </div>
 
-        {/* Support Message */}
         <div className="text-center mt-8">
           <p className="text-gray-500 text-sm">
             Need help?{' '}

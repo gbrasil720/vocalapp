@@ -111,13 +111,11 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Background Animation */}
       <div className="fixed inset-0 z-0 opacity-40">
         <MemoizedHyperspeed />
       </div>
 
       <div className="relative min-h-screen z-10">
-        {/* Header */}
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
@@ -151,9 +149,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent mb-2">
               Welcome back, {session.user.name?.split(' ')[0] || 'there'}!
@@ -163,9 +159,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Credits Card */}
             <SpotlightCard
               className="bg-transparent backdrop-blur-xl"
               spotlightColor="rgba(3, 179, 195, 0.3)"
@@ -196,7 +190,6 @@ export default function DashboardPage() {
               </div>
             </SpotlightCard>
 
-            {/* Minutes Used */}
             <SpotlightCard
               className="bg-transparent backdrop-blur-xl"
               spotlightColor="rgba(200, 71, 172, 0.3)"
@@ -222,7 +215,6 @@ export default function DashboardPage() {
               </div>
             </SpotlightCard>
 
-            {/* Transcriptions */}
             <SpotlightCard
               className="bg-transparent backdrop-blur-xl"
               spotlightColor="rgba(216, 86, 191, 0.3)"
@@ -248,7 +240,6 @@ export default function DashboardPage() {
               </div>
             </SpotlightCard>
 
-            {/* Languages */}
             <SpotlightCard
               className="bg-transparent backdrop-blur-xl"
               spotlightColor="rgba(3, 179, 195, 0.3)"
@@ -271,9 +262,7 @@ export default function DashboardPage() {
             </SpotlightCard>
           </div>
 
-          {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Upload Section - Takes 2 columns */}
             <div className="lg:col-span-2">
               <ElectricBorder
                 color="#d856bf"
@@ -331,7 +320,6 @@ export default function DashboardPage() {
               </ElectricBorder>
             </div>
 
-            {/* Subscription Status */}
             <div className="lg:col-span-1">
               <SpotlightCard className="bg-transparent backdrop-blur-xl h-full">
                 <div className="flex flex-col h-full">
@@ -463,7 +451,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Recent Transcriptions */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
@@ -537,7 +524,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
               <div className="text-center">
