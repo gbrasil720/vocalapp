@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
 import ElectricBorder from './ElectricBorder'
 import { MostPopularBadge } from './most-popular-badge'
 
@@ -28,6 +29,20 @@ export function PricingCard({
     </li>
   ))
 
+  const handleUpgradeToPro = async () => {
+    try {
+      await authClient.subscription.upgrade({
+        plan: 'Pro Plan',
+        annual: false,
+        seats: 1,
+        successUrl: '/success?checkout_id={CHECKOUT_ID}',
+        cancelUrl: '/cancel'
+      })
+    } catch (e) {
+      console.error('Error upgrading to pro', e)
+    }
+  }
+
   if (mostPopular) {
     return (
       <div className="relative group -mt-4">
@@ -55,6 +70,7 @@ export function PricingCard({
             <button
               type="button"
               className="cursor-pointer hover:scale-105 hover:bg-[#03b3c3]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full  transition-all duration-300 backdrop-blur-sm"
+              onClick={handleUpgradeToPro}
             >
               {buttonText}
             </button>

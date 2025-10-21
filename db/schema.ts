@@ -1,4 +1,11 @@
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp
+} from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -10,7 +17,9 @@ export const user = pgTable('user', {
   updatedAt: timestamp('updated_at')
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull()
+    .notNull(),
+  stripeCustomerId: text('stripe_customer_id'),
+  credits: integer('credits').default(30).notNull()
 })
 
 export const session = pgTable('session', {
@@ -58,4 +67,62 @@ export const verification = pgTable('verification', {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull()
+})
+
+export const subscription = pgTable('subscription', {
+  id: text('id').primaryKey(),
+  plan: text('plan').notNull(),
+  referenceId: text('reference_id').notNull(),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  status: text('status').default('incomplete'),
+  periodStart: timestamp('period_start'),
+  periodEnd: timestamp('period_end'),
+  trialStart: timestamp('trial_start'),
+  trialEnd: timestamp('trial_end'),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').default(false),
+  seats: integer('seats')
+})
+
+export const creditTransaction = pgTable('credit_transaction', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  amount: integer('amount').notNull(),
+  type: text('type', {
+    enum: ['purchase', 'usage', 'refund', 'subscription_grant']
+  }).notNull(),
+  description: text('description'),
+  stripePaymentIntentId: text('stripe_payment_intent_id'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+})
+
+export const transcription = pgTable('transcription', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  fileName: text('file_name').notNull(),
+  fileSize: integer('file_size').notNull(), // in bytes
+  mimeType: text('mime_type').notNull(),
+  fileUrl: text('file_url'), // Storage URL for the audio file
+  duration: integer('duration'), // in seconds
+  language: text('language').default('en'),
+  status: text('status', {
+    enum: ['processing', 'completed', 'failed']
+  })
+    .notNull()
+    .default('processing'),
+  text: text('text'), // The transcribed text
+  creditsUsed: integer('credits_used'),
+  errorMessage: text('error_message'),
+  metadata: jsonb('metadata'), // For storing additional info like word timestamps
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at')
 })

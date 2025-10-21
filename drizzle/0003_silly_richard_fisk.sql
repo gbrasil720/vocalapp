@@ -1,0 +1,1 @@
+ALTER TABLE "subscription" ADD COLUMN "reference_id" text;

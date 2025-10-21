@@ -1,8 +1,13 @@
 import { AudioLines } from 'lucide-react'
 import Link from 'next/link'
+import { auth } from '@/lib/auth'
+import { authClient } from '@/lib/auth-client'
 import { Button } from './ui/button'
 
 export function Navbar() {
+  const { data: session } = authClient.useSession()
+  console.log(session)
+
   return (
     <div className="fixed justify-between flex items-center py-3 sm:py-4 mt-2 sm:mt-4 my-0 mx-auto px-4 sm:px-6 lg:px-8 top-0 left-0 right-0 z-50 w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%] shadow-md backdrop-blur-md rounded-full">
       <div className="flex items-center gap-2">
@@ -35,9 +40,15 @@ export function Navbar() {
           Pricing
         </Link>
         <Button asChild size="sm" className="text-sm sm:text-base">
-          <Link href="/sign-in" className="font-['Satoshi'] font-normal">
-            Sign In
-          </Link>
+          {session ? (
+            <Link href="/dashboard" className="font-['Satoshi'] font-normal">
+              Dashboard
+            </Link>
+          ) : (
+            <Link href="/sign-in" className="font-['Satoshi'] font-normal">
+              Sign In
+            </Link>
+          )}
         </Button>
       </div>
     </div>
