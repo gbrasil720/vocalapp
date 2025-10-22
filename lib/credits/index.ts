@@ -29,7 +29,6 @@ export async function addCredits(
   const type = metadata?.type || 'purchase'
   const description = metadata?.description || `Added ${amount} credits`
 
-  // Add credits to user
   await db
     .update(user)
     .set({
@@ -37,7 +36,6 @@ export async function addCredits(
     })
     .where(eq(user.id, userId))
 
-  // Create transaction record
   await db.insert(creditTransaction).values({
     userId,
     amount,
@@ -54,13 +52,11 @@ export async function deductCredits(
   description: string,
   metadata?: Record<string, unknown>
 ): Promise<void> {
-  // Check if user has enough credits
   const hasEnough = await hasEnoughCredits(userId, amount)
   if (!hasEnough) {
     throw new Error('Insufficient credits')
   }
 
-  // Deduct credits from user
   await db
     .update(user)
     .set({
@@ -68,10 +64,9 @@ export async function deductCredits(
     })
     .where(eq(user.id, userId))
 
-  // Create transaction record
   await db.insert(creditTransaction).values({
     userId,
-    amount: -amount, // Negative for deduction
+    amount: -amount,
     type: 'usage',
     description,
     metadata: metadata as Record<string, unknown>

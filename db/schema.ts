@@ -16,7 +16,7 @@ export const user = pgTable('user', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
   stripeCustomerId: text('stripe_customer_id'),
   credits: integer('credits').default(30).notNull()
@@ -109,20 +109,20 @@ export const transcription = pgTable('transcription', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   fileName: text('file_name').notNull(),
-  fileSize: integer('file_size').notNull(), // in bytes
+  fileSize: integer('file_size').notNull(),
   mimeType: text('mime_type').notNull(),
-  fileUrl: text('file_url'), // Storage URL for the audio file
-  duration: integer('duration'), // in seconds
+  fileUrl: text('file_url'),
+  duration: integer('duration'),
   language: text('language').default('en'),
   status: text('status', {
     enum: ['processing', 'completed', 'failed']
   })
     .notNull()
     .default('processing'),
-  text: text('text'), // The transcribed text
+  text: text('text'),
   creditsUsed: integer('credits_used'),
   errorMessage: text('error_message'),
-  metadata: jsonb('metadata'), // For storing additional info like word timestamps
+  metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   completedAt: timestamp('completed_at')
 })

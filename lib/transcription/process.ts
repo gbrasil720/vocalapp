@@ -10,7 +10,6 @@ const openai = new OpenAI({
 
 export async function processTranscription(transcriptionId: string) {
   try {
-    // Get transcription record
     const [record] = await db
       .select()
       .from(transcriptionTable)
@@ -25,7 +24,6 @@ export async function processTranscription(transcriptionId: string) {
       throw new Error('File URL not found')
     }
 
-    // Download the file from URL
     const fileResponse = await fetch(record.fileUrl)
     if (!fileResponse.ok) {
       throw new Error('Failed to download file')
@@ -36,25 +34,21 @@ export async function processTranscription(transcriptionId: string) {
       type: record.mimeType
     })
 
-    // Process with OpenAI Whisper
     const transcriptionResult = await openai.audio.transcriptions.create({
       file: file,
       model: 'whisper-1',
       language: record.language || 'en',
-      response_format: 'verbose_json' // Get duration and other metadata
+      response_format: 'verbose_json'
     })
 
-    // Calculate duration in minutes for credits
     const durationMinutes = Math.ceil((transcriptionResult.duration || 0) / 60)
 
-    // Deduct credits
     await deductTranscriptionCredits(
       record.userId,
       durationMinutes,
       transcriptionId
     )
 
-    // Update transcription record with results
     await db
       .update(transcriptionTable)
       .set({
@@ -65,7 +59,7 @@ export async function processTranscription(transcriptionId: string) {
         completedAt: new Date(),
         metadata: {
           language: transcriptionResult.language,
-          segments: transcriptionResult.segments?.slice(0, 10) // Store first 10 segments for timestamps
+          segments: transcriptionResult.segments?.slice(0, 10)
         }
       })
       .where(eq(transcriptionTable.id, transcriptionId))
@@ -82,7 +76,6 @@ export async function processTranscription(transcriptionId: string) {
   } catch (error) {
     console.error(`Error processing transcription ${transcriptionId}:`, error)
 
-    // Update status to failed
     await db
       .update(transcriptionTable)
       .set({

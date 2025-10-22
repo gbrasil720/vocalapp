@@ -9,9 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.705.0",
-    "@aws-sdk/s3-request-presigner": "^3.705.0",
     "@better-auth/stripe": "^1.3.28",
+    "@vercel/blob": "^0.24.0",
     "@hugeicons/core-free-icons": "^1.2.1",
     "@hugeicons/react": "^1.1.1",
     "@neondatabase/serverless": "^1.0.2",

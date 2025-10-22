@@ -10,7 +10,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -21,7 +20,6 @@ export async function GET(
 
     const { id } = params
 
-    // Fetch transcription (ensure it belongs to the user)
     const [result] = await db
       .select()
       .from(transcription)

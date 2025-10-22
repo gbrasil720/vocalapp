@@ -5,24 +5,23 @@ import { db } from '@/db'
 import { subscription, transcription } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { getUserCredits } from '@/lib/credits'
-import { generateS3Key, uploadToS3 } from '@/lib/storage/s3'
+import { generateBlobKey, uploadToBlob } from '@/lib/storage/vercel-blob'
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB (OpenAI Whisper limit)
+const MAX_FILE_SIZE = 25 * 1024 * 1024
 const ALLOWED_TYPES = [
-  'audio/mpeg', // mp3
-  'audio/mp4', // m4a
+  'audio/mpeg',
+  'audio/mp4',
   'audio/wav',
   'audio/webm',
   'audio/flac',
   'audio/ogg',
-  'video/mp4', // mp4
+  'video/mp4',
   'video/mpeg',
   'video/webm'
 ]
 
 export async function POST(req: Request) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -33,16 +32,14 @@ export async function POST(req: Request) {
 
     const userId = session.user.id
 
-    // Check if user has enough credits (minimum 1 credit needed)
     const credits = await getUserCredits(userId)
     if (credits < 1) {
       return NextResponse.json(
         { error: 'Insufficient credits. Please purchase more credits.' },
-        { status: 402 } // Payment Required
+        { status: 402 }
       )
     }
 
-    // Check if user has Pro subscription for multiple file support
     const [sub] = await db
       .select()
       .from(subscription)
@@ -51,7 +48,6 @@ export async function POST(req: Request) {
 
     const isPro = sub && sub.status === 'active'
 
-    // Parse form data
     const formData = await req.formData()
     const files = formData.getAll('files') as File[]
 
@@ -59,7 +55,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
     }
 
-    // Check multiple file limit for non-Pro users
     if (!isPro && files.length > 1) {
       return NextResponse.json(
         {
@@ -70,7 +65,6 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate each file
     for (const file of files) {
       if (file.size > MAX_FILE_SIZE) {
         return NextResponse.json(
@@ -91,15 +85,12 @@ export async function POST(req: Request) {
       }
     }
 
-    // Upload files and create transcription records
     const transcriptions = []
 
     for (const file of files) {
-      // Upload to S3
-      const s3Key = generateS3Key(userId, file.name)
-      const uploadResult = await uploadToS3(file, s3Key)
+      const blobKey = generateBlobKey(userId, file.name)
+      const uploadResult = await uploadToBlob(file, blobKey)
 
-      // Create transcription record
       const [newTranscription] = await db
         .insert(transcription)
         .values({
@@ -114,8 +105,6 @@ export async function POST(req: Request) {
 
       transcriptions.push(newTranscription)
 
-      // Trigger transcription processing asynchronously
-      // Using fetch with no-wait pattern
       fetch(
         `${req.headers.get('origin') || process.env.NEXT_PUBLIC_URL}/api/transcriptions/process`,
         {

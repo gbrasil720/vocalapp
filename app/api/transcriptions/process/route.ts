@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { processTranscription } from '@/lib/transcription/process'
 
-export const maxDuration = 300 // 5 minutes max execution time
+export const maxDuration = 300
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +14,6 @@ export async function POST(req: Request) {
       )
     }
 
-    // Process the transcription
     const result = await processTranscription(transcriptionId)
 
     return NextResponse.json({

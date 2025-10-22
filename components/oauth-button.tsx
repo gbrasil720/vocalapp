@@ -12,7 +12,6 @@ export function OAuthButton() {
     useState(false)
 
   useEffect(() => {
-    // Only check on client-side to avoid hydration mismatch
     setWasGoogleLastLoginMethod(authClient.isLastUsedLoginMethod('google'))
   }, [])
 

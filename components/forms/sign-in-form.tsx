@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <explanation> */
 import { useForm } from '@tanstack/react-form'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { ViewIcon, ViewOffIcon, SquareLock02Icon, MailIcon } from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -18,6 +19,7 @@ import {
 } from '../ui/field'
 import { Input } from '../ui/input'
 import { Spinner } from '../ui/spinner'
+import { HugeiconsIcon } from '@hugeicons/react'
 
 export function SignInForm() {
   const router = useRouter()
@@ -76,7 +78,7 @@ export function SignInForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <HugeiconsIcon icon={MailIcon} size={22} color='#99a1af ' className='absolute left-3 top-1/2 transform -translate-y-1/2'/>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -121,7 +123,7 @@ export function SignInForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <HugeiconsIcon icon={SquareLock02Icon} size={22} color='#99a1af ' className='absolute left-3 top-1/2 transform -translate-y-1/2'/>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -145,15 +147,9 @@ export function SignInForm() {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <Eye
-                          size={22}
-                          className="text-gray-400 cursor-pointer"
-                        />
+                        <HugeiconsIcon icon={ViewIcon} size={22} color='#99a1af '/>
                       ) : (
-                        <EyeOff
-                          size={22}
-                          className="text-gray-400 cursor-pointer"
-                        />
+                        <HugeiconsIcon icon={ViewOffIcon} size={22} color='#99a1af '/>
                       )}
                     </Button>
                   </div>

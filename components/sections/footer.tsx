@@ -1,5 +1,7 @@
 'use client'
 
+import { AudioWave01Icon, GithubIcon, Linkedin02Icon, Mail01Icon, NewTwitterIcon, ZapIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { AudioLines, Github, Linkedin, Mail, Twitter, Zap } from 'lucide-react'
 import Link from 'next/link'
 
@@ -31,14 +33,14 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { name: 'Twitter', href: 'https://twitter.com/vocalapp', icon: Twitter },
+  { name: 'Twitter', href: 'https://twitter.com/vocalapp', icon: NewTwitterIcon },
   {
     name: 'LinkedIn',
     href: 'https://linkedin.com/company/vocalapp',
-    icon: Linkedin
+    icon: Linkedin02Icon
   },
-  { name: 'GitHub', href: 'https://github.com/vocalapp', icon: Github },
-  { name: 'Email', href: 'mailto:hello@vocal.app', icon: Mail }
+  { name: 'GitHub', href: 'https://github.com/vocalapp', icon: GithubIcon },
+  { name: 'Email', href: 'mailto:hello@vocal.app', icon: Mail01Icon }
 ]
 
 export function Footer() {
@@ -50,7 +52,8 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <AudioLines className="w-8 h-8 text-[#03b3c3]" />
+              {/* <AudioLines className="w-8 h-8 text-[#03b3c3]" /> */}
+              <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
               <span className="text-2xl font-bold text-[#e5e5e5] font-['Satoshi']">
                 vocal.app
               </span>
@@ -156,7 +159,8 @@ export function Footer() {
                       className="p-2 bg-white/5 border border-white/20 rounded-lg text-gray-300 hover:text-[#03b3c3] hover:border-[#03b3c3]/50 transition-all duration-300 transform hover:scale-110"
                       aria-label={social.name}
                     >
-                      <Icon className="w-5 h-5" />
+                      {/* <Icon className="w-5 h-5" /> */}
+                      <HugeiconsIcon icon={Icon} size={22} />
                     </Link>
                   )
                 })}
@@ -166,15 +170,15 @@ export function Footer() {
             {/* Trust Badges */}
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#03b3c3]" />
+                <HugeiconsIcon icon={ZapIcon} size={18} color='#03b3c3'/>
                 <span>SOC 2 Compliant</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#d856bf]" />
+                <HugeiconsIcon icon={ZapIcon} size={18} color='#d856bf'/>
                 <span>GDPR Ready</span>
               </div>
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#c247ac]" />
+                <HugeiconsIcon icon={ZapIcon} size={18} color='#c247ac'/>
                 <span>99.9% Uptime</span>
               </div>
             </div>
