@@ -1,10 +1,18 @@
+import {
+  AiBrain05Icon,
+  DocumentAttachmentIcon,
+  EarthIcon,
+  Tick02Icon,
+  UserIcon,
+  ZapIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Brain, Check, FileText, Globe, User, Zap } from 'lucide-react'
 import SpotlightCard from '../SpotlightCard'
 
 export function Features() {
   return (
     <section className="relative z-10 py-20 px-6" id="features">
-      {/* Section Title */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
           Elevate Your Productivity with Precision
@@ -16,15 +24,14 @@ export function Features() {
         </p>
       </div>
 
-      {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto">
-        {/* Hero Feature - Large Card */}
         <SpotlightCard className="md:col-span-2 lg:row-span-2 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full justify-between">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-2xl bg-[#E5E5E5]">
-                  <Zap className="w-6 h-6 text-[#1F1F1F]" />
+                  {/* <Zap className="w-6 h-6 text-[#1F1F1F]" /> */}
+                  <HugeiconsIcon icon={ZapIcon} color="#1f1f1f" size={22} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">
                   AI Powered Transcription
@@ -44,12 +51,12 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Accuracy Feature */}
         <SpotlightCard className="md:col-span-1 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <Check className="w-5 h-5 text-[#1F1F1F]" />
+                {/* <Check className="w-5 h-5 text-[#1F1F1F]" /> */}
+                <HugeiconsIcon icon={Tick02Icon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">
                 100% Accurate
@@ -62,12 +69,12 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Easy to Use */}
         <SpotlightCard className="md:col-span-1 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <User className="w-5 h-5 text-[#1F1F1F]" />
+                {/* <User className="w-5 h-5 text-[#1F1F1F]" /> */}
+                <HugeiconsIcon icon={UserIcon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">Easy to Use</h3>
             </div>
@@ -77,12 +84,12 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Multi-Language */}
         <SpotlightCard className="md:col-span-2 lg:col-span-1 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <Globe className="w-5 h-5 text-[#1F1F1F]" />
+                {/* <Globe className="w-5 h-5 text-[#1F1F1F]" /> */}
+                <HugeiconsIcon icon={EarthIcon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">
                 Multi-Language
@@ -94,12 +101,16 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* No Manual Transcription */}
         <SpotlightCard className="md:col-span-2 lg:col-span-1 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <FileText className="w-5 h-5 text-[#1F1F1F]" />
+                {/* <FileText className="w-5 h-5 text-[#1F1F1F]" /> */}
+                <HugeiconsIcon
+                  icon={DocumentAttachmentIcon}
+                  color="#1f1f1f"
+                  size={22}
+                />
               </div>
               <h3 className="text-lg font-semibold text-white">
                 No Manual Work
@@ -112,12 +123,12 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Brain AI */}
         <SpotlightCard className="md:col-span-1 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <Brain className="w-5 h-5 text-[#1F1F1F]" />
+                {/* <Brain className="w-5 h-5 text-[#1F1F1F]" /> */}
+                <HugeiconsIcon icon={AiBrain05Icon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">Smart AI</h3>
             </div>

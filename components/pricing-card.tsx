@@ -1,3 +1,5 @@
+import { Tick02Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Check } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import ElectricBorder from './ElectricBorder'
@@ -24,7 +26,12 @@ export function PricingCard({
 }: PricingCardProps) {
   const mappedBenefits = benefits.map((benefit) => (
     <li key={benefit} className="flex items-center gap-3">
-      <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
+      {/* <Check className="w-5 h-5 text-green-400 flex-shrink-0" /> */}
+      <HugeiconsIcon
+        icon={Tick02Icon}
+        color="oklch(79.2% 0.209 151.711)"
+        size={22}
+      />
       <span className="text-gray-300">{benefit}</span>
     </li>
   ))

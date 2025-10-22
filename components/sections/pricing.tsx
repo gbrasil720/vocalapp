@@ -2,6 +2,8 @@
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: interactive divs have click handlers */
 'use client'
 
+import { Tick02Icon, ZapIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Check, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import type { CreditPackType } from '@/lib/billing/credit-products'
@@ -93,7 +95,8 @@ export function Pricing() {
                 {/* Left Section - Info */}
                 <div className="flex-1 text-center lg:text-left">
                   <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
-                    <Zap className="w-4 h-4 text-white" />
+                    {/* <Zap className="w-4 h-4 text-white" /> */}
+                    <HugeiconsIcon icon={ZapIcon} color="#ffffff" size={22} />
                     <span className="text-sm font-semibold text-white">
                       Out of Credits?
                     </span>
@@ -131,7 +134,12 @@ export function Pricing() {
                           credits (2 hours)
                         </div>
                         <div className="flex items-center justify-center gap-1">
-                          <Check className="w-4 h-4 text-green-400" />
+                          {/* <Check className="w-4 h-4 text-green-400" /> */}
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            color="oklch(79.2% 0.209 151.711)"
+                            size={20}
+                          />
                           <span className="text-xs text-gray-300">
                             $0.042/min
                           </span>
@@ -167,7 +175,12 @@ export function Pricing() {
                           credits (7.5 hours)
                         </div>
                         <div className="flex items-center justify-center gap-1">
-                          <Check className="w-4 h-4 text-green-400" />
+                          {/* <Check className="w-4 h-4 text-green-400" /> */}
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            color="oklch(79.2% 0.209 151.711)"
+                            size={20}
+                          />
                           <span className="text-xs text-gray-300">
                             $0.033/min
                           </span>
@@ -198,7 +211,12 @@ export function Pricing() {
                           credits (25 hours)
                         </div>
                         <div className="flex items-center justify-center gap-1">
-                          <Check className="w-4 h-4 text-green-400" />
+                          {/* <Check className="w-4 h-4 text-green-400" /> */}
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            color="oklch(79.2% 0.209 151.711)"
+                            size={20}
+                          />
                           <span className="text-xs text-gray-300">
                             $0.027/min
                           </span>
@@ -228,15 +246,18 @@ export function Pricing() {
         </p>
         <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#03b3c3]" />
+            {/* <Zap className="w-4 h-4 text-[#03b3c3]" /> */}
+            <HugeiconsIcon icon={ZapIcon} color="#03b3c3" size={20} />
             <span>99.9% uptime SLA</span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#d856bf]" />
+            {/* <Zap className="w-4 h-4 text-[#d856bf]" /> */}
+            <HugeiconsIcon icon={ZapIcon} color="#d856bf" size={20} />
             <span>SOC 2 compliant</span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#c247ac]" />
+            {/* <Zap className="w-4 h-4 text-[#c247ac]" /> */}
+            <HugeiconsIcon icon={ZapIcon} color="#c247ac" size={20} />
             <span>GDPR ready</span>
           </div>
         </div>

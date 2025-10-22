@@ -1,5 +1,7 @@
 'use client'
 
+import { QuoteDownIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
@@ -144,7 +146,8 @@ export function Testimonials() {
             >
               {/* Quote Icon */}
               <div className="mb-6">
-                <Quote className="w-8 h-8 text-[#03b3c3] opacity-60" />
+                {/* <Quote className="w-8 h-8 text-[#03b3c3] opacity-60" /> */}
+                <HugeiconsIcon icon={QuoteDownIcon} color="#03b3c3" size={30} />
               </div>
 
               {/* Content */}
