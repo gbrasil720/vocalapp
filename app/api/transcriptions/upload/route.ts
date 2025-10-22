@@ -1,4 +1,3 @@
-import { put } from '@vercel/blob'
 import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -6,6 +5,7 @@ import { db } from '@/db'
 import { subscription, transcription } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { getUserCredits } from '@/lib/credits'
+import { generateS3Key, uploadToS3 } from '@/lib/storage/s3'
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB (OpenAI Whisper limit)
 const ALLOWED_TYPES = [
@@ -95,15 +95,9 @@ export async function POST(req: Request) {
     const transcriptions = []
 
     for (const file of files) {
-      // Upload to Vercel Blob
-      const blob = await put(
-        `transcriptions/${userId}/${Date.now()}-${file.name}`,
-        file,
-        {
-          access: 'public',
-          addRandomSuffix: true
-        }
-      )
+      // Upload to S3
+      const s3Key = generateS3Key(userId, file.name)
+      const uploadResult = await uploadToS3(file, s3Key)
 
       // Create transcription record
       const [newTranscription] = await db
@@ -113,7 +107,7 @@ export async function POST(req: Request) {
           fileName: file.name,
           fileSize: file.size,
           mimeType: file.type,
-          fileUrl: blob.url,
+          fileUrl: uploadResult.url,
           status: 'processing'
         })
         .returning()
@@ -155,4 +149,3 @@ export async function POST(req: Request) {
     )
   }
 }
-
