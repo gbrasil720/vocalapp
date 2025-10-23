@@ -16,8 +16,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has a Stripe customer ID
-    const user = session.user as typeof session.user & { stripeCustomerId?: string | null }
-    
+    const user = session.user as typeof session.user & {
+      stripeCustomerId?: string | null
+    }
+
     if (!user.stripeCustomerId) {
       return NextResponse.json(
         { error: 'No Stripe customer found' },
