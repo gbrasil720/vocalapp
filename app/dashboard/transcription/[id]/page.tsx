@@ -15,9 +15,12 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { CustomAudioPlayer } from '@/components/custom-audio-player'
+import { ExpiredAudioMessage } from '@/components/expired-audio-message'
 import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
+import { authClient } from '@/lib/auth-client'
 
 interface TranscriptionData {
   id: string
@@ -39,12 +42,14 @@ interface TranscriptionData {
 export default function TranscriptionDetailPage() {
   const params = useParams()
   const id = params.id as string
+  const { data: session } = authClient.useSession()
 
   const [transcription, setTranscription] = useState<TranscriptionData | null>(
     null
   )
   const [loading, setLoading] = useState(true)
   const [polling, setPolling] = useState(false)
+  const [isPro, setIsPro] = useState(false)
 
   useEffect(() => {
     const fetchTranscription = async () => {
@@ -73,6 +78,25 @@ export default function TranscriptionDetailPage() {
 
     fetchTranscription()
   }, [id])
+
+  // Check if user has Pro subscription
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!session?.user) return
+
+      try {
+        const response = await fetch('/api/user/subscription')
+        if (response.ok) {
+          const data = await response.json()
+          setIsPro(data.isPro || false)
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error)
+      }
+    }
+
+    checkSubscription()
+  }, [session])
 
   // Poll for updates if processing
   useEffect(() => {
@@ -331,23 +355,24 @@ export default function TranscriptionDetailPage() {
           )}
 
           {/* Audio Player */}
-          {transcription.fileUrl && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-white mb-4">
-                Audio Playback
-              </h2>
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-white mb-4">
+              Audio Playback
+            </h2>
+            {transcription.fileUrl ? (
               <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                <audio controls className="w-full">
-                  <source
-                    src={transcription.fileUrl}
-                    type={transcription.mimeType}
-                  />
-                  <track kind="captions" />
-                  Your browser does not support the audio element.
-                </audio>
+                <CustomAudioPlayer
+                  src={transcription.fileUrl}
+                  mimeType={transcription.mimeType}
+                />
               </SpotlightCard>
-            </div>
-          )}
+            ) : (
+              <ExpiredAudioMessage
+                createdAt={transcription.createdAt}
+                isPro={isPro}
+              />
+            )}
+          </div>
         </div>
       </div>
     </>

@@ -4,7 +4,6 @@
 
 import { Tick02Icon, ZapIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Check, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import type { CreditPackType } from '@/lib/billing/credit-products'
 import { purchaseCredits } from '@/lib/billing/purchase-credits'
@@ -42,6 +41,7 @@ export function Pricing() {
           priceUnit="30 credits (1 credit = 1 minute of transcription)"
           benefits={[
             '30 minutes of transcription',
+            '7-day audio history',
             'Real-time transcription',
             '10+ languages',
             'Basic email support'
@@ -56,7 +56,7 @@ export function Pricing() {
           priceUnit="/month"
           benefits={[
             'Everything on Starter',
-            'Real-time transcription',
+            '90-day audio history',
             '10 hours of transcription per month',
             'Multiple files processing',
             '50+ languages',

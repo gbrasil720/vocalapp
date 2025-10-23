@@ -9,7 +9,10 @@ const openai = new OpenAI({
 })
 
 export async function processTranscription(transcriptionId: string) {
+  let fileUrl: string | null = null
+
   try {
+    // Fetch transcription record
     const [record] = await db
       .select()
       .from(transcriptionTable)
@@ -24,6 +27,13 @@ export async function processTranscription(transcriptionId: string) {
       throw new Error('File URL not found')
     }
 
+    if (!record.duration || record.duration <= 0) {
+      throw new Error('Audio duration not found or invalid')
+    }
+
+    fileUrl = record.fileUrl
+
+    // Download audio file
     const fileResponse = await fetch(record.fileUrl)
     if (!fileResponse.ok) {
       throw new Error('Failed to download file')
@@ -34,6 +44,7 @@ export async function processTranscription(transcriptionId: string) {
       type: record.mimeType
     })
 
+    // Send to Whisper API for transcription
     const transcriptionResult = await openai.audio.transcriptions.create({
       file: file,
       model: 'whisper-1',
@@ -41,21 +52,16 @@ export async function processTranscription(transcriptionId: string) {
       response_format: 'verbose_json'
     })
 
-    const durationMinutes = Math.ceil((transcriptionResult.duration || 0) / 60)
+    // Transcription successful - now update DB and deduct credits
+    const creditsUsed = Math.ceil(record.duration / 60)
 
-    await deductTranscriptionCredits(
-      record.userId,
-      durationMinutes,
-      transcriptionId
-    )
-
+    // Update database with transcription result
     await db
       .update(transcriptionTable)
       .set({
         status: 'completed',
         text: transcriptionResult.text,
-        duration: Math.floor(transcriptionResult.duration || 0),
-        creditsUsed: durationMinutes,
+        creditsUsed,
         completedAt: new Date(),
         metadata: {
           language: transcriptionResult.language,
@@ -64,18 +70,35 @@ export async function processTranscription(transcriptionId: string) {
       })
       .where(eq(transcriptionTable.id, transcriptionId))
 
+    // Deduct credits AFTER successful completion
+    try {
+      await deductTranscriptionCredits(
+        record.userId,
+        record.duration,
+        transcriptionId
+      )
+    } catch (creditError) {
+      console.error(
+        `Warning: Credit deduction failed for ${transcriptionId}:`,
+        creditError
+      )
+      // Transcription still succeeded, log the credit issue but don't fail
+    }
+
     console.log(`✓ Transcription ${transcriptionId} completed successfully`)
+    console.log(`Audio file retained for playback: ${fileUrl}`)
 
     return {
       success: true,
       transcriptionId,
       text: transcriptionResult.text,
-      duration: transcriptionResult.duration,
-      creditsUsed: durationMinutes
+      duration: record.duration,
+      creditsUsed
     }
   } catch (error) {
     console.error(`Error processing transcription ${transcriptionId}:`, error)
 
+    // Update status to failed
     await db
       .update(transcriptionTable)
       .set({
@@ -85,9 +108,9 @@ export async function processTranscription(transcriptionId: string) {
       })
       .where(eq(transcriptionTable.id, transcriptionId))
 
+    console.log(`✗ Transcription ${transcriptionId} failed`)
+    console.log(`Audio file retained for debugging: ${fileUrl}`)
+
     throw error
   }
 }
-
-
-

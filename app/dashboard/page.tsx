@@ -41,10 +41,24 @@ interface UserStats {
   }
 }
 
+interface Transcription {
+  id: string
+  fileName: string
+  fileSize: number
+  mimeType: string
+  duration: number | null
+  language: string | null
+  status: 'processing' | 'completed' | 'failed'
+  creditsUsed: number | null
+  createdAt: string
+  completedAt: string | null
+}
+
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
+  const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -68,11 +82,26 @@ export default function DashboardPage() {
     }
   }, [])
 
+  const fetchTranscriptions = useCallback(async () => {
+    try {
+      const response = await fetch('/api/transcriptions', {
+        cache: 'no-store'
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setTranscriptions(data.transcriptions || [])
+      }
+    } catch (error) {
+      console.error('Error fetching transcriptions:', error)
+    }
+  }, [])
+
   useEffect(() => {
     if (session) {
       fetchStats()
+      fetchTranscriptions()
     }
-  }, [session, fetchStats])
+  }, [session, fetchStats, fetchTranscriptions])
 
   if (isPending || loadingStats) {
     return <LoadingScreen />
@@ -82,32 +111,39 @@ export default function DashboardPage() {
     return null
   }
 
-  const recentTranscriptions = [
-    {
-      id: 1,
-      name: 'Team Meeting Recording.mp3',
-      duration: '45:32',
-      language: 'English',
-      status: 'completed',
-      date: '2 hours ago'
-    },
-    {
-      id: 2,
-      name: 'Client Call - Jan 15.wav',
-      duration: '32:18',
-      language: 'Spanish',
-      status: 'completed',
-      date: '5 hours ago'
-    },
-    {
-      id: 3,
-      name: 'Podcast Episode 42.mp3',
-      duration: '1:12:45',
-      language: 'English',
-      status: 'processing',
-      date: 'Just now'
+  // Helper function to format duration from seconds to MM:SS or HH:MM:SS
+  const formatDuration = (seconds: number | null): string => {
+    if (!seconds) return 'N/A'
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
-  ]
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Helper function to format relative time
+  const formatRelativeTime = (dateString: string): string => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    return date.toLocaleDateString()
+  }
+
+  // Get the first 10 transcriptions for display
+  const recentTranscriptions = transcriptions.slice(0, 10)
 
   return (
     <>
@@ -291,6 +327,7 @@ export default function DashboardPage() {
                       toast.success('Upload complete! Refreshing...')
                       setTimeout(() => {
                         fetchStats()
+                        fetchTranscriptions()
                       }, 1000)
                     }}
                     isPro={stats.plan.isActive}
@@ -457,7 +494,7 @@ export default function DashboardPage() {
                 Recent Transcriptions
               </h2>
               <Link
-                href="#"
+                href="/dashboard/transcriptions"
                 className="text-[#03b3c3] hover:text-[#d856bf] transition-colors text-sm flex items-center gap-1"
               >
                 View All
@@ -466,61 +503,79 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-4">
-              {recentTranscriptions.map((transcription) => (
-                <Link
-                  key={transcription.id}
-                  href={`/dashboard/transcription/${transcription.id}`}
-                >
-                  <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-[1.02] transition-transform">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="p-3 rounded-xl bg-white/5">
-                          <FileText className="w-5 h-5 text-[#03b3c3]" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-white mb-1">
-                            {transcription.name}
-                          </h3>
-                          <div className="flex items-center gap-4 text-xs text-gray-400">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {transcription.duration}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Globe className="w-3 h-3" />
-                              {transcription.language}
-                            </span>
-                            <span>{transcription.date}</span>
+              {recentTranscriptions.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400 text-lg mb-2">
+                    No transcriptions yet
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    Upload an audio file to get started
+                  </p>
+                </div>
+              ) : (
+                recentTranscriptions.map((transcription) => (
+                  <Link
+                    key={transcription.id}
+                    href={`/dashboard/transcription/${transcription.id}`}
+                  >
+                    <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-[1.02] transition-transform">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="p-3 rounded-xl bg-white/5">
+                            <FileText className="w-5 h-5 text-[#03b3c3]" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-white mb-1">
+                              {transcription.fileName}
+                            </h3>
+                            <div className="flex items-center gap-4 text-xs text-gray-400">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {formatDuration(transcription.duration)}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Globe className="w-3 h-3" />
+                                {transcription.language || 'Unknown'}
+                              </span>
+                              <span>
+                                {formatRelativeTime(transcription.createdAt)}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {transcription.status === 'completed' ? (
-                          <>
-                            <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full">
-                              Completed
+                        <div className="flex items-center gap-3">
+                          {transcription.status === 'completed' ? (
+                            <>
+                              <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full">
+                                Completed
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                }}
+                                className="p-2 rounded-full hover:bg-white/5 transition-colors"
+                              >
+                                <Download className="w-4 h-4 text-gray-400 hover:text-white" />
+                              </button>
+                            </>
+                          ) : transcription.status === 'failed' ? (
+                            <span className="px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full">
+                              Failed
                             </span>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                              }}
-                              className="p-2 rounded-full hover:bg-white/5 transition-colors"
-                            >
-                              <Download className="w-4 h-4 text-gray-400 hover:text-white" />
-                            </button>
-                          </>
-                        ) : (
-                          <span className="px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse">
-                            Processing...
-                          </span>
-                        )}
+                          ) : (
+                            <span className="px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse">
+                              Processing...
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </SpotlightCard>
-                </Link>
-              ))}
+                    </SpotlightCard>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
