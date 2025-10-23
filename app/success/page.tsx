@@ -13,7 +13,10 @@ import { Suspense } from 'react'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const checkoutId = searchParams.get('checkout_id')
+  const checkoutId =
+    searchParams.get('checkout_id') ||
+    searchParams.get('subscription_id') ||
+    searchParams.get('session_id')
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#1a0a1a] to-[#0a0a0a] flex items-center justify-center p-6">

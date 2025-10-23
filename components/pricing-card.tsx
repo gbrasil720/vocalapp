@@ -41,8 +41,8 @@ export function PricingCard({
         plan: 'Pro Plan',
         annual: false,
         seats: 1,
-        successUrl: '/success?checkout_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: '/'
+        successUrl: `${window.location.origin}/api/stripe/subscription-success`,
+        cancelUrl: `${window.location.origin}/`
       })
     } catch (e) {
       console.error('Error upgrading to pro', e)
