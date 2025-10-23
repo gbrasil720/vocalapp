@@ -1,6 +1,5 @@
 import { Tick02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Check } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import ElectricBorder from './ElectricBorder'
 import { MostPopularBadge } from './most-popular-badge'
@@ -42,8 +41,8 @@ export function PricingCard({
         plan: 'Pro Plan',
         annual: false,
         seats: 1,
-        successUrl: '/success?checkout_id={CHECKOUT_ID}',
-        cancelUrl: '/cancel'
+        successUrl: '/success?checkout_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: '/'
       })
     } catch (e) {
       console.error('Error upgrading to pro', e)
