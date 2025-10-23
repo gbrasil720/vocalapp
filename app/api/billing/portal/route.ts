@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has a Stripe customer ID
-    if (!session.user.stripeCustomerId) {
+    const user = session.user as typeof session.user & { stripeCustomerId?: string | null }
+    
+    if (!user.stripeCustomerId) {
       return NextResponse.json(
         { error: 'No Stripe customer found' },
         { status: 400 }
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     // Create a Stripe customer portal session
     const portalSession = await stripeClient.billingPortal.sessions.create({
-      customer: session.user.stripeCustomerId,
+      customer: user.stripeCustomerId,
       return_url: `${req.nextUrl.origin}/dashboard/billing`
     })
 

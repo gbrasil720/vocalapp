@@ -16,10 +16,7 @@ export async function POST(req: Request) {
 
     const result = await processTranscription(transcriptionId)
 
-    return NextResponse.json({
-      success: true,
-      ...result
-    })
+    return NextResponse.json(result)
   } catch (error) {
     console.error('Error in transcription processing:', error)
     return NextResponse.json(
@@ -30,6 +27,3 @@ export async function POST(req: Request) {
     )
   }
 }
-
-
-

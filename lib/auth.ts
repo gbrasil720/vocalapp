@@ -9,6 +9,13 @@ import { stripeClient } from './billing/stripe-client'
 import { addCredits } from './credits'
 
 export const auth = betterAuth({
+  additionalUserFields: {
+    credits: {
+      type: 'number',
+      required: false,
+      defaultValue: 30
+    }
+  },
   emailAndPassword: {
     enabled: true
   },
