@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "biome check --write"
+    "lint": "biome check --write",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@better-auth/stripe": "^1.3.28",

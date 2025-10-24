@@ -11,6 +11,23 @@ import {
 import { type FC, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+// Device detection utility
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false
+  const userAgent = navigator.userAgent || navigator.vendor
+  const isMobileUA =
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+      userAgent.toLowerCase()
+    )
+  const isSmallScreen = window.innerWidth < 768
+  return isMobileUA || isSmallScreen
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 interface Distortion {
   uniforms: Record<string, { value: any }>
   getDistortion: string
@@ -101,6 +118,17 @@ const defaultOptions: HyperspeedOptions = {
     leftCars: [0xd856bf, 0x6750a2, 0xc247ac],
     rightCars: [0x03b3c3, 0x0e5ea5, 0x324555],
     sticks: 0x03b3c3
+  }
+}
+
+// Mobile-optimized options with reduced complexity
+function getMobileOptimizedOptions(
+  baseOptions: HyperspeedOptions
+): HyperspeedOptions {
+  return {
+    ...baseOptions,
+    totalSideLightSticks: 10, // Reduced from 20
+    lightPairsPerRoadWay: 20 // Reduced from 40
   }
 }
 
@@ -802,9 +830,10 @@ class Road {
     this.uTime = { value: 0 }
   }
 
-  createPlane(side: number, width: number, isRoad: boolean) {
+  createPlane(side: number, isRoad: boolean) {
     const options = this.options
-    const segments = 100
+    const isMobile = isMobileDevice()
+    const segments = isMobile ? 50 : 100 // Reduced segments on mobile
     const geometry = new THREE.PlaneGeometry(
       isRoad ? options.roadWidth : options.islandWidth,
       options.length,
@@ -876,9 +905,9 @@ class Road {
   }
 
   init() {
-    this.leftRoadWay = this.createPlane(-1, this.options.roadWidth, true)
-    this.rightRoadWay = this.createPlane(1, this.options.roadWidth, true)
-    this.island = this.createPlane(0, this.options.islandWidth, false)
+    this.leftRoadWay = this.createPlane(-1, true)
+    this.rightRoadWay = this.createPlane(1, true)
+    this.island = this.createPlane(0, false)
   }
 
   update(time: number) {
@@ -1011,7 +1040,10 @@ class App {
       alpha: true
     })
     this.renderer.setSize(container.offsetWidth, container.offsetHeight, false)
-    this.renderer.setPixelRatio(window.devicePixelRatio)
+    const isMobile = isMobileDevice()
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, isMobile ? 1 : 2)
+    )
 
     this.composer = new EffectComposer(this.renderer)
     container.appendChild(this.renderer.domElement)
@@ -1092,28 +1124,37 @@ class App {
   }
 
   initPasses() {
+    const isMobile = isMobileDevice()
+    const reduceMotion = prefersReducedMotion()
+
     this.renderPass = new RenderPass(this.scene, this.camera)
-    this.bloomPass = new EffectPass(
-      this.camera,
-      new BloomEffect({
-        luminanceThreshold: 0.2,
-        luminanceSmoothing: 0,
-        resolutionScale: 1
-      })
-    )
+
+    // Skip Bloom on mobile or if user prefers reduced motion for better performance
+    if (!isMobile && !reduceMotion) {
+      this.bloomPass = new EffectPass(
+        this.camera,
+        new BloomEffect({
+          luminanceThreshold: 0.2,
+          luminanceSmoothing: 0,
+          resolutionScale: 1
+        })
+      )
+      this.bloomPass.renderToScreen = false
+    }
 
     const smaaPass = new EffectPass(
       this.camera,
       new SMAAEffect({
-        preset: SMAAPreset.MEDIUM
+        preset: isMobile ? SMAAPreset.LOW : SMAAPreset.MEDIUM
       })
     )
     this.renderPass.renderToScreen = false
-    this.bloomPass.renderToScreen = false
     smaaPass.renderToScreen = true
 
     this.composer.addPass(this.renderPass)
-    this.composer.addPass(this.bloomPass)
+    if (this.bloomPass) {
+      this.composer.addPass(this.bloomPass)
+    }
     this.composer.addPass(smaaPass)
   }
 
@@ -1301,10 +1342,18 @@ class App {
 }
 
 const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
-  const mergedOptions: HyperspeedOptions = {
+  const isMobile = isMobileDevice()
+
+  const baseOptions = {
     ...defaultOptions,
     ...effectOptions
   }
+
+  // Apply mobile optimizations if needed
+  const mergedOptions: HyperspeedOptions = isMobile
+    ? getMobileOptimizedOptions(baseOptions)
+    : baseOptions
+
   const hyperspeed = useRef<HTMLDivElement>(null)
   const appRef = useRef<App | null>(null)
 

@@ -7,7 +7,6 @@ import {
   ZapIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Brain, Check, FileText, Globe, User, Zap } from 'lucide-react'
 import SpotlightCard from '../SpotlightCard'
 
 export function Features() {

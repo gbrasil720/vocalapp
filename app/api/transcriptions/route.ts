@@ -35,7 +35,15 @@ export async function GET() {
       .orderBy(desc(transcription.createdAt))
       .limit(50)
 
-    return NextResponse.json({ transcriptions })
+    return NextResponse.json(
+      { transcriptions },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=60, stale-while-revalidate=120',
+          'CDN-Cache-Control': 'no-store'
+        }
+      }
+    )
   } catch (error) {
     console.error('Error fetching transcriptions:', error)
     return NextResponse.json(
@@ -44,6 +52,3 @@ export async function GET() {
     )
   }
 }
-
-
-

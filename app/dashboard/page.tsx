@@ -20,8 +20,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import ElectricBorder from '@/components/ElectricBorder'
 import { FileUpload } from '@/components/file-upload'
+import { LazyHyperspeed } from '@/components/lazy-hyperspeed'
 import { LoadingScreen } from '@/components/loading-screen'
-import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
@@ -96,6 +96,37 @@ export default function DashboardPage() {
     }
   }, [])
 
+  // Memoized helper function to format duration from seconds to MM:SS or HH:MM:SS
+  const formatDuration = useCallback((seconds: number | null): string => {
+    if (!seconds) return 'N/A'
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`
+  }, [])
+
+  // Memoized helper function to format relative time
+  const formatRelativeTime = useCallback((dateString: string): string => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    return date.toLocaleDateString()
+  }, [])
+
   useEffect(() => {
     if (session) {
       fetchStats()
@@ -111,44 +142,13 @@ export default function DashboardPage() {
     return null
   }
 
-  // Helper function to format duration from seconds to MM:SS or HH:MM:SS
-  const formatDuration = (seconds: number | null): string => {
-    if (!seconds) return 'N/A'
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`
-  }
-
-  // Helper function to format relative time
-  const formatRelativeTime = (dateString: string): string => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60)
-      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`
-    if (diffHours < 24)
-      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
-    return date.toLocaleDateString()
-  }
-
   // Get the first 10 transcriptions for display
   const recentTranscriptions = transcriptions.slice(0, 10)
 
   return (
     <>
       <div className="fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
+        <LazyHyperspeed />
       </div>
 
       <div className="relative min-h-screen z-10">
