@@ -22,6 +22,5 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-// Explicitly use Node.js runtime - better-auth uses dynamic code evaluation
-// which is not supported in Edge Runtime
-export const runtime = 'nodejs'
+// Note: Middleware runs on Node.js runtime by default when not specified
+// Cannot use Edge runtime due to better-auth's dynamic code evaluation
