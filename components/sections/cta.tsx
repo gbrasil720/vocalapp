@@ -1,15 +1,40 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { LazyHyperspeed } from '../lazy-hyperspeed'
 import { Button } from '../ui/button'
 
+// Check if device is mobile for optimization
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth < 768
+}
+
 export function CTA() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+
+    const handleResize = () => {
+      setIsMobile(isMobileDevice())
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <>
-      <div className="fixed inset-0 z-0">
-        <LazyHyperspeed />
-      </div>
+      {/* Only render 3D background on non-mobile devices for better performance */}
+      {!isMobile ? (
+        <div className="fixed inset-0 z-0">
+          <LazyHyperspeed />
+        </div>
+      ) : (
+        <div className="fixed inset-0 z-0 bg-gradient-to-b from-black via-gray-900 to-black" />
+      )}
 
       {/* Text content on top */}
       <div className="relative w-screen h-[100vh] z-40 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pointer-events-none">

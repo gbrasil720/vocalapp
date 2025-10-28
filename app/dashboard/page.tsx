@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import ElectricBorder from '@/components/ElectricBorder'
 import { FileUpload } from '@/components/file-upload'
@@ -25,6 +25,17 @@ import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+
+// Utility function to detect mobile device
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false
+  return (
+    window.innerWidth < 768 ||
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+      navigator.userAgent.toLowerCase()
+    )
+  )
+}
 
 interface UserStats {
   credits: number
@@ -59,6 +70,19 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile device on mount
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+
+    const handleResize = () => {
+      setIsMobile(isMobileDevice())
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -127,6 +151,12 @@ export default function DashboardPage() {
     return date.toLocaleDateString()
   }, [])
 
+  // Memoize the first 10 transcriptions
+  const recentTranscriptions = useMemo(
+    () => transcriptions.slice(0, 10),
+    [transcriptions]
+  )
+
   useEffect(() => {
     if (session) {
       fetchStats()
@@ -142,14 +172,19 @@ export default function DashboardPage() {
     return null
   }
 
-  // Get the first 10 transcriptions for display
-  const recentTranscriptions = transcriptions.slice(0, 10)
-
   return (
     <>
-      <div className="fixed inset-0 z-0 opacity-40">
-        <LazyHyperspeed />
-      </div>
+      {/* Only render 3D background on non-mobile devices for better performance */}
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <LazyHyperspeed />
+        </div>
+      )}
+
+      {/* Fallback gradient background for mobile */}
+      {isMobile && (
+        <div className="fixed inset-0 z-0 bg-gradient-to-b from-black via-gray-900 to-black opacity-40" />
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
