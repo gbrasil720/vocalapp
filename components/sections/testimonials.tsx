@@ -178,6 +178,7 @@ export const Testimonials = memo(() => {
                     alt={testimonials[currentIndex].name}
                     width={48}
                     height={48}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 </div>

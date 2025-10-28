@@ -2,6 +2,7 @@ import type React from 'react'
 import {
   type CSSProperties,
   type PropsWithChildren,
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
@@ -60,7 +61,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     setIsMobile(isMobileDevice())
   }, [])
 
-  const updateAnim = () => {
+  const updateAnim = useCallback(() => {
     // Skip complex animations on mobile devices
     if (isMobile) return
 
@@ -127,11 +128,11 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         }
       })
     })
-  }
+  }, [isMobile, filterId, speed, chaos])
 
   useEffect(() => {
     updateAnim()
-  }, [speed, chaos])
+  }, [updateAnim])
 
   useLayoutEffect(() => {
     if (!rootRef.current) return
@@ -139,7 +140,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     ro.observe(rootRef.current)
     updateAnim()
     return () => ro.disconnect()
-  }, [])
+  }, [updateAnim])
 
   const inheritRadius: CSSProperties = {
     borderRadius: style?.borderRadius ?? 'inherit'
