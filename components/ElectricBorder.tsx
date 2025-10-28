@@ -2,11 +2,14 @@ import type React from 'react'
 import {
   type CSSProperties,
   type PropsWithChildren,
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
-  useRef
+  useRef,
+  useState
 } from 'react'
+import { isMobileDevice } from '@/lib/device-utils'
 
 type ElectricBorderProps = PropsWithChildren<{
   color?: string
@@ -47,8 +50,16 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   const svgRef = useRef<SVGSVGElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const strokeRef = useRef<HTMLDivElement | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
-  const updateAnim = () => {
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
+
+  const updateAnim = useCallback(() => {
+    // Skip complex animations on mobile devices
+    if (isMobile) return
+
     const svg = svgRef.current
     const host = rootRef.current
     if (!svg || !host) return
@@ -112,11 +123,11 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         }
       })
     })
-  }
+  }, [isMobile, filterId, speed, chaos])
 
   useEffect(() => {
     updateAnim()
-  }, [speed, chaos])
+  }, [updateAnim])
 
   useLayoutEffect(() => {
     if (!rootRef.current) return
@@ -124,7 +135,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     ro.observe(rootRef.current)
     updateAnim()
     return () => ro.disconnect()
-  }, [])
+  }, [updateAnim])
 
   const inheritRadius: CSSProperties = {
     borderRadius: style?.borderRadius ?? 'inherit'
@@ -170,107 +181,118 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       className={'relative isolate ' + (className ?? '')}
       style={style}
     >
-      <svg
-        ref={svgRef}
-        className="fixed -left-[10000px] -top-[10000px] w-[10px] h-[10px] opacity-[0.001] pointer-events-none"
-        aria-hidden
-        focusable="false"
-      >
-        <defs>
-          <filter
-            id={filterId}
-            colorInterpolationFilters="sRGB"
-            x="-20%"
-            y="-20%"
-            width="140%"
-            height="140%"
-          >
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.02"
-              numOctaves="10"
-              result="noise1"
-              seed="1"
-            />
-            <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
-              <animate
-                attributeName="dy"
-                values="700; 0"
-                dur="6s"
-                repeatCount="indefinite"
-                calcMode="linear"
+      {/* Only render complex SVG filters on non-mobile devices */}
+      {!isMobile && (
+        <svg
+          ref={svgRef}
+          className="fixed -left-[10000px] -top-[10000px] w-[10px] h-[10px] opacity-[0.001] pointer-events-none"
+          aria-hidden
+          focusable="false"
+        >
+          <defs>
+            <filter
+              id={filterId}
+              colorInterpolationFilters="sRGB"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.02"
+                numOctaves="10"
+                result="noise1"
+                seed="1"
               />
-            </feOffset>
+              <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+                <animate
+                  attributeName="dy"
+                  values="700; 0"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  calcMode="linear"
+                />
+              </feOffset>
 
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.02"
-              numOctaves="10"
-              result="noise2"
-              seed="1"
-            />
-            <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
-              <animate
-                attributeName="dy"
-                values="0; -700"
-                dur="6s"
-                repeatCount="indefinite"
-                calcMode="linear"
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.02"
+                numOctaves="10"
+                result="noise2"
+                seed="1"
               />
-            </feOffset>
+              <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+                <animate
+                  attributeName="dy"
+                  values="0; -700"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  calcMode="linear"
+                />
+              </feOffset>
 
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.02"
-              numOctaves="10"
-              result="noise1"
-              seed="2"
-            />
-            <feOffset in="noise1" dx="0" dy="0" result="offsetNoise3">
-              <animate
-                attributeName="dx"
-                values="490; 0"
-                dur="6s"
-                repeatCount="indefinite"
-                calcMode="linear"
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.02"
+                numOctaves="10"
+                result="noise1"
+                seed="2"
               />
-            </feOffset>
+              <feOffset in="noise1" dx="0" dy="0" result="offsetNoise3">
+                <animate
+                  attributeName="dx"
+                  values="490; 0"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  calcMode="linear"
+                />
+              </feOffset>
 
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.02"
-              numOctaves="10"
-              result="noise2"
-              seed="2"
-            />
-            <feOffset in="noise2" dx="0" dy="0" result="offsetNoise4">
-              <animate
-                attributeName="dx"
-                values="0; -490"
-                dur="6s"
-                repeatCount="indefinite"
-                calcMode="linear"
+              <feTurbulence
+                type="turbulence"
+                baseFrequency="0.02"
+                numOctaves="10"
+                result="noise2"
+                seed="2"
               />
-            </feOffset>
+              <feOffset in="noise2" dx="0" dy="0" result="offsetNoise4">
+                <animate
+                  attributeName="dx"
+                  values="0; -490"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  calcMode="linear"
+                />
+              </feOffset>
 
-            <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
-            <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
-            <feBlend
-              in="part1"
-              in2="part2"
-              mode="color-dodge"
-              result="combinedNoise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="combinedNoise"
-              scale="30"
-              xChannelSelector="R"
-              yChannelSelector="B"
-            />
-          </filter>
-        </defs>
-      </svg>
+              <feComposite
+                in="offsetNoise1"
+                in2="offsetNoise2"
+                result="part1"
+              />
+              <feComposite
+                in="offsetNoise3"
+                in2="offsetNoise4"
+                result="part2"
+              />
+              <feBlend
+                in="part1"
+                in2="part2"
+                mode="color-dodge"
+                result="combinedNoise"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="combinedNoise"
+                scale="30"
+                xChannelSelector="R"
+                yChannelSelector="B"
+              />
+            </filter>
+          </defs>
+        </svg>
+      )}
 
       <div
         className="absolute inset-0 pointer-events-none"
@@ -281,9 +303,16 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
           className="absolute inset-0 box-border"
           style={strokeStyle}
         />
-        <div className="absolute inset-0 box-border" style={glow1Style} />
-        <div className="absolute inset-0 box-border" style={glow2Style} />
-        <div className="absolute inset-0" style={bgGlowStyle} />
+        {/* Simplify glow effects on mobile */}
+        {!isMobile ? (
+          <>
+            <div className="absolute inset-0 box-border" style={glow1Style} />
+            <div className="absolute inset-0 box-border" style={glow2Style} />
+            <div className="absolute inset-0" style={bgGlowStyle} />
+          </>
+        ) : (
+          <div className="absolute inset-0 box-border" style={glow1Style} />
+        )}
       </div>
 
       <div className="relative" style={inheritRadius}>

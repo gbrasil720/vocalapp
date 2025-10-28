@@ -1,11 +1,11 @@
 'use client'
 
+import { MailIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { ForgotPasswordForm } from '@/components/forms/forgot-password-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
-import { MailIcon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 
 export default function ForgotPassword() {
   return (
@@ -30,8 +30,7 @@ export default function ForgotPassword() {
           <div className="max-w-md pointer-events-auto">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                <HugeiconsIcon icon={MailIcon} size={30} color='#99a1af '/>
-
+                <HugeiconsIcon icon={MailIcon} size={30} color="#99a1af " />
               </div>
               <div>
                 <h1 className="text-4xl font-bold font-['Satoshi']">
@@ -49,8 +48,8 @@ export default function ForgotPassword() {
 
             <p className="text-white/90 text-lg leading-relaxed mb-8">
               Don&apos;t worry, it happens to the best of us. Enter your email
-              address and we&apos;ll send you a link to reset your password
-              and get back to transcribing.
+              address and we&apos;ll send you a link to reset your password and
+              get back to transcribing.
             </p>
 
             <div className="space-y-4">
@@ -60,9 +59,7 @@ export default function ForgotPassword() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <span className="text-white/90">
-                  Link expires in 24 hours
-                </span>
+                <span className="text-white/90">Link expires in 24 hours</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -79,7 +76,7 @@ export default function ForgotPassword() {
             <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
                 {/* <Mail className="w-6 h-6" /> */}
-                <HugeiconsIcon icon={MailIcon} size={22} color='#99a1af '/>
+                <HugeiconsIcon icon={MailIcon} size={22} color="#99a1af " />
               </div>
               <h1 className="text-3xl font-medium font-['Satoshi']">
                 vocal.app

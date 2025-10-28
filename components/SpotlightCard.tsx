@@ -2,7 +2,8 @@
 'use client'
 
 import type React from 'react'
-import { memo, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { isMobileDevice } from '@/lib/device-utils'
 
 interface Position {
   x: number
@@ -24,13 +25,35 @@ const SpotlightCard: React.FC<SpotlightCardProps> = memo(
     const [isFocused, setIsFocused] = useState<boolean>(false)
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
     const [opacity, setOpacity] = useState<number>(0)
+    const [isMobile, setIsMobile] = useState(false)
+    const rafRef = useRef<number | null>(null)
+
+    useEffect(() => {
+      setIsMobile(isMobileDevice())
+    }, [])
 
     const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
-      if (!divRef.current || isFocused) return
+      if (!divRef.current || isFocused || isMobile) return
 
-      const rect = divRef.current.getBoundingClientRect()
-      setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+      // Use requestAnimationFrame to throttle updates
+      if (rafRef.current !== null) return
+
+      rafRef.current = requestAnimationFrame(() => {
+        const rect = divRef.current?.getBoundingClientRect()
+        if (rect) {
+          setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+        }
+        rafRef.current = null
+      })
     }
+
+    useEffect(() => {
+      return () => {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current)
+        }
+      }
+    }, [])
 
     const handleFocus = () => {
       setIsFocused(true)
@@ -61,13 +84,16 @@ const SpotlightCard: React.FC<SpotlightCardProps> = memo(
         className={`relative rounded-3xl border border-neutral-800 bg-neutral-900 overflow-hidden p-8 ${className}`}
         role="presentation"
       >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out"
-          style={{
-            opacity,
-            background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`
-          }}
-        />
+        {/* Only render spotlight effect on non-mobile for better performance */}
+        {!isMobile && (
+          <div
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out"
+            style={{
+              opacity,
+              background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`
+            }}
+          />
+        )}
         {children}
       </div>
     )
