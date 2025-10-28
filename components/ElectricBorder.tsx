@@ -9,6 +9,7 @@ import {
   useRef,
   useState
 } from 'react'
+import { isMobileDevice } from '@/lib/device-utils'
 
 type ElectricBorderProps = PropsWithChildren<{
   color?: string
@@ -33,12 +34,6 @@ function hexToRgba(hex: string, alpha = 1): string {
   const g = (int >> 8) & 255
   const b = int & 255
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
-}
-
-// Check if device is mobile for optimization
-function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.innerWidth < 768
 }
 
 const ElectricBorder: React.FC<ElectricBorderProps> = ({

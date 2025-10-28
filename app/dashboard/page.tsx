@@ -25,17 +25,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
-
-// Utility function to detect mobile device
-function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false
-  return (
-    window.innerWidth < 768 ||
-    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-      navigator.userAgent.toLowerCase()
-    )
-  )
-}
+import { isMobileDevice } from '@/lib/device-utils'
 
 interface UserStats {
   credits: number

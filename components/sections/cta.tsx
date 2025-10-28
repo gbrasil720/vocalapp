@@ -2,14 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { isMobileDevice } from '@/lib/device-utils'
 import { LazyHyperspeed } from '../lazy-hyperspeed'
 import { Button } from '../ui/button'
-
-// Check if device is mobile for optimization
-function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.innerWidth < 768
-}
 
 export function CTA() {
   const [isMobile, setIsMobile] = useState(false)

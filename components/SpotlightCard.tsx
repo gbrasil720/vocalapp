@@ -3,6 +3,7 @@
 
 import type React from 'react'
 import { memo, useEffect, useRef, useState } from 'react'
+import { isMobileDevice } from '@/lib/device-utils'
 
 interface Position {
   x: number
@@ -12,12 +13,6 @@ interface Position {
 interface SpotlightCardProps extends React.PropsWithChildren {
   className?: string
   spotlightColor?: `rgba(${number}, ${number}, ${number}, ${number})`
-}
-
-// Check if device is mobile for optimization
-function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.innerWidth < 768
 }
 
 const SpotlightCard: React.FC<SpotlightCardProps> = memo(
