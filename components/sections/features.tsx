@@ -7,9 +7,10 @@ import {
   ZapIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { memo } from 'react'
 import SpotlightCard from '../SpotlightCard'
 
-export function Features() {
+export const Features = memo(() => {
   return (
     <section className="relative z-10 py-20 px-6" id="features">
       <div className="text-center mb-16 max-w-4xl mx-auto">
@@ -139,4 +140,6 @@ export function Features() {
       </div>
     </section>
   )
-}
+})
+
+Features.displayName = 'Features'

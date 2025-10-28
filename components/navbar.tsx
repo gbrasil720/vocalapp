@@ -1,11 +1,15 @@
+'use client'
+
 import { AudioWave01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { AudioLines } from 'lucide-react'
 import Link from 'next/link'
+import { memo } from 'react'
 import { auth } from '@/lib/auth'
 import { authClient } from '@/lib/auth-client'
 import { Button } from './ui/button'
-export function Navbar() {
+
+export const Navbar = memo(() => {
   const { data: session } = authClient.useSession()
   console.log(session)
 
@@ -55,4 +59,6 @@ export function Navbar() {
       </div>
     </div>
   )
-}
+})
+
+Navbar.displayName = 'Navbar'

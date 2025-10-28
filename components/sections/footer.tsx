@@ -11,6 +11,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import { AudioLines, Github, Linkedin, Mail, Twitter, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { memo } from 'react'
 
 const footerLinks = {
   product: [
@@ -54,7 +55,7 @@ const socialLinks = [
   { name: 'Email', href: 'mailto:hello@vocal.app', icon: Mail01Icon }
 ]
 
-export function Footer() {
+export const Footer = memo(() => {
   return (
     <footer className="relative z-10 border-t border-white/10 bg-transparent backdrop-blur-xl">
       {/* Main Footer Content */}
@@ -212,4 +213,6 @@ export function Footer() {
       </div>
     </footer>
   )
-}
+})
+
+Footer.displayName = 'Footer'

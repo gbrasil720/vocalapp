@@ -4,9 +4,9 @@ import { QuoteDownIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
 import Image from 'next/image'
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 
-export function Testimonials() {
+export const Testimonials = memo(() => {
   const testimonials = [
     {
       name: 'Sarah Chen',
@@ -245,4 +245,6 @@ export function Testimonials() {
       {/* Stats Section */}
     </section>
   )
-}
+})
+
+Testimonials.displayName = 'Testimonials'
