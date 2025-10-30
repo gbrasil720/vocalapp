@@ -195,7 +195,8 @@ export default function DashboardPage() {
               <BetaBadge variant="large" />
             </div>
             <p className="text-gray-400 text-lg">
-              You're a beta tester! Help us shape the future of transcription. 🚀
+              You're a beta tester! Help us shape the future of transcription.
+              🚀
             </p>
           </div>
 

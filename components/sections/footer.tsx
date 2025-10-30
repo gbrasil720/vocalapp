@@ -1,6 +1,13 @@
 'use client'
 
-import { AudioWave01Icon, GithubIcon, Linkedin02Icon, Mail01Icon, NewTwitterIcon, ZapIcon } from '@hugeicons/core-free-icons'
+import {
+  AudioWave01Icon,
+  GithubIcon,
+  Linkedin02Icon,
+  Mail01Icon,
+  NewTwitterIcon,
+  ZapIcon
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { AudioLines, Github, Linkedin, Mail, Twitter, Zap } from 'lucide-react'
 import Link from 'next/link'
@@ -33,7 +40,11 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { name: 'Twitter', href: 'https://twitter.com/vocalapp', icon: NewTwitterIcon },
+  {
+    name: 'Twitter',
+    href: 'https://twitter.com/vocalapp',
+    icon: NewTwitterIcon
+  },
   {
     name: 'LinkedIn',
     href: 'https://linkedin.com/company/vocalapp',
@@ -170,15 +181,15 @@ export function Footer() {
             {/* Trust Badges */}
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={ZapIcon} size={18} color='#03b3c3'/>
+                <HugeiconsIcon icon={ZapIcon} size={18} color="#03b3c3" />
                 <span>SOC 2 Compliant</span>
               </div>
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={ZapIcon} size={18} color='#d856bf'/>
+                <HugeiconsIcon icon={ZapIcon} size={18} color="#d856bf" />
                 <span>GDPR Ready</span>
               </div>
               <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={ZapIcon} size={18} color='#c247ac'/>
+                <HugeiconsIcon icon={ZapIcon} size={18} color="#c247ac" />
                 <span>99.9% Uptime</span>
               </div>
             </div>

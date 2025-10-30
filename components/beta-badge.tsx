@@ -6,14 +6,19 @@ interface BetaBadgeProps {
   className?: string
 }
 
-export function BetaBadge({ variant = 'default', className = '' }: BetaBadgeProps) {
+export function BetaBadge({
+  variant = 'default',
+  className = ''
+}: BetaBadgeProps) {
   if (variant === 'large') {
     return (
       <div
         className={`inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 ${className}`}
       >
         <HugeiconsIcon icon={StarIcon} color="#03b3c3" size={20} />
-        <span className="text-sm font-semibold text-[#03b3c3]">Beta Access</span>
+        <span className="text-sm font-semibold text-[#03b3c3]">
+          Beta Access
+        </span>
       </div>
     )
   }
@@ -27,4 +32,3 @@ export function BetaBadge({ variant = 'default', className = '' }: BetaBadgeProp
     </span>
   )
 }
-

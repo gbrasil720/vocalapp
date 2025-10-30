@@ -1,7 +1,7 @@
+import { eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { db } from '@/db'
 import { user } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 
 /**
  * Check if a user has beta access
@@ -123,4 +123,3 @@ export async function listBetaUsers() {
     return []
   }
 }
-

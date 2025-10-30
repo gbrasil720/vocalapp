@@ -28,10 +28,10 @@ export function CTA() {
             </span>
           </div>
 
-          <h1 className="font-['Satoshi'] font-medium text-2xl sm:text-3xl md:text-4xl lg:text-7xl bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight drop-shadow-lg max-w-4xl">
+          <h1 className="font-['Satoshi'] font-medium text-3xl sm:text-3xl md:text-4xl lg:text-7xl bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight drop-shadow-lg max-w-4xl">
             The best speech-to-text experience you'll ever have.
           </h1>
-          <p className="font-['Inter'] font-normal text-base sm:text-lg lg:text-2xl mt-4 sm:mt-6 text-[#03b3c3]/90 max-w-3xl leading-relaxed text-center mx-auto">
+          <p className="font-['Inter'] font-normal text-lg sm:text-lg lg:text-2xl mt-4 sm:mt-6 text-[#03b3c3]/90 max-w-3xl leading-relaxed text-center mx-auto">
             Transform any audio into precise text with cutting-edge AI. 100%
             accurate transcription. No more manual transcription.
           </p>
