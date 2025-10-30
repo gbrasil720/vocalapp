@@ -400,7 +400,9 @@ export default function DashboardPage() {
                         <p className="text-2xl font-bold text-white">
                           {stats.credits}
                         </p>
-                        <p className="text-xs text-gray-400">Credits Available</p>
+                        <p className="text-xs text-gray-400">
+                          Credits Available
+                        </p>
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-white">

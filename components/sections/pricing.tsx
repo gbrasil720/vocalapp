@@ -287,7 +287,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                     {/* Left Section - Info */}
                     <div className="flex-1 text-center lg:text-left">
                       <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
-                        <HugeiconsIcon icon={ZapIcon} color="#ffffff" size={22} />
+                        <HugeiconsIcon
+                          icon={ZapIcon}
+                          color="#ffffff"
+                          size={22}
+                        />
                         <span className="text-sm font-semibold text-white">
                           Out of Credits?
                         </span>
