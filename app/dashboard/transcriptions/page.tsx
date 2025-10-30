@@ -39,7 +39,7 @@ type StatusFilter = 'all' | 'completed' | 'processing' | 'failed'
 type SortOption = 'recent' | 'oldest' | 'duration'
 
 export default function TranscriptionsPage() {
-  const { data: session, isPending} = authClient.useSession()
+  const { data: session, isPending } = authClient.useSession()
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [filteredTranscriptions, setFilteredTranscriptions] = useState<
     Transcription[]

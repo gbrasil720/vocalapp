@@ -73,9 +73,7 @@ export function WaitlistBanner() {
     return (
       <div className="w-full max-w-4xl mx-auto px-6 mb-8">
         {/* Mobile version - no electric border */}
-        <div className="block md:hidden">
-          {content}
-        </div>
+        <div className="block md:hidden">{content}</div>
         {/* Desktop version - with electric border */}
         <div className="hidden md:block">
           <ElectricBorder
@@ -130,9 +128,7 @@ export function WaitlistBanner() {
   return (
     <div className="w-full max-w-4xl mx-auto px-6 mb-8">
       {/* Mobile version - no electric border */}
-      <div className="block md:hidden">
-        {formContent}
-      </div>
+      <div className="block md:hidden">{formContent}</div>
       {/* Desktop version - with electric border */}
       <div className="hidden md:block">
         <ElectricBorder
