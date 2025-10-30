@@ -18,6 +18,7 @@ import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import type { CreditPackType } from '@/lib/billing/credit-products'
 import { purchaseCredits } from '@/lib/billing/purchase-credits'
+import { isMobileDevice } from '@/lib/utils'
 
 interface Transaction {
   id: string
@@ -49,6 +50,11 @@ export default function BillingPage() {
   const [subscriptionData, setSubscriptionData] =
     useState<SubscriptionData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
 
   const fetchData = useCallback(async () => {
     try {
@@ -220,9 +226,11 @@ export default function BillingPage() {
   return (
     <>
       {/* Background Animation */}
-      <div className="fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         {/* Header */}
@@ -269,13 +277,7 @@ export default function BillingPage() {
               <h2 className="text-xl font-bold text-white mb-4">
                 Current Plan
               </h2>
-              <ElectricBorder
-                color="#d856bf"
-                speed={1.5}
-                chaos={0.6}
-                thickness={2}
-                className="rounded-3xl"
-              >
+              {isMobile ? (
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Left Side - Plan Details Skeleton */}

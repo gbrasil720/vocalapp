@@ -26,6 +26,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+import { isMobileDevice } from '@/lib/utils'
 
 interface UserStats {
   credits: number
@@ -60,6 +61,11 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -148,9 +154,11 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="fixed inset-0 z-0 opacity-40">
-        <LazyHyperspeed />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <LazyHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -305,13 +313,7 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
-              <ElectricBorder
-                color="#d856bf"
-                speed={1.5}
-                chaos={0.6}
-                thickness={2}
-                className="rounded-3xl h-full"
-              >
+              {isMobile ? (
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
                   <div className="flex items-center justify-between mb-6">
                     <div>
@@ -359,7 +361,63 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-              </ElectricBorder>
+              ) : (
+                <ElectricBorder
+                  color="#d856bf"
+                  speed={1.5}
+                  chaos={0.6}
+                  thickness={2}
+                  className="rounded-3xl h-full"
+                >
+                  <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                          Upload Audio
+                        </h2>
+                        <p className="text-gray-400 text-sm">
+                          Drag and drop your audio file or click to browse
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-[#d856bf]/20">
+                        <Upload className="w-6 h-6 text-[#d856bf]" />
+                      </div>
+                    </div>
+
+                    <FileUpload
+                      onUploadComplete={() => {
+                        toast.success('Upload complete! Refreshing...')
+                        setTimeout(() => {
+                          fetchStats()
+                          fetchTranscriptions()
+                        }, 1000)
+                      }}
+                      isPro={stats.plan.isActive}
+                    />
+
+                    <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-2xl font-bold text-white">
+                          {stats.credits}
+                        </p>
+                        <p className="text-xs text-gray-400">Credits Available</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-white">
+                          {stats.usage.transcriptionsCount}
+                        </p>
+                        <p className="text-xs text-gray-400">Transcriptions</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-white">
+                          {stats.usage.minutesUsed}
+                        </p>
+                        <p className="text-xs text-gray-400">Minutes</p>
+                      </div>
+                    </div>
+                  </div>
+                </ElectricBorder>
+              )}
             </div>
 
             <div className="lg:col-span-1">
