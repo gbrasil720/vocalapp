@@ -26,7 +26,6 @@ import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
-import { isMobileDevice } from '@/lib/utils'
 
 interface UserStats {
   credits: number
@@ -61,11 +60,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -154,11 +148,9 @@ export default function DashboardPage() {
 
   return (
     <>
-      {!isMobile && (
-        <div className="fixed inset-0 z-0 opacity-40">
-          <LazyHyperspeed />
-        </div>
-      )}
+      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+        <LazyHyperspeed />
+      </div>
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -313,8 +305,8 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
-              {isMobile ? (
-                <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
+              {/* Mobile version - no electric border */}
+              <div className="block md:hidden bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h2 className="text-2xl font-bold text-white mb-2">
@@ -361,7 +353,9 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-              ) : (
+              </div>
+              {/* Desktop version - with electric border */}
+              <div className="hidden md:block">
                 <ElectricBorder
                   color="#d856bf"
                   speed={1.5}
@@ -419,7 +413,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </ElectricBorder>
-              )}
+              </div>
             </div>
 
             <div className="lg:col-span-1">

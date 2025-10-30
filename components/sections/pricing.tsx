@@ -4,11 +4,9 @@
 
 import { StarIcon, Tick02Icon, ZapIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { CreditPackType } from '@/lib/billing/credit-products'
 import { purchaseCredits } from '@/lib/billing/purchase-credits'
-import { isMobileDevice } from '@/lib/utils'
 import ElectricBorder from '../ElectricBorder'
 import { PricingCard } from '../pricing-card'
 
@@ -17,12 +15,6 @@ interface PricingProps {
 }
 
 export function Pricing({ waitlistMode = false }: PricingProps = {}) {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
-
   const handleCreditPurchase = async (packType: CreditPackType) => {
     try {
       await purchaseCredits(packType)
@@ -110,7 +102,8 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
       {!waitlistMode && (
         <div className="mt-16 max-w-6xl mx-auto">
           <div className="relative group">
-            {isMobile ? (
+            {/* Mobile version - no electric border */}
+            <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                 <div className="flex flex-col lg:flex-row items-center gap-8">
                   {/* Left Section - Info */}
@@ -274,7 +267,9 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                   </p>
                 </div>
               </div>
-            ) : (
+            </div>
+            {/* Desktop version - with electric border */}
+            <div className="hidden md:block">
               <ElectricBorder
                 color="#d856bf"
                 speed={2}
@@ -446,7 +441,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                   </div>
                 </div>
               </ElectricBorder>
-            )}
+            </div>
           </div>
         </div>
       )}

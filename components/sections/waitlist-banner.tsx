@@ -2,9 +2,8 @@
 
 import { Mail01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { isMobileDevice } from '@/lib/utils'
 import ElectricBorder from '../ElectricBorder'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -13,11 +12,6 @@ export function WaitlistBanner() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,9 +72,12 @@ export function WaitlistBanner() {
 
     return (
       <div className="w-full max-w-4xl mx-auto px-6 mb-8">
-        {isMobile ? (
-          content
-        ) : (
+        {/* Mobile version - no electric border */}
+        <div className="block md:hidden">
+          {content}
+        </div>
+        {/* Desktop version - with electric border */}
+        <div className="hidden md:block">
           <ElectricBorder
             color="#03b3c3"
             speed={1.5}
@@ -90,7 +87,7 @@ export function WaitlistBanner() {
           >
             {content}
           </ElectricBorder>
-        )}
+        </div>
       </div>
     )
   }
@@ -132,9 +129,12 @@ export function WaitlistBanner() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-6 mb-8">
-      {isMobile ? (
-        formContent
-      ) : (
+      {/* Mobile version - no electric border */}
+      <div className="block md:hidden">
+        {formContent}
+      </div>
+      {/* Desktop version - with electric border */}
+      <div className="hidden md:block">
         <ElectricBorder
           color="#d856bf"
           speed={2}
@@ -144,7 +144,7 @@ export function WaitlistBanner() {
         >
           {formContent}
         </ElectricBorder>
-      )}
+      </div>
     </div>
   )
 }

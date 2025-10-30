@@ -8,9 +8,8 @@ import {
   ZapIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { isMobileDevice } from '@/lib/utils'
 import ElectricBorder from '../ElectricBorder'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -19,11 +18,6 @@ export function WaitlistSection() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice())
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,7 +79,8 @@ export function WaitlistSection() {
       <div className="max-w-2xl mx-auto mb-16">
         {success ? (
           <>
-            {isMobile ? (
+            {/* Mobile version - no electric border */}
+            <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center">
                 <HugeiconsIcon
                   icon={Tick02Icon}
@@ -103,7 +98,9 @@ export function WaitlistSection() {
                   We'll notify you when it's your turn to access the beta.
                 </p>
               </div>
-            ) : (
+            </div>
+            {/* Desktop version - with electric border */}
+            <div className="hidden md:block">
               <ElectricBorder
                 color="#03b3c3"
                 speed={1.5}
@@ -129,11 +126,12 @@ export function WaitlistSection() {
                   </p>
                 </div>
               </ElectricBorder>
-            )}
+            </div>
           </>
         ) : (
           <>
-            {isMobile ? (
+            {/* Mobile version - no electric border */}
+            <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="relative">
@@ -164,7 +162,9 @@ export function WaitlistSection() {
                   No spam. Unsubscribe anytime. We respect your privacy.
                 </p>
               </div>
-            ) : (
+            </div>
+            {/* Desktop version - with electric border */}
+            <div className="hidden md:block">
               <ElectricBorder
                 color="#d856bf"
                 speed={2}
@@ -203,7 +203,7 @@ export function WaitlistSection() {
                   </p>
                 </div>
               </ElectricBorder>
-            )}
+            </div>
           </>
         )}
       </div>
