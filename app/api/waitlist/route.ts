@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { addToWaitlist, getWaitlistCount, checkIPRateLimit } from '@/lib/waitlist'
+import {
+  addToWaitlist,
+  checkIPRateLimit,
+  getWaitlistCount
+} from '@/lib/waitlist'
 
 const waitlistSchema = z.object({
   email: z.string().email('Please enter a valid email address')
@@ -9,9 +13,10 @@ const waitlistSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Get IP address for rate limiting
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-                request.headers.get('x-real-ip') || 
-                'unknown'
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0] ||
+      request.headers.get('x-real-ip') ||
+      'unknown'
 
     // Check IP rate limit (max 3 submissions per hour)
     const isRateLimited = await checkIPRateLimit(ip)
@@ -33,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: validation.error.errors[0].message
+          error: validation.error.issues[0].message
         },
         { status: 400 }
       )
@@ -91,4 +96,3 @@ export async function GET() {
     )
   }
 }
-

@@ -1,4 +1,4 @@
-import { Lock01Icon, StarIcon } from '@hugeicons/core-free-icons'
+import { SquareLock01Icon, StarIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import ElectricBorder from './ElectricBorder'
@@ -27,7 +27,11 @@ export function BetaAccessRequired({
         >
           <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 md:p-12 text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#03b3c3]/20 mb-6">
-              <HugeiconsIcon icon={Lock01Icon} color="#03b3c3" size={40} />
+              <HugeiconsIcon
+                icon={SquareLock01Icon}
+                color="#03b3c3"
+                size={40}
+              />
             </div>
 
             <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
