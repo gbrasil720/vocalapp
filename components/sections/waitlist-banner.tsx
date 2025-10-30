@@ -91,7 +91,10 @@ export function WaitlistBanner() {
         className="rounded-2xl"
       >
         <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-2xl p-6">
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row items-center gap-4"
+          >
             <div className="flex-1 w-full">
               <div className="relative">
                 <HugeiconsIcon
@@ -123,4 +126,3 @@ export function WaitlistBanner() {
     </div>
   )
 }
-

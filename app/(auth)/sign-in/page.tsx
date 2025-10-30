@@ -1,13 +1,13 @@
 'use client'
 
+import { UserIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft, User } from 'lucide-react'
 import Link from 'next/link'
 import { BetaBadge } from '@/components/beta-badge'
 import { SignInForm } from '@/components/forms/sign-in-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import { OAuthButton } from '@/components/oauth-button'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { UserIcon } from '@hugeicons/core-free-icons'
 
 export default function SignIn() {
   return (
@@ -32,7 +32,7 @@ export default function SignIn() {
           <div className="max-w-md pointer-events-auto">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                <HugeiconsIcon icon={UserIcon} size={30} color='#99a1af '/>
+                <HugeiconsIcon icon={UserIcon} size={30} color="#99a1af " />
               </div>
               <div>
                 <h1 className="text-4xl font-bold font-['Satoshi']">
@@ -83,7 +83,7 @@ export default function SignIn() {
           <div className="text-center mb-8">
             <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                <HugeiconsIcon icon={UserIcon} size={22} color='#99a1af '/>
+                <HugeiconsIcon icon={UserIcon} size={22} color="#99a1af " />
               </div>
               <h1 className="text-3xl font-medium font-['Satoshi']">
                 vocal.app
@@ -98,7 +98,9 @@ export default function SignIn() {
               Welcome Back
             </h2>
             <p className="text-gray-400">Sign in to your account to continue</p>
-            <p className="text-[#03b3c3] text-sm mt-2">Beta access required for dashboard</p>
+            <p className="text-[#03b3c3] text-sm mt-2">
+              Beta access required for dashboard
+            </p>
           </div>
 
           <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8">

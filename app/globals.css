@@ -116,11 +116,11 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
     @apply bg-background text-foreground;
   }
@@ -128,7 +128,8 @@
 
 @layer utilities {
   @keyframes blob {
-    0%, 100% {
+    0%,
+    100% {
       transform: translate(0, 0) scale(1);
     }
     33% {
@@ -138,7 +139,7 @@
       transform: translate(-20px, 20px) scale(0.9);
     }
   }
-  
+
   @keyframes progress {
     0% {
       transform: translateX(-100%);
@@ -147,27 +148,27 @@
       transform: translateX(100%);
     }
   }
-  
+
   .animate-blob {
     animation: blob 7s infinite;
   }
-  
+
   .animate-progress {
     animation: progress 1.5s ease-in-out infinite;
   }
-  
+
   .animation-delay-200 {
     animation-delay: 0.2s;
   }
-  
+
   .animation-delay-400 {
     animation-delay: 0.4s;
   }
-  
+
   .animation-delay-2000 {
     animation-delay: 2s;
   }
-  
+
   .animation-delay-4000 {
     animation-delay: 4s;
   }

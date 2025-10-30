@@ -12,7 +12,7 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+
   // Get session
   const session = await auth.api.getSession({
     headers: request.headers
@@ -36,7 +36,9 @@ export async function middleware(request: NextRequest) {
   if (pathname === '/sign-up') {
     if (WAITLIST_MODE) {
       // Redirect to landing page with waitlist
-      const response = NextResponse.redirect(new URL('/?signup=disabled', request.url))
+      const response = NextResponse.redirect(
+        new URL('/?signup=disabled', request.url)
+      )
       response.headers.set('x-middleware-cache', 'no-cache')
       return response
     }
@@ -56,10 +58,12 @@ export async function middleware(request: NextRequest) {
     // In waitlist mode, check for beta access
     if (WAITLIST_MODE) {
       const hasBetaAccess = await isBetaUser(session.user.id)
-      
+
       if (!hasBetaAccess) {
         // Redirect non-beta users to landing page
-        const response = NextResponse.redirect(new URL('/?error=beta-required', request.url))
+        const response = NextResponse.redirect(
+          new URL('/?error=beta-required', request.url)
+        )
         response.headers.set('x-middleware-cache', 'no-cache')
         return response
       }
