@@ -78,70 +78,133 @@ export function WaitlistSection() {
       {/* Main Waitlist Form */}
       <div className="max-w-2xl mx-auto mb-16">
         {success ? (
-          <ElectricBorder
-            color="#03b3c3"
-            speed={1.5}
-            chaos={0.6}
-            thickness={2}
-            className="rounded-3xl"
-          >
-            <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center">
-              <HugeiconsIcon
-                icon={Tick02Icon}
-                color="oklch(79.2% 0.209 151.711)"
-                size={64}
-                className="mx-auto mb-4"
-              />
-              <h3 className="text-3xl font-bold text-white mb-4">
-                You're on the list!
-              </h3>
-              <p className="text-xl text-gray-300 mb-2">
-                Thank you for joining the waitlist
-              </p>
-              <p className="text-gray-400">
-                We'll notify you when it's your turn to access the beta.
-              </p>
+          <>
+            {/* Mobile version - no electric border */}
+            <div className="block md:hidden">
+              <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center">
+                <HugeiconsIcon
+                  icon={Tick02Icon}
+                  color="oklch(79.2% 0.209 151.711)"
+                  size={64}
+                  className="mx-auto mb-4"
+                />
+                <h3 className="text-3xl font-bold text-white mb-4">
+                  You're on the list!
+                </h3>
+                <p className="text-xl text-gray-300 mb-2">
+                  Thank you for joining the waitlist
+                </p>
+                <p className="text-gray-400">
+                  We'll notify you when it's your turn to access the beta.
+                </p>
+              </div>
             </div>
-          </ElectricBorder>
-        ) : (
-          <ElectricBorder
-            color="#d856bf"
-            speed={2}
-            chaos={0.6}
-            thickness={2}
-            className="rounded-3xl"
-          >
-            <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="relative">
+            {/* Desktop version - with electric border */}
+            <div className="hidden md:block">
+              <ElectricBorder
+                color="#03b3c3"
+                speed={1.5}
+                chaos={0.6}
+                thickness={2}
+                className="rounded-3xl"
+              >
+                <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center">
                   <HugeiconsIcon
-                    icon={Mail01Icon}
-                    color="#03b3c3"
-                    size={22}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
+                    icon={Tick02Icon}
+                    color="oklch(79.2% 0.209 151.711)"
+                    size={64}
+                    className="mx-auto mb-4"
                   />
-                  <Input
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    className="w-full pl-14 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-[#03b3c3] h-14 text-lg rounded-full"
-                  />
+                  <h3 className="text-3xl font-bold text-white mb-4">
+                    You're on the list!
+                  </h3>
+                  <p className="text-xl text-gray-300 mb-2">
+                    Thank you for joining the waitlist
+                  </p>
+                  <p className="text-gray-400">
+                    We'll notify you when it's your turn to access the beta.
+                  </p>
                 </div>
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
-                >
-                  {loading ? 'Joining...' : 'Secure Your Spot'}
-                </Button>
-              </form>
-              <p className="text-center text-gray-400 text-sm mt-4">
-                No spam. Unsubscribe anytime. We respect your privacy.
-              </p>
+              </ElectricBorder>
             </div>
-          </ElectricBorder>
+          </>
+        ) : (
+          <>
+            {/* Mobile version - no electric border */}
+            <div className="block md:hidden">
+              <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="relative">
+                    <HugeiconsIcon
+                      icon={Mail01Icon}
+                      color="#03b3c3"
+                      size={22}
+                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                      className="w-full pl-14 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-[#03b3c3] h-14 text-lg rounded-full"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
+                  >
+                    {loading ? 'Joining...' : 'Secure Your Spot'}
+                  </Button>
+                </form>
+                <p className="text-center text-gray-400 text-sm mt-4">
+                  No spam. Unsubscribe anytime. We respect your privacy.
+                </p>
+              </div>
+            </div>
+            {/* Desktop version - with electric border */}
+            <div className="hidden md:block">
+              <ElectricBorder
+                color="#d856bf"
+                speed={2}
+                chaos={0.6}
+                thickness={2}
+                className="rounded-3xl"
+              >
+                <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="relative">
+                      <HugeiconsIcon
+                        icon={Mail01Icon}
+                        color="#03b3c3"
+                        size={22}
+                        className="absolute left-4 top-1/2 -translate-y-1/2"
+                      />
+                      <Input
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                        className="w-full pl-14 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-[#03b3c3] h-14 text-lg rounded-full"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
+                    >
+                      {loading ? 'Joining...' : 'Secure Your Spot'}
+                    </Button>
+                  </form>
+                  <p className="text-center text-gray-400 text-sm mt-4">
+                    No spam. Unsubscribe anytime. We respect your privacy.
+                  </p>
+                </div>
+              </ElectricBorder>
+            </div>
+          </>
         )}
       </div>
 

@@ -36,7 +36,7 @@ export default function SettingsPage() {
   return (
     <>
       {/* Background Animation */}
-      <div className="fixed inset-0 z-0 opacity-40">
+      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
         <MemoizedHyperspeed />
       </div>
 
