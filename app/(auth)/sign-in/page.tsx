@@ -2,7 +2,7 @@
 
 import { UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft, User } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { BetaBadge } from '@/components/beta-badge'
 import { SignInForm } from '@/components/forms/sign-in-form'

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false
-  const userAgent = navigator.userAgent || navigator.vendor
+  const userAgent = navigator.userAgent || navigator.vendor || ''
   const isMobileUA =
     /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
       userAgent.toLowerCase()
@@ -31,6 +31,14 @@ export const LazyHyperspeed = () => {
   useEffect(() => {
     setMounted(true)
     setIsMobile(isMobileDevice())
+
+    // Handle window resize to detect screen size changes
+    const handleResize = () => {
+      setIsMobile(isMobileDevice())
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   // Don't render anything on server or on mobile
