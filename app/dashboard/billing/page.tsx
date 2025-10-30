@@ -346,20 +346,91 @@ export default function BillingPage() {
                     </span>
                   </div>
                 </div>
-              </ElectricBorder>
+              ) : (
+                <ElectricBorder
+                  color="#d856bf"
+                  speed={1.5}
+                  chaos={0.6}
+                  thickness={2}
+                  className="rounded-3xl"
+                >
+                  <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Left Side - Plan Details Skeleton */}
+                      <div className="space-y-6">
+                        {/* Plan Header Skeleton */}
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-2xl bg-white/5 animate-pulse">
+                            <div className="w-6 h-6 bg-white/10 rounded" />
+                          </div>
+                          <div className="space-y-2 flex-1">
+                            <div className="h-8 bg-white/10 rounded-lg w-32 animate-pulse" />
+                            <div className="h-4 bg-white/5 rounded w-20 animate-pulse" />
+                          </div>
+                        </div>
+
+                        {/* Features Skeleton */}
+                        <div className="space-y-4">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
+                              <div className="h-4 bg-white/10 rounded flex-1 animate-pulse" />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Info Box Skeleton */}
+                        <div className="bg-white/5 rounded-2xl p-4 space-y-2">
+                          <div className="h-3 bg-white/10 rounded w-24 animate-pulse" />
+                          <div className="h-4 bg-white/10 rounded w-full animate-pulse" />
+                        </div>
+                      </div>
+
+                      {/* Right Side - Stats Skeleton */}
+                      <div className="space-y-6">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="bg-white/5 border border-white/10 rounded-2xl p-6"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-2 flex-1">
+                                <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
+                                <div className="h-6 bg-white/10 rounded w-32 animate-pulse" />
+                              </div>
+                              <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                            </div>
+                            {i === 3 && (
+                              <div className="mt-4 w-full bg-white/5 rounded-full h-2">
+                                <div className="h-2 bg-gradient-to-r from-[#d856bf]/30 to-[#03b3c3]/30 rounded-full w-2/3 animate-pulse" />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Loading Indicator */}
+                    <div className="mt-6 flex items-center justify-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#d856bf] animate-bounce" />
+                        <div className="w-2 h-2 rounded-full bg-[#c247ac] animate-bounce animation-delay-200" />
+                        <div className="w-2 h-2 rounded-full bg-[#03b3c3] animate-bounce animation-delay-400" />
+                      </div>
+                      <span className="text-sm text-gray-400 ml-2">
+                        Loading subscription...
+                      </span>
+                    </div>
+                  </div>
+                </ElectricBorder>
+              )}
             </div>
           ) : hasSubscription && subscriptionData?.subscription ? (
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4">
                 Current Plan
               </h2>
-              <ElectricBorder
-                color="#d856bf"
-                speed={1.5}
-                chaos={0.6}
-                thickness={2}
-                className="rounded-3xl"
-              >
+              {isMobile ? (
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Plan Details */}
@@ -496,7 +567,19 @@ export default function BillingPage() {
                     </div>
                   </div>
                 </div>
-              </ElectricBorder>
+              ) : (
+                <ElectricBorder
+                  color="#d856bf"
+                  speed={1.5}
+                  chaos={0.6}
+                  thickness={2}
+                  className="rounded-3xl"
+                >
+                  <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                    {/* Same content continues below */}
+                  </div>
+                </ElectricBorder>
+              )}
             </div>
           ) : (
             <div className="mb-8">

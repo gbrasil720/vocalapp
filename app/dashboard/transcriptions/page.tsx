@@ -21,6 +21,7 @@ import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+import { isMobileDevice } from '@/lib/utils'
 
 interface Transcription {
   id: string
@@ -40,6 +41,7 @@ type SortOption = 'recent' | 'oldest' | 'duration'
 
 export default function TranscriptionsPage() {
   const { data: session, isPending } = authClient.useSession()
+  const [isMobile, setIsMobile] = useState(false)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [filteredTranscriptions, setFilteredTranscriptions] = useState<
     Transcription[]
@@ -60,6 +62,10 @@ export default function TranscriptionsPage() {
   const observerTarget = useRef<HTMLDivElement>(null)
 
   const ITEMS_PER_PAGE = 20
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -303,9 +309,11 @@ export default function TranscriptionsPage() {
 
   return (
     <>
-      <div className="fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         {/* Header */}

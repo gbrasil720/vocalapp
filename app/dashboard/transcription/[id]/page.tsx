@@ -21,6 +21,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { isMobileDevice } from '@/lib/utils'
 
 interface TranscriptionData {
   id: string
@@ -44,12 +45,17 @@ export default function TranscriptionDetailPage() {
   const id = params.id as string
   const { data: session } = authClient.useSession()
 
+  const [isMobile, setIsMobile] = useState(false)
   const [transcription, setTranscription] = useState<TranscriptionData | null>(
     null
   )
   const [loading, setLoading] = useState(true)
   const [polling, setPolling] = useState(false)
   const [isPro, setIsPro] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
 
   useEffect(() => {
     const fetchTranscription = async () => {
@@ -176,9 +182,11 @@ export default function TranscriptionDetailPage() {
   return (
     <>
       {/* Background Animation */}
-      <div className="fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         {/* Header */}

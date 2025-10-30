@@ -10,13 +10,15 @@ import {
   User
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { isMobileDevice } from '@/lib/utils'
 
 export default function SettingsPage() {
   const { data: session } = authClient.useSession()
+  const [isMobile, setIsMobile] = useState(false)
   const [settings, setSettings] = useState({
     name: session?.user.name || '',
     email: session?.user.email || '',
@@ -28,6 +30,10 @@ export default function SettingsPage() {
     }
   })
 
+  useEffect(() => {
+    setIsMobile(isMobileDevice())
+  }, [])
+
   const handleSave = () => {
     // Save settings logic here
     console.log('Saving settings:', settings)
@@ -36,9 +42,11 @@ export default function SettingsPage() {
   return (
     <>
       {/* Background Animation */}
-      <div className="fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         {/* Header */}
