@@ -2,6 +2,7 @@
 
 import { ArrowLeft, User } from 'lucide-react'
 import Link from 'next/link'
+import { BetaBadge } from '@/components/beta-badge'
 import { SignInForm } from '@/components/forms/sign-in-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import { OAuthButton } from '@/components/oauth-button'
@@ -89,10 +90,15 @@ export default function SignIn() {
               </h1>
             </div>
 
+            <div className="flex justify-center mb-4">
+              <BetaBadge variant="large" />
+            </div>
+
             <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2 font-['Satoshi']">
               Welcome Back
             </h2>
             <p className="text-gray-400">Sign in to your account to continue</p>
+            <p className="text-[#03b3c3] text-sm mt-2">Beta access required for dashboard</p>
           </div>
 
           <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8">

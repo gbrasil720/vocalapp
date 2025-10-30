@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { BetaBadge } from '@/components/beta-badge'
 import ElectricBorder from '@/components/ElectricBorder'
 import { FileUpload } from '@/components/file-upload'
 import { LazyHyperspeed } from '@/components/lazy-hyperspeed'
@@ -187,11 +188,14 @@ export default function DashboardPage() {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent mb-2">
-              Welcome back, {session.user.name?.split(' ')[0] || 'there'}!
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent">
+                Welcome back, {session.user.name?.split(' ')[0] || 'there'}!
+              </h1>
+              <BetaBadge variant="large" />
+            </div>
             <p className="text-gray-400 text-lg">
-              Ready to transcribe some audio today?
+              You're a beta tester! Help us shape the future of transcription. 🚀
             </p>
           </div>
 

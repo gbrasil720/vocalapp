@@ -12,6 +12,7 @@ interface PricingCardProps {
   priceUnit: string
   benefits: string[]
   buttonText: string
+  waitlistMode?: boolean
 }
 
 export function PricingCard({
@@ -21,7 +22,8 @@ export function PricingCard({
   price,
   priceUnit,
   benefits,
-  buttonText
+  buttonText,
+  waitlistMode = false
 }: PricingCardProps) {
   const mappedBenefits = benefits.map((benefit) => (
     <li key={benefit} className="flex items-center gap-3">
@@ -73,13 +75,22 @@ export function PricingCard({
 
             <ul className="flex-1 space-y-4 mb-8">{mappedBenefits}</ul>
 
-            <button
-              type="button"
-              className="cursor-pointer hover:scale-105 hover:bg-[#03b3c3]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full  transition-all duration-300 backdrop-blur-sm"
-              onClick={handleUpgradeToPro}
-            >
-              {buttonText}
-            </button>
+            {waitlistMode ? (
+              <a
+                href="#waitlist"
+                className="cursor-pointer hover:scale-105 hover:bg-[#03b3c3]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full transition-all duration-300 backdrop-blur-sm text-center block"
+              >
+                Join Waitlist
+              </a>
+            ) : (
+              <button
+                type="button"
+                className="cursor-pointer hover:scale-105 hover:bg-[#03b3c3]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full  transition-all duration-300 backdrop-blur-sm"
+                onClick={handleUpgradeToPro}
+              >
+                {buttonText}
+              </button>
+            )}
           </div>
         </ElectricBorder>
       </div>
@@ -100,12 +111,21 @@ export function PricingCard({
 
         <ul className="flex-1 space-y-4 mb-8">{mappedBenefits}</ul>
 
-        <button
-          type="button"
-          className="cursor-pointer hover:scale-105 hover:bg-[#d856bf]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full  transition-all duration-300 backdrop-blur-sm"
-        >
-          {buttonText}
-        </button>
+        {waitlistMode ? (
+          <a
+            href="#waitlist"
+            className="cursor-pointer hover:scale-105 hover:bg-[#d856bf]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full transition-all duration-300 backdrop-blur-sm text-center block"
+          >
+            Join Waitlist
+          </a>
+        ) : (
+          <button
+            type="button"
+            className="cursor-pointer hover:scale-105 hover:bg-[#d856bf]/20 transform w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full  transition-all duration-300 backdrop-blur-sm"
+          >
+            {buttonText}
+          </button>
+        )}
       </div>
     </div>
   )

@@ -19,7 +19,8 @@ export const user = pgTable('user', {
     .$onUpdate(() => new Date())
     .notNull(),
   stripeCustomerId: text('stripe_customer_id'),
-  credits: integer('credits').default(30).notNull()
+  credits: integer('credits').default(30).notNull(),
+  isBetaUser: boolean('is_beta_user').default(false).notNull()
 })
 
 export const session = pgTable('session', {

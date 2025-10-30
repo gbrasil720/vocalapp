@@ -14,6 +14,11 @@ export const auth = betterAuth({
       type: 'number',
       required: false,
       defaultValue: 30
+    },
+    isBetaUser: {
+      type: 'boolean',
+      required: false,
+      defaultValue: false
     }
   },
   emailAndPassword: {

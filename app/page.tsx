@@ -2,20 +2,22 @@
 
 import { Navbar } from '@/components/navbar'
 import { CTA } from '@/components/sections/cta'
-import { FAQ } from '@/components/sections/faq'
 import { Features } from '@/components/sections/features'
 import { Footer } from '@/components/sections/footer'
 import { Pricing } from '@/components/sections/pricing'
-import { Testimonials } from '@/components/sections/testimonials'
+import { WaitlistSection } from '@/components/sections/waitlist-section'
+
 export default function Home() {
+  // Toggle this to switch between waitlist mode and normal mode
+  const isWaitlistMode = true
+
   return (
     <>
-      <Navbar />
+      <Navbar waitlistMode={isWaitlistMode} />
       <CTA />
       <Features />
-      <Pricing />
-      <Testimonials />
-      <FAQ />
+      <Pricing waitlistMode={isWaitlistMode} />
+      {isWaitlistMode && <WaitlistSection />}
       <Footer />
     </>
   )

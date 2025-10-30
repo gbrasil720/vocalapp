@@ -5,7 +5,12 @@ import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { authClient } from '@/lib/auth-client'
 import { Button } from './ui/button'
-export function Navbar() {
+
+interface NavbarProps {
+  waitlistMode?: boolean
+}
+
+export function Navbar({ waitlistMode = false }: NavbarProps) {
   const { data: session } = authClient.useSession()
   console.log(session)
 
