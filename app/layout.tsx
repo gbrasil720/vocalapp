@@ -15,7 +15,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Vocal - AI-Powered Audio Transcription',
+  title: 'vocal.app - Home - Beta',
   description:
     'Transform any audio into precise text with cutting-edge AI. 100% accurate transcription with support for 50+ languages.'
 }
