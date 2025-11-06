@@ -35,7 +35,19 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         body: formData
       })
 
-      const data = await response.json()
+      // Clone response to read as both text and JSON if needed
+      const responseClone = response.clone()
+      let data
+      try {
+        data = await response.json()
+      } catch (jsonError) {
+        // Handle non-JSON responses (e.g., 500 error pages)
+        const text = await responseClone.text()
+        console.error('Failed to parse response as JSON:', text)
+        throw new Error(
+          `Server error (${response.status}): ${text.substring(0, 100)}`
+        )
+      }
 
       if (response.ok) {
         toast.success(
@@ -43,11 +55,23 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         )
         onUploadComplete()
       } else {
-        toast.error(data.error || 'Upload failed')
+        const errorMessage =
+          data?.error ||
+          `Upload failed with status ${response.status}`
+        console.error('Upload failed:', {
+          status: response.status,
+          error: errorMessage,
+          data
+        })
+        toast.error(errorMessage)
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('Failed to upload files')
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to upload files. Please check your connection and try again.'
+      toast.error(errorMessage)
     } finally {
       setUploading(false)
       if (fileInputRef.current) {

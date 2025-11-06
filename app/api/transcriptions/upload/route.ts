@@ -17,22 +17,61 @@ const ALLOWED_TYPES = [
   'audio/webm',
   'audio/flac',
   'audio/ogg',
+  'audio/x-m4a',
+  'audio/aac',
   'video/mp4',
   'video/mpeg',
   'video/webm'
 ]
 
+const ALLOWED_EXTENSIONS = [
+  '.mp3',
+  '.m4a',
+  '.wav',
+  '.webm',
+  '.flac',
+  '.ogg',
+  '.aac',
+  '.mp4',
+  '.mpeg',
+  '.mpg'
+]
+
+function getFileExtension(filename: string): string {
+  const lastDot = filename.lastIndexOf('.')
+  if (lastDot === -1) return ''
+  return filename.substring(lastDot).toLowerCase()
+}
+
+function isValidFileType(file: File): boolean {
+  // Check MIME type first
+  if (file.type && ALLOWED_TYPES.includes(file.type)) {
+    return true
+  }
+
+  // Fallback to file extension if MIME type is missing or incorrect
+  const extension = getFileExtension(file.name)
+  if (ALLOWED_EXTENSIONS.includes(extension)) {
+    return true
+  }
+
+  return false
+}
+
 export async function POST(req: Request) {
   try {
+    console.log('📤 File upload request received')
     const session = await auth.api.getSession({
       headers: await headers()
     })
 
     if (!session?.user) {
+      console.error('❌ Unauthorized upload attempt')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userId = session.user.id
+    console.log(`✅ Authenticated user: ${userId}`)
 
     const [sub] = await db
       .select()
@@ -44,6 +83,13 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
     const files = formData.getAll('files') as File[]
+
+    console.log(`📁 Received ${files.length} file(s)`)
+    files.forEach((file, index) => {
+      console.log(
+        `  File ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type || 'unknown'})`
+      )
+    })
 
     if (files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
@@ -61,6 +107,15 @@ export async function POST(req: Request) {
 
     // Validate file sizes and types
     for (const file of files) {
+      if (file.size === 0) {
+        return NextResponse.json(
+          {
+            error: `File "${file.name}" is empty`
+          },
+          { status: 400 }
+        )
+      }
+
       if (file.size > MAX_FILE_SIZE) {
         return NextResponse.json(
           {
@@ -70,10 +125,12 @@ export async function POST(req: Request) {
         )
       }
 
-      if (!ALLOWED_TYPES.includes(file.type)) {
+      if (!isValidFileType(file)) {
+        const detectedType = file.type || 'unknown'
+        const extension = getFileExtension(file.name)
         return NextResponse.json(
           {
-            error: `File "${file.name}" has unsupported type. Supported: MP3, M4A, WAV, WEBM, FLAC, OGG, MP4`
+            error: `File "${file.name}" has unsupported type (${detectedType}${extension ? `, extension: ${extension}` : ''}). Supported: MP3, M4A, WAV, WEBM, FLAC, OGG, AAC, MP4`
           },
           { status: 400 }
         )
@@ -198,8 +255,18 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error('Error uploading files:', error)
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error occurred'
+    console.error('Upload error details:', {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined
+    })
     return NextResponse.json(
-      { error: 'Failed to upload files' },
+      {
+        error: 'Failed to upload files',
+        details:
+          process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
