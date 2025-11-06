@@ -21,8 +21,8 @@ export const auth = betterAuth({
     },
     isBetaUser: {
       type: 'boolean',
-      required: false,
-      defaultValue: false
+      required: false
+      // No defaultValue - handled entirely by database hook
     }
   },
   emailAndPassword: {
@@ -50,6 +50,12 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
+          console.log('🚨 DATABASE HOOK CALLED for user creation:', {
+            email: user.email,
+            name: user.name,
+            betaMode: process.env.BETA_MODE
+          })
+
           // Check if email is approved in waitlist (only in beta mode)
           if (process.env.BETA_MODE === 'true') {
             const isApproved = await isEmailApproved(user.email)
@@ -58,7 +64,8 @@ export const auth = betterAuth({
             console.log('🔍 User creation check:', {
               email: user.email,
               isApproved,
-              existingBetaUser
+              existingBetaUser,
+              incomingIsBetaUser: (user as any).isBetaUser
             })
 
             // Reject if not approved in waitlist AND not an existing beta user
@@ -72,19 +79,40 @@ export const auth = betterAuth({
             }
 
             // If approved in waitlist OR existing beta user, mark as beta user
+            // For new users: isApproved will be true, existingBetaUser will be false
+            // For existing users: existingBetaUser will be true
+            const shouldBeBetaUser = isApproved || existingBetaUser
+
             console.log(
-              `✅ Setting isBetaUser=true for ${user.email} (approved: ${isApproved}, existing: ${existingBetaUser})`
+              `✅ Setting isBetaUser=${shouldBeBetaUser} for ${user.email} (approved: ${isApproved}, existing: ${existingBetaUser})`
             )
+
+            // Explicitly set isBetaUser to override any default value
+            // Remove isBetaUser from user object first, then set it explicitly
+            const { isBetaUser: _, ...userWithoutBetaFlag } = user as any
+            const userData = {
+              ...userWithoutBetaFlag,
+              isBetaUser: shouldBeBetaUser
+            }
+
+            console.log(
+              `📝 Returning user data with isBetaUser=${userData.isBetaUser} (explicitly set)`
+            )
+
             return {
-              data: {
-                ...user,
-                isBetaUser: true
-              }
+              data: userData
             }
           }
 
           // Not in beta mode, proceed normally
-          return { data: user }
+          // Still explicitly set isBetaUser to false when not in beta mode
+          const { isBetaUser: _, ...userWithoutBetaFlag } = user as any
+          return {
+            data: {
+              ...userWithoutBetaFlag,
+              isBetaUser: false
+            }
+          }
         }
       }
     }
