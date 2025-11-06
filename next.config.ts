@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   compress: true
+  // Note: Body size limits for App Router are configured in vercel.json
+  // and via route segment config (export const runtime, maxDuration)
 }
 
 export default nextConfig

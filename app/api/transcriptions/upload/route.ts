@@ -9,6 +9,10 @@ import { getUserCredits } from '@/lib/credits'
 import { calculateTranscriptionCost } from '@/lib/credits/transcription-billing'
 import { generateBlobKey, uploadToBlob } from '@/lib/storage/vercel-blob'
 
+// Configure route to handle large file uploads
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 const ALLOWED_TYPES = [
   'audio/mpeg',
@@ -257,10 +261,30 @@ export async function POST(req: Request) {
     console.error('Error uploading files:', error)
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred'
+
+    // Detect Vercel payload size errors
+    const isPayloadError =
+      errorMessage.includes('BIG_PAYLOAD') ||
+      errorMessage.includes('payload') ||
+      errorMessage.includes('413') ||
+      errorMessage.includes('Request Entity Too Large')
+
     console.error('Upload error details:', {
       message: errorMessage,
+      isPayloadError,
       stack: error instanceof Error ? error.stack : undefined
     })
+
+    if (isPayloadError) {
+      return NextResponse.json(
+        {
+          error:
+            'File size exceeds server limit. Vercel has a 4.5MB body size limit. Please upload smaller files or contact support for assistance.'
+        },
+        { status: 413 }
+      )
+    }
+
     return NextResponse.json(
       {
         error: 'Failed to upload files',

@@ -4,5 +4,14 @@
       "path": "/api/cron/cleanup-expired-audio",
       "schedule": "0 3 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/transcriptions/upload/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "env": {
+    "VERCEL_BLOB_MAX_PAYLOAD_SIZE": "26214400"
+  }
 }

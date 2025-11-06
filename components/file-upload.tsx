@@ -55,13 +55,35 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         )
         onUploadComplete()
       } else {
-        const errorMessage =
+        let errorMessage =
           data?.error ||
           `Upload failed with status ${response.status}`
+
+        // Detect Vercel payload size error
+        if (
+          response.status === 413 ||
+          errorMessage.includes('BIG_PAYLOAD') ||
+          errorMessage.includes('payload') ||
+          errorMessage.includes('too large') ||
+          errorMessage.includes('413')
+        ) {
+          const totalSize = Array.from(files).reduce(
+            (sum, file) => sum + file.size,
+            0
+          )
+          const sizeMB = (totalSize / 1024 / 1024).toFixed(2)
+          errorMessage = `File upload failed: The file size (${sizeMB}MB) exceeds the server limit. Please try uploading a smaller file (under 4.5MB) or contact support.`
+        }
+
         console.error('Upload failed:', {
           status: response.status,
           error: errorMessage,
-          data
+          data,
+          fileSizes: Array.from(files).map((f) => ({
+            name: f.name,
+            size: f.size,
+            sizeMB: (f.size / 1024 / 1024).toFixed(2)
+          }))
         })
         toast.error(errorMessage)
       }
