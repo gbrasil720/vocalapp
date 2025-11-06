@@ -1,12 +1,16 @@
 import { stripe } from '@better-auth/stripe'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { lastLoginMethod, openAPI } from 'better-auth/plugins'
+import { APIError } from 'better-auth/api'
+import { lastLoginMethod, magicLink, openAPI } from 'better-auth/plugins'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
+import { isBetaUserByEmail } from './beta-access'
 import { stripeClient } from './billing/stripe-client'
 import { addCredits } from './credits'
+import { sendMagicLinkEmail } from './email/magic-link'
+import { isEmailApproved } from './waitlist'
 
 export const auth = betterAuth({
   additionalUserFields: {
@@ -42,9 +46,74 @@ export const auth = betterAuth({
       creditTransaction: schema.creditTransaction
     }
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Check if email is approved in waitlist (only in beta mode)
+          if (process.env.BETA_MODE === 'true') {
+            const isApproved = await isEmailApproved(user.email)
+
+            if (!isApproved) {
+              throw new APIError('UNAUTHORIZED', {
+                message: `Access denied. ${user.email} is not on the approved beta list.`
+              })
+            }
+
+            // If approved, mark as beta user
+            return {
+              data: {
+                ...user,
+                isBetaUser: true
+              }
+            }
+          }
+
+          // Not in beta mode, proceed normally
+          return { data: user }
+        }
+      }
+    }
+  },
   plugins: [
     openAPI(),
     lastLoginMethod(),
+    magicLink({
+      sendMagicLink: async ({ email, token, url }) => {
+        console.log('🔍 Magic Link Request:', {
+          email,
+          betaMode: process.env.BETA_MODE,
+          isBetaModeActive: process.env.BETA_MODE === 'true'
+        })
+        
+        // Check if email is approved before sending (only in beta mode)
+        if (process.env.BETA_MODE === 'true') {
+          // Check if email is in the approved waitlist
+          const isApproved = await isEmailApproved(email)
+          console.log(`✅ Waitlist approval check for ${email}:`, isApproved)
+          
+          // Also check if user already exists with beta access
+          const existingBetaUser = await isBetaUserByEmail(email)
+          console.log(`✅ Existing beta user check for ${email}:`, existingBetaUser)
+          
+          // Allow if either approved in waitlist OR already a beta user
+          if (!isApproved && !existingBetaUser) {
+            console.log(`❌ Rejecting magic link for unapproved email: ${email}`)
+            throw new APIError('UNAUTHORIZED', {
+              message: `Access denied. ${email} is not on the approved beta list.`
+            })
+          }
+          
+          console.log(`✅ Access granted for ${email} (approved: ${isApproved}, existing: ${existingBetaUser})`)
+        } else {
+          console.log('⚠️  BETA_MODE is not active - skipping approval check!')
+        }
+        
+        // Email is approved (or not in beta mode), send the magic link
+        console.log(`📧 Sending magic link to: ${email}`)
+        await sendMagicLinkEmail({ email, token, url })
+      }
+    }),
     stripe({
       stripeClient,
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET as string,

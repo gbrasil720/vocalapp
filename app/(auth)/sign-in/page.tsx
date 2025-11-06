@@ -4,12 +4,20 @@ import { UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { BetaBadge } from '@/components/beta-badge'
 import { SignInForm } from '@/components/forms/sign-in-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import { OAuthButton } from '@/components/oauth-button'
 
 export default function SignIn() {
+  const router = useRouter()
+
+  useEffect(() => {
+    router.push('/login-beta')
+  })
+
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-black via-gray-900 to-black overflow-x-hidden flex flex-col lg:flex-row">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(3,179,195,0.1),transparent_50%)]" />
@@ -106,6 +114,20 @@ export default function SignIn() {
           </div>
 
           <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8">
+            {process.env.NEXT_PUBLIC_BETA_MODE === 'true' && (
+              <div className="mb-6 p-4 bg-[#03b3c3]/10 border border-[#03b3c3]/30 rounded-lg">
+                <p className="text-sm text-center text-white">
+                  🚀 <span className="font-semibold">Beta Program Active!</span>{' '}
+                  <Link
+                    href="/login-beta"
+                    className="text-[#03b3c3] hover:text-[#d856bf] underline transition-colors"
+                  >
+                    Use passwordless login here
+                  </Link>
+                </p>
+              </div>
+            )}
+
             <SignInForm />
 
             <div className="relative my-6">

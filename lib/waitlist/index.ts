@@ -8,6 +8,7 @@ const redis = new Redis({
 
 const WAITLIST_SET_KEY = 'waitlist:set'
 const WAITLIST_IP_KEY = 'waitlist:ip:'
+const APPROVED_WAITLIST_SET_KEY = 'waitlist:approved'
 
 export interface WaitlistEntry {
   email: string
@@ -141,5 +142,71 @@ export async function getWaitlistEntries(limit = 100): Promise<string[]> {
   } catch (error) {
     console.error('Error getting waitlist entries:', error)
     return []
+  }
+}
+
+/**
+ * Approve an email for beta access
+ * Moves the email from waitlist to approved set
+ * @param email The email address to approve
+ * @returns True if successful, false otherwise
+ */
+export async function approveEmail(email: string): Promise<boolean> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim()
+    
+    // Add to approved set (using set instead of sorted set for simple membership check)
+    await redis.sadd(APPROVED_WAITLIST_SET_KEY, normalizedEmail)
+    
+    return true
+  } catch (error) {
+    console.error('Error approving email:', error)
+    return false
+  }
+}
+
+/**
+ * Check if an email is approved for beta access
+ * @param email The email address to check
+ * @returns True if approved, false otherwise
+ */
+export async function isEmailApproved(email: string): Promise<boolean> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim()
+    const isMember = await redis.sismember(APPROVED_WAITLIST_SET_KEY, normalizedEmail)
+    return isMember === 1
+  } catch (error) {
+    console.error('Error checking email approval:', error)
+    return false
+  }
+}
+
+/**
+ * Get all approved emails (for admin purposes)
+ * @returns Array of approved email addresses
+ */
+export async function getApprovedEmails(): Promise<string[]> {
+  try {
+    const emails = await redis.smembers(APPROVED_WAITLIST_SET_KEY)
+    return emails as string[]
+  } catch (error) {
+    console.error('Error getting approved emails:', error)
+    return []
+  }
+}
+
+/**
+ * Revoke beta access approval for an email
+ * @param email The email address to revoke approval from
+ * @returns True if successful, false otherwise
+ */
+export async function revokeApproval(email: string): Promise<boolean> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim()
+    await redis.srem(APPROVED_WAITLIST_SET_KEY, normalizedEmail)
+    return true
+  } catch (error) {
+    console.error('Error revoking approval:', error)
+    return false
   }
 }
