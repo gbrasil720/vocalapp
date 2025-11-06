@@ -53,14 +53,28 @@ export const auth = betterAuth({
           // Check if email is approved in waitlist (only in beta mode)
           if (process.env.BETA_MODE === 'true') {
             const isApproved = await isEmailApproved(user.email)
+            const existingBetaUser = await isBetaUserByEmail(user.email)
 
-            if (!isApproved) {
+            console.log('🔍 User creation check:', {
+              email: user.email,
+              isApproved,
+              existingBetaUser
+            })
+
+            // Reject if not approved in waitlist AND not an existing beta user
+            if (!isApproved && !existingBetaUser) {
+              console.log(
+                `❌ Rejecting user creation for unapproved email: ${user.email}`
+              )
               throw new APIError('UNAUTHORIZED', {
                 message: `Access denied. ${user.email} is not on the approved beta list.`
               })
             }
 
-            // If approved, mark as beta user
+            // If approved in waitlist OR existing beta user, mark as beta user
+            console.log(
+              `✅ Setting isBetaUser=true for ${user.email} (approved: ${isApproved}, existing: ${existingBetaUser})`
+            )
             return {
               data: {
                 ...user,
@@ -85,30 +99,37 @@ export const auth = betterAuth({
           betaMode: process.env.BETA_MODE,
           isBetaModeActive: process.env.BETA_MODE === 'true'
         })
-        
+
         // Check if email is approved before sending (only in beta mode)
         if (process.env.BETA_MODE === 'true') {
           // Check if email is in the approved waitlist
           const isApproved = await isEmailApproved(email)
           console.log(`✅ Waitlist approval check for ${email}:`, isApproved)
-          
+
           // Also check if user already exists with beta access
           const existingBetaUser = await isBetaUserByEmail(email)
-          console.log(`✅ Existing beta user check for ${email}:`, existingBetaUser)
-          
+          console.log(
+            `✅ Existing beta user check for ${email}:`,
+            existingBetaUser
+          )
+
           // Allow if either approved in waitlist OR already a beta user
           if (!isApproved && !existingBetaUser) {
-            console.log(`❌ Rejecting magic link for unapproved email: ${email}`)
+            console.log(
+              `❌ Rejecting magic link for unapproved email: ${email}`
+            )
             throw new APIError('UNAUTHORIZED', {
               message: `Access denied. ${email} is not on the approved beta list.`
             })
           }
-          
-          console.log(`✅ Access granted for ${email} (approved: ${isApproved}, existing: ${existingBetaUser})`)
+
+          console.log(
+            `✅ Access granted for ${email} (approved: ${isApproved}, existing: ${existingBetaUser})`
+          )
         } else {
           console.log('⚠️  BETA_MODE is not active - skipping approval check!')
         }
-        
+
         // Email is approved (or not in beta mode), send the magic link
         console.log(`📧 Sending magic link to: ${email}`)
         await sendMagicLinkEmail({ email, token, url })

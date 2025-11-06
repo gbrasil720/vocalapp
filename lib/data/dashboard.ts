@@ -6,6 +6,7 @@ import {
   transcription,
   user
 } from '@/db/schema'
+import { getUserLanguageCount } from '../transcription/language-tracking'
 
 export interface UserStats {
   credits: number
@@ -70,8 +71,8 @@ export async function getServerStats(userId: string): Promise<UserStats> {
       )
     )
 
-  // Get unique languages from transaction metadata
-  const languagesUsed = 1
+  // Get unique languages count from transcriptions
+  const languagesUsed = await getUserLanguageCount(userId)
 
   // Determine plan info
   const hasSubscription =

@@ -330,6 +330,62 @@ export default function TranscriptionDetailPage() {
             </SpotlightCard>
           </div>
 
+          {/* Language Limit Warning */}
+          {(() => {
+            if (transcription.status !== 'completed') return null
+            if (!transcription.metadata) return null
+            if (typeof transcription.metadata !== 'object') return null
+            if (transcription.metadata === null) return null
+
+            const metadata = transcription.metadata as Record<
+              string,
+              any | undefined
+            >
+            if (metadata.languageLimitExceeded !== true) return null
+
+            return (
+              <div className="mb-6">
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                      <span className="text-yellow-500 text-sm">⚠️</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-yellow-400 font-semibold mb-1">
+                        Language Limit Exceeded
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-3">
+                        {metadata.languageLimitMessage
+                          ? String(metadata.languageLimitMessage)
+                          : 'Your free plan supports up to 10 languages. This audio was transcribed to English.'}
+                      </p>
+                      {metadata.originalDetectedLanguage && (
+                        <p className="text-gray-400 text-xs mb-3">
+                          Detected language:{' '}
+                          <span className="text-yellow-400 capitalize">
+                            {String(metadata.originalDetectedLanguage)}
+                          </span>
+                          {' → '}Transcribed in:{' '}
+                          <span className="text-yellow-400 capitalize">
+                            {transcription.language || 'English'}
+                          </span>
+                        </p>
+                      )}
+                      {!isPro && (
+                        <Link
+                          href="/dashboard/billing"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#03b3c3] to-[#028a96] hover:from-[#028a96] hover:to-[#03b3c3] text-white text-sm font-medium rounded-lg transition-all"
+                        >
+                          Upgrade to Pro for Unlimited Languages
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+
           {/* Transcription Text */}
           {transcription.status === 'completed' && transcription.text && (
             <div className="mb-8">

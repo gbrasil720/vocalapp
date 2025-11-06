@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { creditTransaction, subscription, user } from '@/db/schema'
 import { auth } from '@/lib/auth'
+import { getUserLanguageCount } from '@/lib/transcription/language-tracking'
 
 export async function GET() {
   try {
@@ -52,9 +53,8 @@ export async function GET() {
         )
       )
 
-    // Get unique languages from transaction metadata (if stored)
-    // For now, we'll use a placeholder since transcriptions table doesn't exist yet
-    const languagesUsed = 1 // Default to 1 (English) for now
+    // Get unique languages count from transcriptions
+    const languagesUsed = await getUserLanguageCount(userId)
 
     // Determine plan info
     const hasSubscription =
