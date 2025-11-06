@@ -7,7 +7,6 @@ import { subscription, transcription } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { getUserCredits } from '@/lib/credits'
 import { calculateTranscriptionCost } from '@/lib/credits/transcription-billing'
-import { generateBlobKey, uploadToBlob } from '@/lib/storage/vercel-blob'
 
 // Configure route to handle large file uploads
 export const runtime = 'nodejs'
@@ -47,14 +46,14 @@ function getFileExtension(filename: string): string {
   return filename.substring(lastDot).toLowerCase()
 }
 
-function isValidFileType(file: File): boolean {
+function isValidFileType(mimeType: string, fileName: string): boolean {
   // Check MIME type first
-  if (file.type && ALLOWED_TYPES.includes(file.type)) {
+  if (mimeType && ALLOWED_TYPES.includes(mimeType)) {
     return true
   }
 
   // Fallback to file extension if MIME type is missing or incorrect
-  const extension = getFileExtension(file.name)
+  const extension = getFileExtension(fileName)
   if (ALLOWED_EXTENSIONS.includes(extension)) {
     return true
   }
@@ -62,9 +61,17 @@ function isValidFileType(file: File): boolean {
   return false
 }
 
+interface FileMetadata {
+  fileUrl: string
+  fileName: string
+  fileSize: number
+  mimeType: string
+  blobPathname: string
+}
+
 export async function POST(req: Request) {
   try {
-    console.log('📤 File upload request received')
+    console.log('📤 File upload metadata request received')
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -85,13 +92,14 @@ export async function POST(req: Request) {
 
     const isPro = sub && sub.status === 'active'
 
-    const formData = await req.formData()
-    const files = formData.getAll('files') as File[]
+    // Accept JSON with file metadata instead of FormData
+    const body = await req.json()
+    const files: FileMetadata[] = Array.isArray(body.files) ? body.files : [body]
 
-    console.log(`📁 Received ${files.length} file(s)`)
+    console.log(`📁 Received metadata for ${files.length} file(s)`)
     files.forEach((file, index) => {
       console.log(
-        `  File ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type || 'unknown'})`
+        `  File ${index + 1}: ${file.fileName} (${(file.fileSize / 1024 / 1024).toFixed(2)}MB, type: ${file.mimeType || 'unknown'})`
       )
     })
 
@@ -109,52 +117,68 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate file sizes and types
+    // Validate file metadata
     for (const file of files) {
-      if (file.size === 0) {
+      if (!file.fileUrl || !file.fileName || !file.fileSize || !file.mimeType) {
         return NextResponse.json(
           {
-            error: `File "${file.name}" is empty`
+            error: 'Missing required fields: fileUrl, fileName, fileSize, mimeType'
           },
           { status: 400 }
         )
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.fileSize === 0) {
         return NextResponse.json(
           {
-            error: `File "${file.name}" exceeds maximum size of 25MB`
+            error: `File "${file.fileName}" is empty`
           },
           { status: 400 }
         )
       }
 
-      if (!isValidFileType(file)) {
-        const detectedType = file.type || 'unknown'
-        const extension = getFileExtension(file.name)
+      if (file.fileSize > MAX_FILE_SIZE) {
         return NextResponse.json(
           {
-            error: `File "${file.name}" has unsupported type (${detectedType}${extension ? `, extension: ${extension}` : ''}). Supported: MP3, M4A, WAV, WEBM, FLAC, OGG, AAC, MP4`
+            error: `File "${file.fileName}" exceeds maximum size of 25MB`
+          },
+          { status: 400 }
+        )
+      }
+
+      if (!isValidFileType(file.mimeType, file.fileName)) {
+        const extension = getFileExtension(file.fileName)
+        return NextResponse.json(
+          {
+            error: `File "${file.fileName}" has unsupported type (${file.mimeType}${extension ? `, extension: ${extension}` : ''}). Supported: MP3, M4A, WAV, WEBM, FLAC, OGG, AAC, MP4`
           },
           { status: 400 }
         )
       }
     }
 
-    // Extract duration and validate credits for each file
+    // Download files from Blob and extract duration
     const fileDetailsArray: Array<{
-      file: File
+      metadata: FileMetadata
       duration: number
       cost: number
     }> = []
 
-    for (const file of files) {
+    for (const fileMetadata of files) {
       try {
-        // Extract audio duration
-        const fileBuffer = await file.arrayBuffer()
+        // Download file from Vercel Blob to extract duration
+        console.log(`⬇️  Downloading file from Blob: ${fileMetadata.fileUrl}`)
+        const fileResponse = await fetch(fileMetadata.fileUrl)
+        if (!fileResponse.ok) {
+          throw new Error(
+            `Failed to download file from Blob: ${fileResponse.statusText}`
+          )
+        }
+
+        const fileBuffer = await fileResponse.arrayBuffer()
         const metadata = await parseBuffer(
           Buffer.from(fileBuffer),
-          { mimeType: file.type },
+          { mimeType: fileMetadata.mimeType },
           { duration: true }
         )
 
@@ -163,7 +187,7 @@ export async function POST(req: Request) {
         if (!durationSeconds || durationSeconds <= 0) {
           return NextResponse.json(
             {
-              error: `Cannot extract duration from "${file.name}". Please ensure it's a valid audio file.`
+              error: `Cannot extract duration from "${fileMetadata.fileName}". Please ensure it's a valid audio file.`
             },
             { status: 400 }
           )
@@ -172,15 +196,18 @@ export async function POST(req: Request) {
         const cost = calculateTranscriptionCost(durationSeconds)
 
         fileDetailsArray.push({
-          file,
+          metadata: fileMetadata,
           duration: durationSeconds,
           cost
         })
       } catch (error) {
-        console.error(`Error extracting duration from ${file.name}:`, error)
+        console.error(
+          `Error extracting duration from ${fileMetadata.fileName}:`,
+          error
+        )
         return NextResponse.json(
           {
-            error: `Failed to extract audio duration from "${file.name}". Please ensure it's a valid audio file.`
+            error: `Failed to extract audio duration from "${fileMetadata.fileName}". Please ensure it's a valid audio file.`
           },
           { status: 400 }
         )
@@ -208,19 +235,16 @@ export async function POST(req: Request) {
 
     // Process each file
     for (const fileDetail of fileDetailsArray) {
-      const { file, duration, cost } = fileDetail
-
-      const blobKey = generateBlobKey(userId, file.name)
-      const uploadResult = await uploadToBlob(file, blobKey)
+      const { metadata, duration, cost } = fileDetail
 
       const [newTranscription] = await db
         .insert(transcription)
         .values({
           userId,
-          fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
-          fileUrl: uploadResult.url,
+          fileName: metadata.fileName,
+          fileSize: metadata.fileSize,
+          mimeType: metadata.mimeType,
+          fileUrl: metadata.fileUrl,
           duration,
           status: 'processing',
           metadata: {

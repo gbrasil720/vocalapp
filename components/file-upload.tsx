@@ -1,5 +1,6 @@
 'use client'
 
+import { upload } from '@vercel/blob/client'
 import { Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,8 +10,13 @@ interface FileUploadProps {
   isPro: boolean
 }
 
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25MB
+
 export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
+    {}
+  )
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -22,27 +28,85 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
       return
     }
 
+    const fileArray = Array.from(files)
+
+    // Validate file sizes on client
+    for (const file of fileArray) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(
+          `File "${file.name}" exceeds maximum size of 25MB (${(file.size / 1024 / 1024).toFixed(2)}MB)`
+        )
+        return
+      }
+    }
+
     setUploading(true)
+    setUploadProgress({})
 
     try {
-      const formData = new FormData()
-      Array.from(files).forEach((file) => {
-        formData.append('files', file)
-      })
+      const uploadResults: Array<{
+        fileUrl: string
+        fileName: string
+        fileSize: number
+        mimeType: string
+        blobPathname: string
+      }> = []
 
+      // Upload each file directly to Vercel Blob
+      for (const file of fileArray) {
+        try {
+          // Upload file directly to Vercel Blob using the official client upload method
+          // This will call /api/transcriptions/upload-token to get a token and handle the upload
+          const blob = await upload(file.name, file, {
+            access: 'public',
+            handleUploadUrl: '/api/transcriptions/upload-token',
+            clientPayload: JSON.stringify({
+              fileName: file.name,
+              fileSize: file.size,
+              mimeType: file.type
+            })
+          })
+
+          uploadResults.push({
+            fileUrl: blob.url,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+            blobPathname: blob.pathname
+          })
+
+          setUploadProgress((prev) => ({
+            ...prev,
+            [file.name]: 100
+          }))
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error)
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : `Failed to upload ${file.name}`
+          toast.error(errorMessage)
+          setUploading(false)
+          return
+        }
+      }
+
+      // Send metadata to upload route
       const response = await fetch('/api/transcriptions/upload', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          files: uploadResults
+        })
       })
 
-      // Clone response to read as both text and JSON if needed
-      const responseClone = response.clone()
       let data
       try {
         data = await response.json()
       } catch (jsonError) {
-        // Handle non-JSON responses (e.g., 500 error pages)
-        const text = await responseClone.text()
+        const text = await response.text()
         console.error('Failed to parse response as JSON:', text)
         throw new Error(
           `Server error (${response.status}): ${text.substring(0, 100)}`
@@ -55,35 +119,12 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         )
         onUploadComplete()
       } else {
-        let errorMessage =
-          data?.error ||
-          `Upload failed with status ${response.status}`
-
-        // Detect Vercel payload size error
-        if (
-          response.status === 413 ||
-          errorMessage.includes('BIG_PAYLOAD') ||
-          errorMessage.includes('payload') ||
-          errorMessage.includes('too large') ||
-          errorMessage.includes('413')
-        ) {
-          const totalSize = Array.from(files).reduce(
-            (sum, file) => sum + file.size,
-            0
-          )
-          const sizeMB = (totalSize / 1024 / 1024).toFixed(2)
-          errorMessage = `File upload failed: The file size (${sizeMB}MB) exceeds the server limit. Please try uploading a smaller file (under 4.5MB) or contact support.`
-        }
-
+        const errorMessage =
+          data?.error || `Upload failed with status ${response.status}`
         console.error('Upload failed:', {
           status: response.status,
           error: errorMessage,
-          data,
-          fileSizes: Array.from(files).map((f) => ({
-            name: f.name,
-            size: f.size,
-            sizeMB: (f.size / 1024 / 1024).toFixed(2)
-          }))
+          data
         })
         toast.error(errorMessage)
       }
@@ -96,6 +137,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
       toast.error(errorMessage)
     } finally {
       setUploading(false)
+      setUploadProgress({})
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
