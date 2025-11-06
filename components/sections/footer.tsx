@@ -3,55 +3,41 @@
 import {
   AudioWave01Icon,
   GithubIcon,
-  Linkedin02Icon,
   Mail01Icon,
   NewTwitterIcon,
   ZapIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { AudioLines, Github, Linkedin, Mail, Twitter, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 const footerLinks = {
   product: [
     { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'API', href: '/api' },
-    { name: 'Integrations', href: '/integrations' }
+    { name: 'Pricing', href: '#pricing' }
   ],
-  company: [
-    { name: 'About Us', href: '/about' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Press', href: '/press' }
-  ],
+  company: [{ name: 'About Us', href: '/about' }],
   support: [
     { name: 'Help Center', href: '/help' },
-    { name: 'Contact Support', href: '/support' },
-    { name: 'Documentation', href: '/docs' },
-    { name: 'Status', href: '/status' }
-  ],
-  legal: [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms of Service', href: '/terms' },
-    { name: 'Cookie Policy', href: '/cookies' },
-    { name: 'GDPR', href: '/gdpr' }
+    { name: 'Contact Support', href: '/support' }
   ]
 }
 
 const socialLinks = [
   {
     name: 'Twitter',
-    href: 'https://twitter.com/vocalapp',
+    href: 'https://twitter.com/guitrynacode',
     icon: NewTwitterIcon
   },
   {
-    name: 'LinkedIn',
-    href: 'https://linkedin.com/company/vocalapp',
-    icon: Linkedin02Icon
+    name: 'GitHub',
+    href: 'https://github.com/gbrasil720/vocalapp',
+    icon: GithubIcon
   },
-  { name: 'GitHub', href: 'https://github.com/vocalapp', icon: GithubIcon },
-  { name: 'Email', href: 'mailto:hello@vocal.app', icon: Mail01Icon }
+  {
+    name: 'Email',
+    href: 'mailto:dev.guilhermebrasil@gmail.com',
+    icon: Mail01Icon
+  }
 ]
 
 export function Footer() {
@@ -66,7 +52,7 @@ export function Footer() {
               {/* <AudioLines className="w-8 h-8 text-[#03b3c3]" /> */}
               <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
               <span className="text-2xl font-bold text-[#e5e5e5] font-['Satoshi']">
-                vocal.app
+                vocalapp
               </span>
             </div>
             <p className="text-gray-300 text-base leading-relaxed mb-6 max-w-sm">
@@ -131,25 +117,6 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Legal Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4 font-['Satoshi']">
-              Legal
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-300 hover:text-[#03b3c3] transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* Social Links & Trust Badges */}
@@ -202,7 +169,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm">
-              © 2024 vocal.app. All rights reserved.
+              © 2025 vocalapp. All rights reserved.
             </p>
             <p className="text-gray-400 text-sm">
               Made with ❤️ for creators worldwide

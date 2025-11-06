@@ -35,7 +35,7 @@ export default function SignUp() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold font-['Satoshi']">
-                  vocal.app
+                  vocalapp
                 </h1>
                 <p className="text-white/80 text-lg">
                   AI-Powered Transcription
@@ -79,7 +79,7 @@ export default function SignUp() {
                 <HugeiconsIcon icon={UserIcon} size={22} color="#99a1af " />
               </div>
               <h1 className="text-3xl font-medium font-['Satoshi']">
-                vocal.app
+                vocalapp
               </h1>
             </div>
 

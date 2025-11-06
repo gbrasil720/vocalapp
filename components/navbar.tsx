@@ -24,7 +24,7 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
         /> */}
         <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
         <p className="font-['Satoshi'] font-medium text-lg sm:text-xl">
-          vocal.app
+          vocalapp
         </p>
       </div>
       <div className="flex items-center gap-2 sm:gap-4">

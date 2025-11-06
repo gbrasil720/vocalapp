@@ -319,7 +319,7 @@ export default function TranscriptionsPage() {
                   className="text-[#03b3c3]"
                 />
                 <span className="font-['Satoshi'] font-medium text-xl">
-                  vocal.app
+                  vocalapp
                 </span>
               </Link>
 
