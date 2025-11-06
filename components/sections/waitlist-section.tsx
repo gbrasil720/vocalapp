@@ -61,7 +61,7 @@ export function WaitlistSection() {
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
           <HugeiconsIcon icon={StarIcon} color="#03b3c3" size={20} />
-          <span className="text-sm font-semibold text-[#03b3c3]">
+          <span className="text-sm sm:text-base font-semibold text-[#03b3c3]">
             Closed Beta
           </span>
         </div>
@@ -193,7 +193,7 @@ export function WaitlistSection() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
+                      className="cursor-pointer w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
                     >
                       {loading ? 'Joining...' : 'Secure Your Spot'}
                     </Button>
