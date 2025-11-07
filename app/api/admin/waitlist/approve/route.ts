@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { sendBetaApprovalEmail } from '@/lib/email/beta-approval'
 import { approveEmail } from '@/lib/waitlist'
 
 /**
@@ -35,6 +36,19 @@ export async function POST(request: Request) {
     const result = await approveEmail(email)
 
     if (result) {
+      try {
+        await sendBetaApprovalEmail(email)
+      } catch (error) {
+        console.error('Error sending approval email:', error)
+        return NextResponse.json(
+          {
+            error: 'Email notification failed after approving user',
+            email
+          },
+          { status: 500 }
+        )
+      }
+
       return NextResponse.json({
         success: true,
         message: `Successfully approved ${email}`,
@@ -57,4 +71,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
