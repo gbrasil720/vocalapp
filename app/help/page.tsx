@@ -1,6 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+
 export const metadata: Metadata = {
   title: 'Help Center',
   description:
@@ -29,10 +38,10 @@ export default function HelpPage() {
   return (
     <div className="relative z-10 py-24 px-6">
       <div className="max-w-4xl mx-auto space-y-12 text-gray-200">
-        <header className="space-y-4 text-center">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#03b3c3]/10 border border-[#03b3c3]/30 px-4 py-1 text-sm font-semibold text-[#03b3c3]">
+        <header className="space-y-4">
+          <Badge className="mx-auto w-fit gap-2 rounded-full border-[#03b3c3]/30 bg-[#03b3c3]/10 px-4 py-1 text-sm font-semibold text-[#03b3c3]">
             Help Center
-          </p>
+          </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-white">
             How can we help?
           </h1>
@@ -43,18 +52,23 @@ export default function HelpPage() {
           </p>
         </header>
 
-        <section className="grid gap-6">
-          {faqItems.map((item) => (
-            <div
-              key={item.question}
-              className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1"
-            >
-              <h2 className="text-2xl font-semibold text-white">
-                {item.question}
-              </h2>
-              <p className="mt-3 text-gray-300">{item.answer}</p>
-            </div>
-          ))}
+        <section>
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqItems.map((item, index) => (
+              <AccordionItem
+                key={item.question}
+                value={`item-${index}`}
+                className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl transition-transform duration-300 data-[state=open]:border-white/20 data-[state=open]:shadow-lg"
+              >
+                <AccordionTrigger className="px-6 py-5 text-left text-2xl font-semibold text-white hover:no-underline">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6 text-gray-300">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </section>
 
         <section className="rounded-3xl border border-white/10 bg-transparent p-8 text-center backdrop-blur-xl">
@@ -67,34 +81,32 @@ export default function HelpPage() {
               href="mailto:hello@vocalapp.ai"
               className="text-[#03b3c3] hover:underline"
             >
-              hello@vocalapp.ai
+              hello@vocalapp.io
             </a>{' '}
             or jump into our GitHub discussions to reach the team and community
             maintainers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://github.com/vocalapp-ai/vocalapp/discussions"
-              className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-white/20 px-6 py-3 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
             >
-              Join discussions
-            </a>
-            <a
-              href="#waitlist"
-              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#d856bf] to-[#03b3c3] px-6 py-3 font-semibold text-white transition-transform duration-300 hover:scale-105"
-            >
-              Check waitlist status
-            </a>
+              <a href="https://github.com/gbrasil720/vocalapp/issues">
+                Open an issue
+              </a>
+            </Button>
           </div>
         </section>
 
         <div className="flex justify-center pt-8">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full border-white/15 px-6 py-3 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
           >
-            ← Back to home
-          </Link>
+            <Link href="/">← Back to home</Link>
+          </Button>
         </div>
       </div>
     </div>

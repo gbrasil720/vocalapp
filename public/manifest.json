@@ -26,11 +26,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": [
-    "productivity",
-    "business",
-    "utilities"
-  ],
+  "categories": ["productivity", "business", "utilities"],
   "screenshots": [],
   "shortcuts": [
     {

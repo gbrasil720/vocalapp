@@ -2,11 +2,11 @@
 
 import { Navbar } from '@/components/navbar'
 import { BetaTestimonials } from '@/components/sections/beta-testimonials'
+import { Contributors } from '@/components/sections/contributors'
 import { CTA } from '@/components/sections/cta'
 import { FAQ } from '@/components/sections/faq'
 import { Features } from '@/components/sections/features'
 import { Footer } from '@/components/sections/footer'
-import { Partners } from '@/components/sections/partners'
 import { Pricing } from '@/components/sections/pricing'
 import { WaitlistSection } from '@/components/sections/waitlist-section'
 
@@ -18,11 +18,11 @@ export function HomePage() {
       <Navbar waitlistMode={isWaitlistMode} />
       <CTA />
       <Features />
-      <Partners />
+      <Contributors />
       <Pricing waitlistMode={isWaitlistMode} />
       {isWaitlistMode && <BetaTestimonials />}
-      <FAQ />
       {isWaitlistMode && <WaitlistSection />}
+      <FAQ />
       <Footer />
     </>
   )

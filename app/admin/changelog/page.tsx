@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   AlertTriangle,
   ArrowLeft,
+  LayoutGrid,
   CalendarClock,
   Edit3,
   Flame,
@@ -258,6 +259,15 @@ export default function AdminChangelogPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link href="/admin">
+              <Button
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+              >
+                <LayoutGrid className="mr-2 h-4 w-4" />
+                Admin Home
+              </Button>
+            </Link>
             <Button
               onClick={() => {
                 resetForm()

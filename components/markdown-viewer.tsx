@@ -22,4 +22,3 @@ export function MarkdownViewer({ content, className }: MarkdownViewerProps) {
 }
 
 export default MarkdownViewer
-

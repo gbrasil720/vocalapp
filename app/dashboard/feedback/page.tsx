@@ -1,6 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FeedbackForm } from '@/components/forms/feedback-form'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 
 export const metadata: Metadata = {
   title: 'Beta Feedback',
@@ -33,9 +42,9 @@ export default function FeedbackPage() {
     <div className="relative z-10 py-16 px-6">
       <div className="max-w-5xl mx-auto space-y-12 text-gray-200">
         <header className="space-y-3">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#03b3c3]/10 border border-[#03b3c3]/30 px-4 py-1 text-sm font-semibold text-[#03b3c3]">
+          <Badge className="gap-2 rounded-full border-[#03b3c3]/30 bg-[#03b3c3]/10 px-4 py-1 text-sm font-semibold text-[#03b3c3]">
             Closed beta feedback
-          </p>
+          </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-white">
             Help us build the roadmap
           </h1>
@@ -50,21 +59,24 @@ export default function FeedbackPage() {
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {helperCards.map((card) => (
-            <div
+            <Card
               key={card.title}
-              className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-transform duration-300 hover:-translate-y-1"
+              className="p-6 transition-transform duration-300 hover:-translate-y-1"
             >
-              <h2 className="text-2xl font-semibold text-white mb-3">
-                {card.title}
-              </h2>
-              <p className="text-gray-300 mb-6">{card.description}</p>
-              <Link
-                href={card.href}
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
-              >
-                {card.label}
-              </Link>
-            </div>
+              <CardHeader className="space-y-3">
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardHeader>
+              <CardFooter className="pt-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-full border-white/20 px-5 py-2 font-semibold text-white transition-transform duration-300 hover:scale-105 hover:bg-white/10"
+                >
+                  <Link href={card.href}>{card.label}</Link>
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
         </section>
       </div>

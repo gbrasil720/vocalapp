@@ -19,6 +19,10 @@ export const user = pgTable('user', {
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
+  role: text('role'),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
+  banExpires: timestamp('ban_expires'),
   stripeCustomerId: text('stripe_customer_id'),
   credits: integer('credits').default(30).notNull(),
   isBetaUser: boolean('is_beta_user').default(true).notNull()
@@ -90,7 +94,8 @@ export const session = pgTable('session', {
   userAgent: text('user_agent'),
   userId: text('user_id')
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' })
+    .references(() => user.id, { onDelete: 'cascade' }),
+  impersonatedBy: text('impersonated_by')
 })
 
 export const account = pgTable('account', {

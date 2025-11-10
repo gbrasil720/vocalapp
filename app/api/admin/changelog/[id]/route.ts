@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { db } from '@/db'
 import { changelogEntry } from '@/db/schema'
 import { auth } from '@/lib/auth'
@@ -36,8 +36,8 @@ async function requireAdmin() {
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminResult = await requireAdmin()
@@ -45,7 +45,7 @@ export async function PATCH(
       return adminResult.error
     }
 
-    const { id } = params
+    const { id } = await context.params
 
     const raw = await request.json()
     const parsed = changelogEntryUpdateSchema.safeParse(raw)
@@ -120,8 +120,8 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminResult = await requireAdmin()
@@ -129,7 +129,7 @@ export async function DELETE(
       return adminResult.error
     }
 
-    const { id } = params
+    const { id } = await context.params
 
     const [entry] = await db
       .delete(changelogEntry)

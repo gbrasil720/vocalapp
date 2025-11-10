@@ -4,6 +4,7 @@ import {
   CheckCheck,
   CheckCircle,
   Clock,
+  LayoutGrid,
   RefreshCw,
   Users,
   XCircle
@@ -157,6 +158,15 @@ export default function AdminWaitlist() {
               <p className="text-gray-400">Manage beta access approvals</p>
             </div>
             <div className="flex gap-3">
+              <Link href="/admin">
+                <Button
+                  variant="outline"
+                  className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                >
+                  <LayoutGrid className="w-4 h-4 mr-2" />
+                  Admin Home
+                </Button>
+              </Link>
               <Button
                 onClick={fetchData}
                 variant="outline"

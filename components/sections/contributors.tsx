@@ -29,9 +29,9 @@ const partnerHighlights = [
   }
 ]
 
-export function Partners() {
+export function Contributors() {
   return (
-    <section className="relative z-10 py-20 px-6" id="partners">
+    <section className="relative z-10 py-20 px-6" id="contributors">
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
           Community Contributors
@@ -69,13 +69,13 @@ export function Partners() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="https://github.com/vocalapp-ai/vocalapp/issues"
+              href="https://github.com/gbrasil720/vocalapp/issues"
               className="px-8 py-3 rounded-full bg-[#d856bf] text-white font-semibold transition-transform duration-300 hover:scale-105"
             >
               Browse Open Issues
             </Link>
             <Link
-              href="https://github.com/vocalapp-ai/vocalapp"
+              href="https://github.com/gbrasil720/vocalapp"
               className="px-8 py-3 rounded-full border border-white/20 text-white font-semibold hover:bg-white/10 transition-transform duration-300 hover:scale-105"
             >
               Contribute on GitHub

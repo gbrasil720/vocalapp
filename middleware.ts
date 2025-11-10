@@ -41,6 +41,13 @@ export async function middleware(request: NextRequest) {
       response.headers.set('x-middleware-cache', 'no-cache')
       return response
     }
+
+    if (session) {
+      const response = NextResponse.redirect(new URL('/dashboard', request.url))
+      response.headers.set('x-middleware-cache', 'no-cache')
+      return response
+    }
+
     const response = NextResponse.next()
     response.headers.set('x-middleware-cache', 'no-cache')
     return response
@@ -54,14 +61,28 @@ export async function middleware(request: NextRequest) {
       response.headers.set('x-middleware-cache', 'no-cache')
       return response
     }
+
+    if (session) {
+      const response = NextResponse.redirect(new URL('/dashboard', request.url))
+      response.headers.set('x-middleware-cache', 'no-cache')
+      return response
+    }
+
     const response = NextResponse.next()
     response.headers.set('x-middleware-cache', 'no-cache')
     return response
   }
 
   if (pathname.startsWith('/admin')) {
+    if (session?.user?.role !== 'admin' && session) {
+      const response = NextResponse.redirect(new URL('/dashboard', request.url))
+      response.headers.set('x-middleware-cache', 'no-cache')
+      return response
+    }
+
     if (!session) {
-      const response = NextResponse.redirect(new URL('/sign-in', request.url))
+      const loginPath = BETA_MODE ? '/login-beta' : '/sign-in'
+      const response = NextResponse.redirect(new URL(loginPath, request.url))
       response.headers.set('x-middleware-cache', 'no-cache')
       return response
     }

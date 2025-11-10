@@ -2,7 +2,7 @@ import { stripe } from '@better-auth/stripe'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
-import { lastLoginMethod, magicLink, openAPI } from 'better-auth/plugins'
+import { admin, lastLoginMethod, magicLink, openAPI } from 'better-auth/plugins'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
@@ -102,6 +102,7 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI(),
+    admin({ defaultRole: 'user' }),
     lastLoginMethod(),
     magicLink({
       sendMagicLink: async ({ email, token, url }) => {

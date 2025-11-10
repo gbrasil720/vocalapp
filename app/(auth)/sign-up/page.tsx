@@ -102,8 +102,8 @@ export default function SignUp() {
                     className="text-[#03b3c3] hover:text-[#d856bf] underline transition-colors"
                   >
                     Login with approved email
-                  </Link>
-                  {' '}or{' '}
+                  </Link>{' '}
+                  or{' '}
                   <Link
                     href="/#waitlist"
                     className="text-[#03b3c3] hover:text-[#d856bf] underline transition-colors"
@@ -113,7 +113,7 @@ export default function SignUp() {
                 </p>
               </div>
             )}
-            
+
             <SignUpForm />
 
             <div className="relative my-6">

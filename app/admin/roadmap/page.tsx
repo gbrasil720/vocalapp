@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  LayoutGrid,
   CheckCircle2,
   Edit3,
   Inbox,
@@ -240,6 +241,15 @@ export default function AdminRoadmapPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <Link href="/admin">
+              <Button
+                variant="outline"
+                className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+              >
+                <LayoutGrid className="mr-2 h-4 w-4" />
+                Admin Home
+              </Button>
+            </Link>
             <Button
               onClick={() => {
                 resetForm()
