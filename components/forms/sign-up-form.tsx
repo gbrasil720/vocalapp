@@ -9,7 +9,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from '@tanstack/react-form'
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -89,7 +88,6 @@ export function SignUpForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    {/* <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /> */}
                     <HugeiconsIcon
                       icon={UserIcon}
                       size={22}
@@ -140,7 +138,6 @@ export function SignUpForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    {/* <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /> */}
                     <HugeiconsIcon
                       icon={UserIcon}
                       size={22}
@@ -193,7 +190,6 @@ export function SignUpForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    {/* <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /> */}
                     <HugeiconsIcon
                       icon={MailIcon}
                       size={22}
@@ -246,7 +242,6 @@ export function SignUpForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    {/* <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /> */}
                     <HugeiconsIcon
                       icon={SquareLock02Icon}
                       size={22}
@@ -319,7 +314,6 @@ export function SignUpForm() {
                 </FieldLabel>
                 <FieldContent>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
                       id={field.name}
                       name={field.name}

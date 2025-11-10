@@ -30,7 +30,6 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
 
     const fileArray = Array.from(files)
 
-    // Validate file sizes on client
     for (const file of fileArray) {
       if (file.size > MAX_FILE_SIZE) {
         toast.error(
@@ -52,11 +51,8 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         blobPathname: string
       }> = []
 
-      // Upload each file directly to Vercel Blob
       for (const file of fileArray) {
         try {
-          // Upload file directly to Vercel Blob using the official client upload method
-          // This will call /api/transcriptions/upload-token to get a token and handle the upload
           const blob = await upload(file.name, file, {
             access: 'public',
             handleUploadUrl: '/api/transcriptions/upload-token',
@@ -91,7 +87,6 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         }
       }
 
-      // Send metadata to upload route
       const response = await fetch('/api/transcriptions/upload', {
         method: 'POST',
         headers: {

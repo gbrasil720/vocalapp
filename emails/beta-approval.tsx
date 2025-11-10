@@ -91,7 +91,6 @@ export default function BetaApprovalEmail({
   )
 }
 
-// Styles
 const main = {
   backgroundColor: '#0a0a0a',
   fontFamily:

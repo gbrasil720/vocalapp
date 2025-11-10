@@ -1,4 +1,4 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
+import { type HandleUploadBody, handleUpload } from '@vercel/blob/client'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
@@ -39,12 +39,10 @@ function getFileExtension(filename: string): string {
 }
 
 function isValidFileType(mimeType: string, fileName: string): boolean {
-  // Check MIME type first
   if (mimeType && ALLOWED_TYPES.includes(mimeType)) {
     return true
   }
 
-  // Fallback to file extension if MIME type is missing or incorrect
   const extension = getFileExtension(fileName)
   if (ALLOWED_EXTENSIONS.includes(extension)) {
     return true
@@ -71,36 +69,30 @@ export async function POST(request: Request): Promise<NextResponse> {
       body,
       request,
       onBeforeGenerateToken: async (pathname, clientPayload) => {
-        // Extract file metadata from client payload
         const payload = clientPayload
-          ? (typeof clientPayload === 'string'
-              ? JSON.parse(clientPayload)
-              : clientPayload)
+          ? typeof clientPayload === 'string'
+            ? JSON.parse(clientPayload)
+            : clientPayload
           : {}
 
         const fileName = payload.fileName || pathname
         const fileSize = payload.fileSize
         const mimeType = payload.mimeType
 
-        // Validate file size
         if (fileSize && fileSize > MAX_FILE_SIZE) {
           throw new Error(
             `File size (${(fileSize / 1024 / 1024).toFixed(2)}MB) exceeds maximum of 25MB`
           )
         }
 
-        // Validate file type
         if (mimeType && !isValidFileType(mimeType, fileName)) {
           throw new Error(
             `File type "${mimeType}" is not supported. Supported: MP3, M4A, WAV, WEBM, FLAC, OGG, AAC, MP4`
           )
         }
 
-        // Generate blob key with user ID
         const blobKey = generateBlobKey(userId, fileName)
 
-        // Generate a client token for the browser to upload the file
-        // The pathname will be used from the client's upload() call, but we validate it here
         return {
           allowedContentTypes: ALLOWED_TYPES,
           maximumSizeInBytes: MAX_FILE_SIZE,
@@ -115,17 +107,11 @@ export async function POST(request: Request): Promise<NextResponse> {
         }
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // Called by Vercel API on client upload completion
         console.log('Blob upload completed', blob.url)
 
         try {
-          // Parse token payload to get file metadata
-          const payload = tokenPayload
-            ? JSON.parse(tokenPayload)
-            : {}
+          const payload = tokenPayload ? JSON.parse(tokenPayload) : {}
 
-          // The file metadata will be sent to the upload route
-          // We'll handle the transcription creation there
           console.log('Upload metadata:', payload)
         } catch (error) {
           console.error('Error processing upload completion:', error)
@@ -139,8 +125,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error('Error handling upload:', error)
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 400 } // The webhook will retry 5 times waiting for a 200
+      { status: 400 }
     )
   }
 }
-

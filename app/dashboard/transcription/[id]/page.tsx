@@ -59,7 +59,6 @@ export default function TranscriptionDetailPage() {
           const data = await response.json()
           setTranscription(data.transcription)
 
-          // If still processing, continue polling
           if (data.transcription.status === 'processing') {
             setPolling(true)
           } else {
@@ -79,7 +78,6 @@ export default function TranscriptionDetailPage() {
     fetchTranscription()
   }, [id])
 
-  // Check if user has Pro subscription
   useEffect(() => {
     const checkSubscription = async () => {
       if (!session?.user) return
@@ -98,7 +96,6 @@ export default function TranscriptionDetailPage() {
     checkSubscription()
   }, [session])
 
-  // Poll for updates if processing
   useEffect(() => {
     if (!polling) return
 
@@ -175,13 +172,11 @@ export default function TranscriptionDetailPage() {
 
   return (
     <>
-      {/* Background Animation */}
       <div className="hidden md:block fixed inset-0 z-0 opacity-40">
         <MemoizedHyperspeed />
       </div>
 
       <div className="relative min-h-screen z-10">
-        {/* Header */}
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
@@ -213,9 +208,7 @@ export default function TranscriptionDetailPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Status Card */}
           <div className="mb-8">
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
               <div className="flex items-center justify-between">
@@ -255,7 +248,6 @@ export default function TranscriptionDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* File Info */}
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
               <div className="flex items-center gap-3 mb-4">
                 <FileAudio className="w-5 h-5 text-[#03b3c3]" />
@@ -283,7 +275,6 @@ export default function TranscriptionDetailPage() {
               </div>
             </SpotlightCard>
 
-            {/* Language & Credits */}
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
               <div className="flex items-center gap-3 mb-4">
                 <Globe className="w-5 h-5 text-[#c247ac]" />
@@ -305,7 +296,6 @@ export default function TranscriptionDetailPage() {
               </div>
             </SpotlightCard>
 
-            {/* Date Info */}
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
               <div className="flex items-center gap-3 mb-4">
                 <Calendar className="w-5 h-5 text-[#d856bf]" />
@@ -330,7 +320,6 @@ export default function TranscriptionDetailPage() {
             </SpotlightCard>
           </div>
 
-          {/* Language Limit Warning */}
           {(() => {
             if (transcription.status !== 'completed') return null
             if (!transcription.metadata) return null
@@ -386,7 +375,6 @@ export default function TranscriptionDetailPage() {
             )
           })()}
 
-          {/* Transcription Text */}
           {transcription.status === 'completed' && transcription.text && (
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
@@ -410,7 +398,6 @@ export default function TranscriptionDetailPage() {
             </div>
           )}
 
-          {/* Audio Player */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-white mb-4">
               Audio Playback

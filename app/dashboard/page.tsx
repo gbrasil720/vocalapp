@@ -9,6 +9,8 @@ import {
   Download,
   FileText,
   Globe,
+  Map as MapIcon,
+  Newspaper,
   Settings,
   Sparkles,
   Upload,
@@ -29,6 +31,7 @@ import { authClient } from '@/lib/auth-client'
 
 interface UserStats {
   credits: number
+  isBetaUser: boolean
   plan: {
     name: string
     isActive: boolean
@@ -97,7 +100,6 @@ export default function DashboardPage() {
     }
   }, [])
 
-  // Memoized helper function to format duration from seconds to MM:SS or HH:MM:SS
   const formatDuration = useCallback((seconds: number | null): string => {
     if (!seconds) return 'N/A'
     const hours = Math.floor(seconds / 3600)
@@ -110,7 +112,6 @@ export default function DashboardPage() {
     return `${minutes}:${secs.toString().padStart(2, '0')}`
   }, [])
 
-  // Memoized helper function to format relative time
   const formatRelativeTime = useCallback((dateString: string): string => {
     const date = new Date(dateString)
     const now = new Date()
@@ -143,8 +144,12 @@ export default function DashboardPage() {
     return null
   }
 
-  // Get the first 10 transcriptions for display
   const recentTranscriptions = transcriptions.slice(0, 10)
+  const sessionBetaUser =
+    session.user && 'isBetaUser' in session.user
+      ? Boolean((session.user as { isBetaUser?: unknown }).isBetaUser)
+      : false
+  const isBetaUser = stats?.isBetaUser ?? sessionBetaUser
 
   return (
     <>
@@ -180,6 +185,28 @@ export default function DashboardPage() {
                 >
                   Billing
                 </Link>
+                {isBetaUser ? (
+                  <>
+                    <Link
+                      href="/dashboard/feedback"
+                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                    >
+                      Feedback
+                    </Link>
+                    <Link
+                      href="/dashboard/roadmap"
+                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                    >
+                      Roadmap
+                    </Link>
+                    <Link
+                      href="/dashboard/changelog"
+                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                    >
+                      Changelog
+                    </Link>
+                  </>
+                ) : null}
                 <UserNav />
               </div>
             </div>
@@ -192,11 +219,12 @@ export default function DashboardPage() {
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent">
                 Welcome back, {session.user.name?.split(' ')[0] || 'there'}!
               </h1>
-              <BetaBadge variant="large" />
+              {isBetaUser ? <BetaBadge variant="large" /> : null}
             </div>
             <p className="text-gray-400 text-lg">
-              You're a beta tester! Help us shape the future of transcription.
-              🚀
+              {isBetaUser
+                ? "You're a beta tester! Help us shape the future of transcription. 🚀"
+                : 'Need more credits or features? Upgrade to Pro for the full experience.'}
             </p>
           </div>
 
@@ -305,7 +333,6 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
-              {/* Mobile version - no electric border */}
               <div className="block md:hidden bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <div>
@@ -353,7 +380,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              {/* Desktop version - with electric border */}
               <div className="hidden md:block">
                 <ElectricBorder
                   color="#d856bf"
@@ -636,6 +662,53 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          {isBetaUser ? (
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Beta Updates</h2>
+                <Link
+                  href="/dashboard/changelog"
+                  className="text-[#d856bf] hover:text-[#03b3c3] transition-colors text-sm flex items-center gap-1"
+                >
+                  View changelog
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                  <Link href="/dashboard/roadmap" className="block">
+                    <div className="text-start">
+                      <div className="p-4 rounded-full bg-[#03b3c3]/20 inline-block mb-4">
+                        <MapIcon className="w-6 h-6 text-[#03b3c3]" />
+                      </div>
+                      <h3 className="font-semibold text-white mb-2">
+                        Product Roadmap
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        Track what’s planned, in progress, and recently shipped.
+                      </p>
+                    </div>
+                  </Link>
+                </SpotlightCard>
+                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                  <Link href="/dashboard/changelog" className="block">
+                    <div className="text-start">
+                      <div className="p-4 rounded-full bg-[#d856bf]/20 inline-block mb-4">
+                        <Newspaper className="w-6 h-6 text-[#d856bf]" />
+                      </div>
+                      <h3 className="font-semibold text-white mb-2">
+                        Weekly Changelog
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        Catch the highlights from every release and bug fix.
+                      </p>
+                    </div>
+                  </Link>
+                </SpotlightCard>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">

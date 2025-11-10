@@ -37,7 +37,6 @@ export interface TranscriptionData {
 }
 
 export async function getServerStats(userId: string): Promise<UserStats> {
-  // Get user data
   const userData = await db
     .select({
       credits: user.credits
@@ -50,14 +49,12 @@ export async function getServerStats(userId: string): Promise<UserStats> {
     throw new Error('User not found')
   }
 
-  // Get subscription data
   const subscriptionData = await db
     .select()
     .from(subscription)
     .where(eq(subscription.referenceId, userId))
     .limit(1)
 
-  // Calculate minutes used from usage transactions
   const usageStats = await db
     .select({
       totalMinutes: sql<number>`COALESCE(SUM(ABS(${creditTransaction.amount})), 0)`,
@@ -71,10 +68,8 @@ export async function getServerStats(userId: string): Promise<UserStats> {
       )
     )
 
-  // Get unique languages count from transcriptions
   const languagesUsed = await getUserLanguageCount(userId)
 
-  // Determine plan info
   const hasSubscription =
     subscriptionData.length > 0 && subscriptionData[0].status === 'active'
   const planName = hasSubscription ? subscriptionData[0].plan : 'Free Plan'
@@ -134,7 +129,6 @@ export async function getServerTranscriptions(
 }
 
 export async function getDashboardData(userId: string) {
-  // Fetch both stats and transcriptions in parallel for better performance
   const [stats, transcriptions] = await Promise.all([
     getServerStats(userId),
     getServerTranscriptions(userId)

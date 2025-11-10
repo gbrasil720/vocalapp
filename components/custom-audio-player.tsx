@@ -139,7 +139,6 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
       </audio>
 
       <div className="flex flex-col gap-6">
-        {/* Progress Bar */}
         <div className="space-y-2">
           <div
             className="relative h-3 bg-white/10 rounded-full cursor-pointer group"
@@ -164,13 +163,11 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             aria-valuenow={currentTime}
             tabIndex={0}
           >
-            {/* Progress Fill with Gradient */}
             <div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#03b3c3] via-[#c247ac] to-[#d856bf] rounded-full transition-all"
               style={{ width: `${progress}%` }}
             />
 
-            {/* Progress Handle */}
             <div
               className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
               style={{ left: `calc(${progress}% - 10px)` }}
@@ -179,16 +176,13 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             </div>
           </div>
 
-          {/* Time Display */}
           <div className="flex items-center justify-between text-sm text-gray-400">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
         </div>
 
-        {/* Controls */}
         <div className="flex items-center justify-start gap-6">
-          {/* Play/Pause Button */}
           <button
             type="button"
             onClick={togglePlay}
@@ -208,7 +202,6 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             )}
           </button>
 
-          {/* Volume Controls */}
           <div className="flex items-center gap-3 w-64 flex-shrink-0">
             <button
               type="button"
@@ -222,7 +215,6 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
               )}
             </button>
 
-            {/* Volume Slider */}
             <div className="relative flex-1 h-2 bg-white/10 rounded-full">
               <div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#03b3c3] to-[#c247ac] rounded-full"
@@ -241,10 +233,8 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             </div>
           </div>
 
-          {/* Separator */}
           <div className="hidden lg:block h-8 w-px bg-white/10" />
 
-          {/* Waveform Visualization */}
           <div className="hidden lg:flex items-center gap-1 flex-1 max-w-md">
             {[...Array(20)].map((_, i) => {
               const height = Math.floor(Math.random() * 20 + 10)

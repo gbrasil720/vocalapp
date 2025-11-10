@@ -27,7 +27,6 @@ export function PricingCard({
 }: PricingCardProps) {
   const mappedBenefits = benefits.map((benefit) => (
     <li key={benefit} className="flex items-center gap-3">
-      {/* <Check className="w-5 h-5 text-green-400 flex-shrink-0" /> */}
       <HugeiconsIcon
         icon={Tick02Icon}
         color="oklch(79.2% 0.209 151.711)"
@@ -54,7 +53,6 @@ export function PricingCard({
   if (mostPopular) {
     return (
       <div className="relative group -mt-4">
-        {/* Mobile version - no electric border */}
         <div className="block md:hidden">
           <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full flex flex-col relative">
             <MostPopularBadge />
@@ -88,7 +86,6 @@ export function PricingCard({
             )}
           </div>
         </div>
-        {/* Desktop version - with electric border */}
         <div className="hidden md:block">
           <ElectricBorder
             color="#03b3c3"

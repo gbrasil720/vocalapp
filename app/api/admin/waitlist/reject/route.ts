@@ -3,21 +3,15 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { revokeApproval } from '@/lib/waitlist'
 
-/**
- * ADMIN ENDPOINT: Revoke beta access approval (or reject from waitlist)
- */
 export async function POST(request: Request) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
 
-    if (!session?.user) {
+    if (!session?.user)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
-    // Check if user is admin
     const adminEmail = process.env.ADMIN_EMAIL || session.user.email
     if (session.user.email !== adminEmail) {
       return NextResponse.json(
@@ -57,4 +51,3 @@ export async function POST(request: Request) {
     )
   }
 }
-

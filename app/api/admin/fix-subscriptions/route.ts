@@ -6,13 +6,8 @@ import { subscription, user } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { addCredits } from '@/lib/credits'
 
-/**
- * ADMIN ENDPOINT: Grants credits to users with active subscriptions who haven't received them yet
- * This is a one-time fix for existing subscriptions created before the webhook was updated
- */
 export async function POST() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -21,7 +16,6 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get all active subscriptions
     const activeSubscriptions = await db
       .select()
       .from(subscription)
@@ -31,7 +25,6 @@ export async function POST() {
 
     for (const sub of activeSubscriptions) {
       try {
-        // Get user by referenceId (which is the userId)
         const [userRecord] = await db
           .select()
           .from(user)
@@ -39,11 +32,10 @@ export async function POST() {
           .limit(1)
 
         if (userRecord) {
-          // Grant 600 credits for Pro Plan subscription
           await addCredits(userRecord.id, 600, {
             type: 'subscription_grant',
             description: 'Pro Plan monthly credits (manual grant)',
-            stripeSubscriptionId: sub.stripeSubscriptionId || undefined
+            stripeSubscriptionId: sub.stripeSubscriptionId ?? undefined
           })
 
           results.push({

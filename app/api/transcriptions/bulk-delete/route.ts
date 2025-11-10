@@ -8,7 +8,6 @@ import { deleteFromBlob } from '@/lib/storage/vercel-blob'
 
 export async function POST(req: Request) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -31,7 +30,6 @@ export async function POST(req: Request) {
       )
     }
 
-    // Fetch transcriptions to verify ownership and get file URLs
     const transcriptionsToDelete = await db
       .select()
       .from(transcription)
@@ -49,7 +47,6 @@ export async function POST(req: Request) {
       )
     }
 
-    // Delete blob files from storage
     const deletionPromises = transcriptionsToDelete
       .filter((t) => t.fileUrl)
       .map((t) =>
@@ -60,7 +57,6 @@ export async function POST(req: Request) {
 
     await Promise.allSettled(deletionPromises)
 
-    // Delete transcriptions from database
     await db
       .delete(transcription)
       .where(

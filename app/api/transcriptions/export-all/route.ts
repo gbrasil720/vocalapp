@@ -7,7 +7,6 @@ import { auth } from '@/lib/auth'
 
 export async function POST() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -16,7 +15,6 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch all completed transcriptions for the user
     const transcriptions = await db
       .select({
         id: transcription.id,
@@ -28,7 +26,6 @@ export async function POST() {
       .where(eq(transcription.userId, session.user.id))
       .orderBy(desc(transcription.createdAt))
 
-    // Filter only completed transcriptions with text
     const completedTranscriptions = transcriptions.filter(
       (t) => t.text && t.text.trim().length > 0
     )
@@ -40,20 +37,16 @@ export async function POST() {
       )
     }
 
-    // Create ZIP file using JSZip
     const JSZip = (await import('jszip')).default
     const zip = new JSZip()
 
-    // Add each transcription as a text file
     for (const t of completedTranscriptions) {
       const fileName = t.fileName.replace(/\.[^/.]+$/, '') + '.txt'
       zip.file(fileName, t.text || '')
     }
 
-    // Generate ZIP
     const zipBlob = await zip.generateAsync({ type: 'blob' })
 
-    // Return ZIP file
     return new NextResponse(zipBlob, {
       headers: {
         'Content-Type': 'application/zip',

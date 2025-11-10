@@ -6,7 +6,6 @@
 import { MailIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from '@tanstack/react-form'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
@@ -23,7 +22,6 @@ import { Input } from '../ui/input'
 import { Spinner } from '../ui/spinner'
 
 export function MagicLinkForm() {
-  const router = useRouter()
   const [emailSent, setEmailSent] = useState(false)
   const [errorState, setErrorState] = useState<{
     show: boolean
@@ -46,14 +44,12 @@ export function MagicLinkForm() {
           callbackURL: `${window.location.origin}/dashboard`
         })
 
-        // Check if there was an error in the response
         if (result?.error) {
           console.log('Magic link error:', result.error)
           const errorMessage =
             result.error.message ||
             'Failed to send magic link. Please try again.'
 
-          // Show error state instead of just toast
           setErrorState({
             show: true,
             email: values.value.email,
@@ -68,14 +64,12 @@ export function MagicLinkForm() {
       } catch (error: any) {
         console.log('Magic link error (caught):', error)
 
-        // Extract error message from different possible structures
         const errorMessage =
           error?.error?.message ||
           error?.message ||
           error?.toString() ||
           'Failed to send magic link. Please try again.'
 
-        // Show error state instead of just toast
         setErrorState({
           show: true,
           email: values.value.email,
@@ -86,7 +80,6 @@ export function MagicLinkForm() {
     }
   })
 
-  // Error State - Not Approved
   if (errorState.show) {
     return (
       <div className="text-center py-8 space-y-4">
@@ -143,7 +136,6 @@ export function MagicLinkForm() {
     )
   }
 
-  // Success State - Email Sent
   if (emailSent) {
     return (
       <div className="text-center py-8 space-y-4">

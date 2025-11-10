@@ -25,13 +25,11 @@ export function Features() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-7xl mx-auto">
-        {/* Main AI Powered Card - Takes 2 columns and 2 rows */}
         <SpotlightCard className="md:col-span-2 lg:col-span-2 lg:row-span-2 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full justify-between">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-2xl bg-[#E5E5E5]">
-                  {/* <Zap className="w-6 h-6 text-[#1F1F1F]" /> */}
                   <HugeiconsIcon icon={ZapIcon} color="#1f1f1f" size={22} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">
@@ -52,12 +50,10 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Row 1, Right side - 3 cards */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                {/* <Check className="w-5 h-5 text-[#1F1F1F]" /> */}
                 <HugeiconsIcon icon={Tick02Icon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">
@@ -75,7 +71,6 @@ export function Features() {
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                {/* <User className="w-5 h-5 text-[#1F1F1F]" /> */}
                 <HugeiconsIcon icon={UserIcon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">Easy to Use</h3>
@@ -90,7 +85,6 @@ export function Features() {
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                {/* <Globe className="w-5 h-5 text-[#1F1F1F]" /> */}
                 <HugeiconsIcon icon={EarthIcon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">
@@ -103,12 +97,10 @@ export function Features() {
           </div>
         </SpotlightCard>
 
-        {/* Row 2, Right side - 3 cards */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                {/* <FileText className="w-5 h-5 text-[#1F1F1F]" /> */}
                 <HugeiconsIcon
                   icon={DocumentAttachmentIcon}
                   color="#1f1f1f"
@@ -130,7 +122,6 @@ export function Features() {
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                {/* <Brain className="w-5 h-5 text-[#1F1F1F]" /> */}
                 <HugeiconsIcon icon={AiBrain05Icon} color="#1f1f1f" size={22} />
               </div>
               <h3 className="text-lg font-semibold text-white">Smart AI</h3>

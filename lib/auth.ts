@@ -22,7 +22,7 @@ export const auth = betterAuth({
     isBetaUser: {
       type: 'boolean',
       required: false,
-      defaultValue: true // Default to true (all users in beta mode are beta users)
+      defaultValue: true
     }
   },
   emailAndPassword: {
@@ -56,7 +56,6 @@ export const auth = betterAuth({
             betaMode: process.env.BETA_MODE
           })
 
-          // In beta mode: check approval, keep default true if approved
           if (process.env.BETA_MODE === 'true') {
             const isApproved = await isEmailApproved(user.email)
             const existingBetaUser = await isBetaUserByEmail(user.email)
@@ -67,7 +66,6 @@ export const auth = betterAuth({
               existingBetaUser
             })
 
-            // Reject if not approved in waitlist AND not an existing beta user
             if (!isApproved && !existingBetaUser) {
               console.log(
                 `❌ Rejecting user creation for unapproved email: ${user.email}`
@@ -77,7 +75,6 @@ export const auth = betterAuth({
               })
             }
 
-            // Approved users keep default true (explicitly set to ensure it)
             console.log(
               `✅ Setting isBetaUser=true for ${user.email} (approved: ${isApproved}, existing: ${existingBetaUser})`
             )
@@ -85,12 +82,11 @@ export const auth = betterAuth({
             return {
               data: {
                 ...user,
-                isBetaUser: true // Explicitly set to true for approved users
+                isBetaUser: true
               }
             }
           }
 
-          // Not in beta mode: set to false
           console.log(
             `ℹ️  Not in beta mode - setting isBetaUser=false for ${user.email}`
           )
@@ -115,20 +111,16 @@ export const auth = betterAuth({
           isBetaModeActive: process.env.BETA_MODE === 'true'
         })
 
-        // Check if email is approved before sending (only in beta mode)
         if (process.env.BETA_MODE === 'true') {
-          // Check if email is in the approved waitlist
           const isApproved = await isEmailApproved(email)
           console.log(`✅ Waitlist approval check for ${email}:`, isApproved)
 
-          // Also check if user already exists with beta access
           const existingBetaUser = await isBetaUserByEmail(email)
           console.log(
             `✅ Existing beta user check for ${email}:`,
             existingBetaUser
           )
 
-          // Allow if either approved in waitlist OR already a beta user
           if (!isApproved && !existingBetaUser) {
             console.log(
               `❌ Rejecting magic link for unapproved email: ${email}`
@@ -145,7 +137,6 @@ export const auth = betterAuth({
           console.log('⚠️  BETA_MODE is not active - skipping approval check!')
         }
 
-        // Email is approved (or not in beta mode), send the magic link
         console.log(`📧 Sending magic link to: ${email}`)
         await sendMagicLinkEmail({ email, token, url })
       }
@@ -157,12 +148,10 @@ export const auth = betterAuth({
       onEvent: async (event) => {
         console.log('stripe event', event)
 
-        // Handle credit purchases via checkout.session.completed
         if (event.type === 'checkout.session.completed') {
           const session = event.data.object
           const metadata = session.metadata
 
-          // Check if this is a credit purchase (vs subscription)
           if (metadata?.purchaseType === 'credits') {
             const userId = metadata.userId
             const credits = Number.parseInt(metadata.credits || '0')
@@ -170,7 +159,6 @@ export const auth = betterAuth({
 
             if (userId && credits > 0) {
               try {
-                // Add credits to user account
                 await addCredits(userId, credits, {
                   type: 'purchase',
                   description: `Purchased ${packType} credit pack (${credits} credits)`,
@@ -187,17 +175,14 @@ export const auth = betterAuth({
           }
         }
 
-        // Handle subscription activation - grant monthly credits
         if (
           event.type === 'customer.subscription.created' ||
           event.type === 'customer.subscription.updated'
         ) {
           const subscription = event.data.object
 
-          // Only grant credits when subscription becomes active
           if (subscription.status === 'active') {
             try {
-              // Find user by stripe customer ID
               const [userRecord] = await db
                 .select()
                 .from(schema.user)
@@ -212,7 +197,6 @@ export const auth = betterAuth({
               if (userRecord) {
                 const userId = userRecord.id
 
-                // Grant Pro Plan monthly credits (600)
                 await addCredits(userId, 600, {
                   type: 'subscription_grant',
                   description: 'Pro Plan monthly credits',
@@ -238,7 +222,7 @@ export const auth = betterAuth({
         plans: [
           {
             name: 'Pro Plan',
-            priceId: 'price_1SKSwiLei6ZP9igfAKHMocXM', // para prod: 'price_1SKIgxLei6ZP9igfc6prsvK2',
+            priceId: 'price_1SKSwiLei6ZP9igfAKHMocXM',
             limits: {
               credits: 600
             }

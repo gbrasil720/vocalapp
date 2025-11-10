@@ -12,13 +12,11 @@ const waitlistSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Get IP address for rate limiting
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0] ||
       request.headers.get('x-real-ip') ||
       'unknown'
 
-    // Check IP rate limit (max 3 submissions per hour)
     const isRateLimited = await checkIPRateLimit(ip)
     if (isRateLimited) {
       return NextResponse.json(
@@ -32,7 +30,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
-    // Validate email
     const validation = waitlistSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
@@ -46,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     const { email } = validation.data
 
-    // Add to waitlist (also records IP)
     const entry = await addToWaitlist(email, ip)
 
     if (!entry) {

@@ -42,7 +42,7 @@ async function sendEmail(to: string, html: string): Promise<void> {
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   await resend.emails.send({
-    from: process.env.EMAIL_FROM || 'VocalApp <noreply@vocalapp.io>',
+    from: process.env.EMAIL_FROM || 'VocalApp <hello@vocalapp.io>',
     to,
     subject: 'You now have access to VocalApp Beta',
     html

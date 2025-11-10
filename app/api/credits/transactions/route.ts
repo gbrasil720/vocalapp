@@ -5,7 +5,6 @@ import { getTransactionHistory } from '@/lib/credits'
 
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -14,7 +13,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get transaction history
     const transactions = await getTransactionHistory(session.user.id, 50)
 
     return NextResponse.json({ transactions })

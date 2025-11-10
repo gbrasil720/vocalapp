@@ -90,16 +90,13 @@ export default function TranscriptionsPage() {
     }
   }, [session, fetchTranscriptions])
 
-  // Apply filters and search
   useEffect(() => {
     let filtered = [...transcriptions]
 
-    // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter((t) => t.status === statusFilter)
     }
 
-    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((t) =>
@@ -107,7 +104,6 @@ export default function TranscriptionsPage() {
       )
     }
 
-    // Sort
     filtered.sort((a, b) => {
       switch (sortOption) {
         case 'recent':
@@ -131,7 +127,6 @@ export default function TranscriptionsPage() {
     setHasMore(filtered.length > ITEMS_PER_PAGE)
   }, [transcriptions, statusFilter, searchQuery, sortOption])
 
-  // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -524,7 +519,6 @@ export default function TranscriptionsPage() {
                     className="bg-transparent backdrop-blur-xl hover:scale-[1.01] transition-transform"
                   >
                     <div className="flex items-center gap-4">
-                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         checked={selectedIds.has(transcription.id)}
@@ -533,7 +527,6 @@ export default function TranscriptionsPage() {
                         className="w-5 h-5 rounded border-2 border-white/20 bg-white/5 checked:bg-gradient-to-r checked:from-[#d856bf] checked:to-[#c247ac] focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 cursor-pointer flex-shrink-0"
                       />
 
-                      {/* Content */}
                       <Link
                         href={`/dashboard/transcription/${transcription.id}`}
                         className="flex-1 flex items-center justify-between"
@@ -562,7 +555,6 @@ export default function TranscriptionsPage() {
                           </div>
                         </div>
 
-                        {/* Status */}
                         <div className="flex items-center gap-3">
                           {transcription.status === 'completed' ? (
                             <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full flex items-center gap-1">

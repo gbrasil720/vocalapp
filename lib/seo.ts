@@ -71,12 +71,7 @@ export function generateMetadata({
       apple: '/apple-icon.png'
     },
     manifest: '/manifest.json',
-    verification: {
-      // Add verification codes when available
-      // google: 'your-google-verification-code',
-      // yandex: 'your-yandex-verification-code',
-      // bing: 'your-bing-verification-code'
-    }
+    verification: {}
   }
 }
 
@@ -88,14 +83,13 @@ export function generateOrganizationSchema() {
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     sameAs: [
-      // Add social media links when available
       'https://x.com/guitrynacode',
       'https://github.com/gbrasil720/vocalapp'
     ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      email: 'dev.guilhermebrasil@gmail.com' // Update with actual email
+      email: 'dev.guilhermebrasil@gmail.com'
     }
   }
 }

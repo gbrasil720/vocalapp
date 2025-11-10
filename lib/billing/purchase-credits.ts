@@ -2,7 +2,6 @@ import type { CreditPackType } from './credit-products'
 
 export async function purchaseCredits(packType: CreditPackType): Promise<void> {
   try {
-    // Store pack type for dev mode credit granting
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('pending_credit_pack', packType)
     }
@@ -22,7 +21,6 @@ export async function purchaseCredits(packType: CreditPackType): Promise<void> {
     const data = await response.json()
 
     if (data.url) {
-      // Redirect to Stripe Checkout
       window.location.href = data.url
     } else {
       throw new Error('No checkout URL returned')

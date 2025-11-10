@@ -52,10 +52,8 @@ export default function BillingPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Add cache busting timestamp to force fresh data
       const timestamp = Date.now()
 
-      // Fetch credits
       const creditsResponse = await fetch(
         `/api/credits/balance?t=${timestamp}`,
         {
@@ -67,7 +65,6 @@ export default function BillingPage() {
         setCredits(creditsData.credits)
       }
 
-      // Fetch transactions
       const transactionsResponse = await fetch(
         `/api/credits/transactions?t=${timestamp}`,
         {
@@ -79,7 +76,6 @@ export default function BillingPage() {
         setTransactions(transactionsData.transactions)
       }
 
-      // Fetch subscription
       const subscriptionResponse = await fetch(
         `/api/user/subscription?t=${timestamp}`,
         {
@@ -101,17 +97,13 @@ export default function BillingPage() {
   useEffect(() => {
     fetchData()
 
-    // Check URL params for checkout success/cancel
     const params = new URLSearchParams(window.location.search)
     if (params.get('success') === 'true') {
-      // Get the pack type from session storage (stored before checkout)
       const pendingPack = sessionStorage.getItem('pending_credit_pack')
 
       if (pendingPack) {
-        // Clear it immediately
         sessionStorage.removeItem('pending_credit_pack')
 
-        // DEV MODE: Auto-grant credits since webhooks don't work on localhost
         const grantCreditsInDevMode = async () => {
           try {
             const response = await fetch('/api/credits/dev-grant', {
@@ -128,7 +120,6 @@ export default function BillingPage() {
               toast.success(
                 `Payment successful! Added ${data.credits} credits.`
               )
-              // Refresh to show new balance
               setTimeout(() => fetchData(), 500)
             } else {
               toast.success(
@@ -149,12 +140,10 @@ export default function BillingPage() {
         setTimeout(() => fetchData(), 1000)
       }
 
-      // Remove the success param from URL
       window.history.replaceState({}, '', '/dashboard/billing')
     } else if (params.get('canceled') === 'true') {
       toast.info('Payment was canceled. No charges were made.')
       window.history.replaceState({}, '', '/dashboard/billing')
-      // Clear pending pack
       sessionStorage.removeItem('pending_credit_pack')
     }
   }, [fetchData])
@@ -167,7 +156,6 @@ export default function BillingPage() {
     } catch (error) {
       console.error('Error purchasing credits:', error)
 
-      // Check if it's a configuration error
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to start checkout'
 
@@ -197,7 +185,6 @@ export default function BillingPage() {
         const errorData = await response.json()
         console.error('Portal error:', errorData)
 
-        // If portal not configured, show helpful message
         if (errorData.error?.includes('configuration')) {
           toast.error(
             'Stripe Customer Portal needs to be configured. Please contact support or visit your Stripe dashboard settings.'
@@ -214,18 +201,15 @@ export default function BillingPage() {
 
   const hasSubscription = subscriptionData?.hasSubscription ?? false
   const planCredits = hasSubscription ? 600 : 30
-  // Calculate credits used: if user has more credits than plan limit, show 0 used
   const creditsUsed = Math.max(0, planCredits - Math.min(credits, planCredits))
 
   return (
     <>
-      {/* Background Animation */}
       <div className="hidden md:block fixed inset-0 z-0 opacity-40">
         <MemoizedHyperspeed />
       </div>
 
       <div className="relative min-h-screen z-10">
-        {/* Header */}
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
@@ -261,9 +245,7 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Current Plan */}
           {loading ? (
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4">
@@ -278,9 +260,7 @@ export default function BillingPage() {
               >
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left Side - Plan Details Skeleton */}
                     <div className="space-y-6">
-                      {/* Plan Header Skeleton */}
                       <div className="flex items-center gap-3">
                         <div className="p-3 rounded-2xl bg-white/5 animate-pulse">
                           <div className="w-6 h-6 bg-white/10 rounded" />
@@ -291,7 +271,6 @@ export default function BillingPage() {
                         </div>
                       </div>
 
-                      {/* Features Skeleton */}
                       <div className="space-y-4">
                         {[1, 2, 3, 4].map((i) => (
                           <div key={i} className="flex items-center gap-3">
@@ -301,14 +280,12 @@ export default function BillingPage() {
                         ))}
                       </div>
 
-                      {/* Info Box Skeleton */}
                       <div className="bg-white/5 rounded-2xl p-4 space-y-2">
                         <div className="h-3 bg-white/10 rounded w-24 animate-pulse" />
                         <div className="h-4 bg-white/10 rounded w-full animate-pulse" />
                       </div>
                     </div>
 
-                    {/* Right Side - Stats Skeleton */}
                     <div className="space-y-6">
                       {[1, 2, 3].map((i) => (
                         <div
@@ -332,7 +309,6 @@ export default function BillingPage() {
                     </div>
                   </div>
 
-                  {/* Loading Indicator */}
                   <div className="mt-6 flex items-center justify-center gap-2">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 rounded-full bg-[#d856bf] animate-bounce" />
@@ -360,7 +336,6 @@ export default function BillingPage() {
               >
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Plan Details */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="p-3 rounded-2xl bg-[#d856bf]/20">
@@ -424,7 +399,6 @@ export default function BillingPage() {
                       </p>
                     </div>
 
-                    {/* Billing Info */}
                     <div className="space-y-6">
                       <SpotlightCard className="bg-transparent backdrop-blur-xl">
                         <div className="flex items-center justify-between">
@@ -523,7 +497,6 @@ export default function BillingPage() {
             </div>
           )}
 
-          {/* Credit Packs */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-white mb-4">
               Buy Credit Packs
@@ -610,7 +583,6 @@ export default function BillingPage() {
             </div>
           </div>
 
-          {/* Transaction History */}
           <div>
             <h2 className="text-xl font-bold text-white mb-4">
               Transaction History
@@ -683,22 +655,20 @@ export default function BillingPage() {
             </div>
 
             {hasSubscription && (
-              <>
-                <div className="mt-8 bg-white/5 rounded-2xl p-4 border border-white/10">
-                  <p className="text-sm text-gray-400 mb-2">
-                    Need to view invoices or manage your payment method?
-                  </p>
-                  <a
-                    href="https://billing.stripe.com/p/login/test_xxxx"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[#03b3c3] hover:text-[#d856bf] transition-colors text-sm font-semibold"
-                  >
-                    Open Stripe Customer Portal
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </>
+              <div className="mt-8 bg-white/5 rounded-2xl p-4 border border-white/10">
+                <p className="text-sm text-gray-400 mb-2">
+                  Need to view invoices or manage your payment method?
+                </p>
+                <a
+                  href="https://billing.stripe.com/p/login/test_xxxx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-[#03b3c3] hover:text-[#d856bf] transition-colors text-sm font-semibold"
+                >
+                  Open Stripe Customer Portal
+                  <ChevronRight className="w-4 h-4" />
+                </a>
+              </div>
             )}
           </div>
         </div>

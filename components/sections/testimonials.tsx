@@ -2,7 +2,7 @@
 
 import { QuoteDownIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -82,7 +82,6 @@ export function Testimonials() {
     }, 150)
   }, [])
 
-  // Auto-play functionality
   useEffect(() => {
     if (!isAutoPlaying) return
 
@@ -121,7 +120,6 @@ export function Testimonials() {
 
   return (
     <section className="relative z-10 py-20 px-6">
-      {/* Section Title */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
           Trusted by Professionals Worldwide
@@ -132,10 +130,8 @@ export function Testimonials() {
         </p>
       </div>
 
-      {/* Carousel */}
       <div className="max-w-6xl mx-auto">
         <div className="relative">
-          {/* Main Testimonial Card */}
           <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 md:p-12 min-h-[400px] flex flex-col justify-center transition-all duration-500">
             <div
               className={`flex flex-col h-full transition-all duration-300 ${
@@ -144,20 +140,16 @@ export function Testimonials() {
                   : 'opacity-100 transform translate-y-0 scale-100'
               }`}
             >
-              {/* Quote Icon */}
               <div className="mb-6">
-                {/* <Quote className="w-8 h-8 text-[#03b3c3] opacity-60" /> */}
                 <HugeiconsIcon icon={QuoteDownIcon} color="#03b3c3" size={30} />
               </div>
 
-              {/* Content */}
               <div className="flex-1 mb-8">
                 <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-6">
                   "{testimonials[currentIndex].content}"
                 </p>
               </div>
 
-              {/* Rating */}
               <div className="flex items-center gap-1 mb-6">
                 {Array.from(
                   { length: testimonials[currentIndex].rating },
@@ -170,7 +162,6 @@ export function Testimonials() {
                 )}
               </div>
 
-              {/* Author */}
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-[#03b3c3]/30 hover:ring-[#03b3c3] transition-all duration-300">
                   <Image
@@ -196,7 +187,6 @@ export function Testimonials() {
             </div>
           </div>
 
-          {/* Navigation Buttons */}
           <button
             type="button"
             onClick={prevTestimonial}
@@ -214,7 +204,6 @@ export function Testimonials() {
           </button>
         </div>
 
-        {/* Dots Indicator */}
         <div className="flex justify-center gap-3 mt-8">
           {testimonials.map((testimonial, index) => (
             <button
@@ -230,7 +219,6 @@ export function Testimonials() {
           ))}
         </div>
 
-        {/* Auto-play Toggle */}
         <div className="text-center mt-6">
           <button
             type="button"
@@ -241,8 +229,6 @@ export function Testimonials() {
           </button>
         </div>
       </div>
-
-      {/* Stats Section */}
     </section>
   )
 }

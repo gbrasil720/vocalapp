@@ -7,12 +7,8 @@ import {
   isEmailApproved
 } from '@/lib/waitlist'
 
-/**
- * ADMIN ENDPOINT: Get all waitlisted emails with their approval status
- */
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -21,7 +17,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is admin (add your email here or use env variable)
     const adminEmail =
       process.env.ADMIN_EMAIL ||
       session.user.email ||
@@ -33,12 +28,10 @@ export async function GET() {
       )
     }
 
-    // Get all waitlist entries (increase limit to get more)
     const waitlistEmails = await getWaitlistEntries(1000)
     const approvedEmails = await getApprovedEmails()
     const approvedSet = new Set(approvedEmails)
 
-    // Combine data
     const entries = await Promise.all(
       waitlistEmails.map(async (email) => ({
         email,

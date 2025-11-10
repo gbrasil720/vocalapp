@@ -78,7 +78,6 @@ export function UserNav() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-white/10 bg-neutral-900 backdrop-blur-xl shadow-lg overflow-hidden z-50">
-          {/* User Info */}
           <div className="p-4 border-b border-white/10">
             <p className="text-sm font-medium text-white">
               {session.user.name || 'User'}
@@ -88,7 +87,6 @@ export function UserNav() {
             </p>
           </div>
 
-          {/* Menu Items */}
           <div className="p-2">
             <Link
               href="/dashboard"
@@ -118,7 +116,6 @@ export function UserNav() {
             </Link>
           </div>
 
-          {/* Sign Out */}
           <div className="p-2 border-t border-white/10">
             <button
               type="button"

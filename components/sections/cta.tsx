@@ -13,10 +13,8 @@ export function CTA() {
         <LazyHyperspeed />
       </div>
 
-      {/* Text content on top */}
       <div className="relative w-screen h-[100vh] z-40 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 pointer-events-none">
         <div className="pointer-events-auto">
-          {/* Closed Beta Badge */}
           <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-4 sm:mb-6">
             <span className="text-sm sm:text-base font-semibold text-[#03b3c3] flex items-center gap-2">
               <HugeiconsIcon

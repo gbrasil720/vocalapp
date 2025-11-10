@@ -10,7 +10,6 @@ import { stripeClient } from '@/lib/billing/stripe-client'
 
 export async function POST(req: NextRequest) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -19,7 +18,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse request body
     const body = await req.json()
     const { packType } = body as { packType: CreditPackType }
 
@@ -27,7 +25,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid pack type' }, { status: 400 })
     }
 
-    // Get credit pack details
     const pack = getCreditPack(packType)
 
     if (!pack.priceId || pack.priceId.includes('PLACEHOLDER')) {
@@ -40,7 +37,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Create Stripe Checkout Session
     const checkoutSession = await stripeClient.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -57,7 +53,7 @@ export async function POST(req: NextRequest) {
         userId: session.user.id,
         credits: pack.credits.toString(),
         packType: pack.type,
-        purchaseType: 'credits' // Important: to distinguish from subscriptions
+        purchaseType: 'credits'
       }
     })
 

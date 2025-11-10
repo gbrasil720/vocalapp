@@ -7,7 +7,6 @@ import { auth } from '@/lib/auth'
 
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -16,7 +15,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch user's transcriptions
     const transcriptions = await db
       .select({
         id: transcription.id,

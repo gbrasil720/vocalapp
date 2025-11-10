@@ -5,7 +5,6 @@ import { getUserCredits } from '@/lib/credits'
 
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -14,7 +13,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user credits (always fresh from DB)
     const credits = await getUserCredits(session.user.id)
 
     return NextResponse.json(

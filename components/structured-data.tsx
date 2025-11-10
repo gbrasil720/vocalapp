@@ -1,9 +1,10 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
 'use client'
 
 import {
+  generateFAQSchema,
   generateOrganizationSchema,
-  generateWebApplicationSchema,
-  generateFAQSchema
+  generateWebApplicationSchema
 } from '@/lib/seo'
 
 const faqData = [
@@ -87,6 +88,3 @@ export function StructuredData() {
     </>
   )
 }
-
-
-

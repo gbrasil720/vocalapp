@@ -20,10 +20,8 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Only run on client side and when on landing page
     if (typeof window === 'undefined') return
 
-    // Check if we're on the landing page
     const isLandingPage = window.location.pathname === '/'
 
     if (!isLandingPage) {
@@ -34,7 +32,6 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
     let observer: IntersectionObserver | null = null
     let domContentLoadedHandler: (() => void) | null = null
 
-    // Wait for DOM to be ready
     const setupObserver = () => {
       const sections = [
         { id: 'features', element: document.getElementById('features') },
@@ -42,31 +39,27 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
         { id: 'waitlist', element: document.getElementById('waitlist') }
       ].filter((section) => section.element !== null)
 
-      // If no sections found, try again after a short delay
       if (sections.length === 0) {
         setTimeout(setupObserver, 100)
         return
       }
 
-      // Intersection Observer options
       const observerOptions = {
         root: null,
-        rootMargin: '-10% 0px -70% 0px', // Trigger when section enters top 30% of viewport
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5] // Multiple thresholds for better detection
+        rootMargin: '-10% 0px -70% 0px',
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5]
       }
 
       const observerCallback = (entries: IntersectionObserverEntry[]) => {
-        // Find all visible sections and determine which one is most prominent
         const visibleSections = entries.filter((entry) => entry.isIntersecting)
-        
+
         if (visibleSections.length > 0) {
-          // Find the section with the highest intersection ratio (most visible)
           const mostVisible = visibleSections.reduce((prev, current) => {
             return current.intersectionRatio > prev.intersectionRatio
               ? current
               : prev
           })
-          
+
           const sectionId = mostVisible.target.id as ActiveSection
           setActiveSection(sectionId)
         }
@@ -74,14 +67,12 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
 
       observer = new IntersectionObserver(observerCallback, observerOptions)
 
-      // Observe all sections
       sections.forEach((section) => {
         if (section.element) {
           observer?.observe(section.element)
         }
       })
 
-      // Also check initial scroll position
       const checkInitialPosition = () => {
         const scrollY = window.scrollY
         if (scrollY < 100) {
@@ -92,26 +83,21 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
       checkInitialPosition()
     }
 
-    // Handle scroll events for edge cases (top of page, past footer)
     const handleScroll = () => {
       const scrollY = window.scrollY
       const windowHeight = window.innerHeight
       const documentHeight = document.documentElement.scrollHeight
 
-      // If at top of page (before any section)
       if (scrollY < 200) {
         setActiveSection('home')
         return
       }
 
-      // If past footer, keep the last visible section active
-      // (don't change active section when at bottom)
       if (scrollY + windowHeight >= documentHeight - 200) {
         return
       }
     }
 
-    // Throttle scroll handler for better performance
     const throttledHandleScroll = () => {
       if (scrollTimeoutRef.current) return
       scrollTimeoutRef.current = setTimeout(() => {
@@ -120,7 +106,6 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
       }, 100)
     }
 
-    // Start observer setup
     if (document.readyState === 'loading') {
       domContentLoadedHandler = setupObserver
       document.addEventListener('DOMContentLoaded', domContentLoadedHandler)
@@ -135,7 +120,10 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
         observer.disconnect()
       }
       if (domContentLoadedHandler) {
-        document.removeEventListener('DOMContentLoaded', domContentLoadedHandler)
+        document.removeEventListener(
+          'DOMContentLoaded',
+          domContentLoadedHandler
+        )
       }
       window.removeEventListener('scroll', throttledHandleScroll)
       if (scrollTimeoutRef.current) {
@@ -161,7 +149,6 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
   }
 
   const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // Only handle smooth scroll if we're already on the landing page
     if (window.location.pathname === '/') {
       e.preventDefault()
       window.scrollTo({
@@ -170,24 +157,22 @@ export function Navbar({ waitlistMode = false }: NavbarProps) {
       })
       setActiveSection('home')
     }
-    // If we're on a different page, let the Link handle navigation normally
   }
 
   return (
     <div className="fixed justify-between flex items-center py-3 sm:py-4 mt-2 sm:mt-4 my-0 mx-auto px-4 sm:px-6 lg:px-8 top-0 left-0 right-0 z-50 w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%] shadow-md backdrop-blur-md rounded-full">
       <div className="flex items-center gap-2">
-        {/* <AudioLines
-          size={18}
-          strokeWidth={1.5}
-          className="sm:w-5 sm:h-5 text-[#03b3c3]"
-        /> */}
         <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
         <p className="font-['Satoshi'] font-medium text-lg sm:text-xl">
           vocalapp
         </p>
       </div>
       <div className="flex items-center gap-2 sm:gap-4">
-        <Link href="/" className={getHomeLinkClassName()} onClick={handleHomeClick}>
+        <Link
+          href="/"
+          className={getHomeLinkClassName()}
+          onClick={handleHomeClick}
+        >
           Home
         </Link>
         <Link href="#features" className={getLinkClassName('features')}>

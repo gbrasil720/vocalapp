@@ -8,7 +8,6 @@ import { getUserLanguageCount } from '@/lib/transcription/language-tracking'
 
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -19,10 +18,10 @@ export async function GET() {
 
     const userId = session.user.id
 
-    // Get user data
     const userData = await db
       .select({
-        credits: user.credits
+        credits: user.credits,
+        isBetaUser: user.isBetaUser
       })
       .from(user)
       .where(eq(user.id, userId))
@@ -32,14 +31,12 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Get subscription data
     const subscriptionData = await db
       .select()
       .from(subscription)
       .where(eq(subscription.referenceId, userId))
       .limit(1)
 
-    // Calculate minutes used from usage transactions
     const usageStats = await db
       .select({
         totalMinutes: sql<number>`COALESCE(SUM(ABS(${creditTransaction.amount})), 0)`,
@@ -53,14 +50,12 @@ export async function GET() {
         )
       )
 
-    // Get unique languages count from transcriptions
     const languagesUsed = await getUserLanguageCount(userId)
 
-    // Determine plan info
     const hasSubscription =
       subscriptionData.length > 0 && subscriptionData[0].status === 'active'
     const planName = hasSubscription ? subscriptionData[0].plan : 'Free Plan'
-    const planCredits = hasSubscription ? 600 : 30 // Pro gets 600/month, Free gets 30
+    const planCredits = hasSubscription ? 600 : 30
     const nextBillingDate =
       hasSubscription && subscriptionData[0].periodEnd
         ? new Date(subscriptionData[0].periodEnd).toLocaleDateString('en-US', {
@@ -73,6 +68,7 @@ export async function GET() {
     return NextResponse.json(
       {
         credits: userData[0].credits,
+        isBetaUser: userData[0].isBetaUser,
         plan: {
           name: planName,
           isActive: hasSubscription,

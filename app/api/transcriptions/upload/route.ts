@@ -8,7 +8,6 @@ import { auth } from '@/lib/auth'
 import { getUserCredits } from '@/lib/credits'
 import { calculateTranscriptionCost } from '@/lib/credits/transcription-billing'
 
-// Configure route to handle large file uploads
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
@@ -47,12 +46,10 @@ function getFileExtension(filename: string): string {
 }
 
 function isValidFileType(mimeType: string, fileName: string): boolean {
-  // Check MIME type first
   if (mimeType && ALLOWED_TYPES.includes(mimeType)) {
     return true
   }
 
-  // Fallback to file extension if MIME type is missing or incorrect
   const extension = getFileExtension(fileName)
   if (ALLOWED_EXTENSIONS.includes(extension)) {
     return true
@@ -92,9 +89,10 @@ export async function POST(req: Request) {
 
     const isPro = sub && sub.status === 'active'
 
-    // Accept JSON with file metadata instead of FormData
     const body = await req.json()
-    const files: FileMetadata[] = Array.isArray(body.files) ? body.files : [body]
+    const files: FileMetadata[] = Array.isArray(body.files)
+      ? body.files
+      : [body]
 
     console.log(`📁 Received metadata for ${files.length} file(s)`)
     files.forEach((file, index) => {
@@ -117,12 +115,12 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate file metadata
     for (const file of files) {
       if (!file.fileUrl || !file.fileName || !file.fileSize || !file.mimeType) {
         return NextResponse.json(
           {
-            error: 'Missing required fields: fileUrl, fileName, fileSize, mimeType'
+            error:
+              'Missing required fields: fileUrl, fileName, fileSize, mimeType'
           },
           { status: 400 }
         )
@@ -157,7 +155,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // Download files from Blob and extract duration
     const fileDetailsArray: Array<{
       metadata: FileMetadata
       duration: number
@@ -166,7 +163,6 @@ export async function POST(req: Request) {
 
     for (const fileMetadata of files) {
       try {
-        // Download file from Vercel Blob to extract duration
         console.log(`⬇️  Downloading file from Blob: ${fileMetadata.fileUrl}`)
         const fileResponse = await fetch(fileMetadata.fileUrl)
         if (!fileResponse.ok) {
@@ -214,10 +210,8 @@ export async function POST(req: Request) {
       }
     }
 
-    // Calculate total cost
     const totalCost = fileDetailsArray.reduce((sum, fd) => sum + fd.cost, 0)
 
-    // Check user has enough credits
     const userCredits = await getUserCredits(userId)
     if (userCredits < totalCost) {
       const totalMinutes = Math.ceil(
@@ -233,7 +227,6 @@ export async function POST(req: Request) {
 
     const transcriptions = []
 
-    // Process each file
     for (const fileDetail of fileDetailsArray) {
       const { metadata, duration, cost } = fileDetail
 
@@ -255,7 +248,6 @@ export async function POST(req: Request) {
 
       transcriptions.push(newTranscription)
 
-      // Trigger async processing
       fetch(
         `${req.headers.get('origin') || process.env.NEXT_PUBLIC_URL}/api/transcriptions/process`,
         {
@@ -286,7 +278,6 @@ export async function POST(req: Request) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error occurred'
 
-    // Detect Vercel payload size errors
     const isPayloadError =
       errorMessage.includes('BIG_PAYLOAD') ||
       errorMessage.includes('payload') ||
@@ -303,7 +294,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'File size exceeds server limit. Vercel has a 4.5MB body size limit. Please upload smaller files or contact support for assistance.'
+            'File size exceeds server limit. Please upload smaller files or contact support for assistance.'
         },
         { status: 413 }
       )

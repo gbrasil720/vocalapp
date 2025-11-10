@@ -25,7 +25,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
   }
   return (
     <section id="pricing" className="relative z-10 py-20 px-6">
-      {/* Section Title */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         {waitlistMode && (
           <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
@@ -40,15 +39,12 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
         </h2>
         <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
           {waitlistMode
-            ? 'Get a preview of our pricing structure. Join the waitlist to receive exclusive early-bird discounts and bonus credits.'
+            ? 'Preview the plans we’ll roll out at launch. Closed beta access is free—reserve your spot now for early pricing options.'
             : 'Scale your productivity with flexible pricing designed for every professional, from individual creators to enterprise teams.'}
         </p>
       </div>
 
-      {/* Pricing Cards */}
-      <div
-        className={`grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto ${waitlistMode ? 'opacity-60' : ''}`}
-      >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <PricingCard
           title="Starter"
           description="Perfect to test the waters"
@@ -98,18 +94,14 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
         />
       </div>
 
-      {/* Credit Packs Section - Hidden in waitlist mode */}
       {!waitlistMode && (
         <div className="mt-16 max-w-6xl mx-auto">
           <div className="relative group">
-            {/* Mobile version - no electric border */}
             <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                 <div className="flex flex-col lg:flex-row items-center gap-8">
-                  {/* Left Section - Info */}
                   <div className="flex-1 text-center lg:text-left">
                     <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
-                      {/* <Zap className="w-4 h-4 text-white" /> */}
                       <HugeiconsIcon icon={ZapIcon} color="#ffffff" size={22} />
                       <span className="text-sm font-semibold text-white">
                         Out of Credits?
@@ -124,9 +116,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                     </p>
                   </div>
 
-                  {/* Right Section - Credit Pack Options */}
                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full pt-4">
-                    {/* Pack 1 */}
                     <div
                       className="pt-3"
                       onClick={
@@ -136,7 +126,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       }
                     >
                       <div
-                        className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:bg-white/10 hover:border-[#d856bf]/50 hover:scale-105 cursor-pointer'} group/pack`}
+                        className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${
+                          waitlistMode
+                            ? 'cursor-default'
+                            : 'hover:bg-white/10 hover:border-[#d856bf]/50 hover:scale-105 cursor-pointer'
+                        } group/pack`}
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -154,7 +148,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                             credits (2 hours)
                           </div>
                           <div className="flex items-center justify-center gap-1">
-                            {/* <Check className="w-4 h-4 text-green-400" /> */}
                             <HugeiconsIcon
                               icon={Tick02Icon}
                               color="oklch(79.2% 0.209 151.711)"
@@ -168,7 +161,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       </div>
                     </div>
 
-                    {/* Pack 2 - Popular */}
                     <div
                       className="relative pt-3"
                       onClick={
@@ -183,7 +175,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         </span>
                       </div>
                       <div
-                        className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'} group/pack`}
+                        className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
+                          waitlistMode
+                            ? 'cursor-default'
+                            : 'hover:scale-105 cursor-pointer'
+                        } group/pack`}
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -201,7 +197,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                             credits (7.5 hours)
                           </div>
                           <div className="flex items-center justify-center gap-1">
-                            {/* <Check className="w-4 h-4 text-green-400" /> */}
                             <HugeiconsIcon
                               icon={Tick02Icon}
                               color="oklch(79.2% 0.209 151.711)"
@@ -215,7 +210,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       </div>
                     </div>
 
-                    {/* Pack 3 */}
                     <div
                       className="pt-3"
                       onClick={
@@ -225,7 +219,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       }
                     >
                       <div
-                        className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:bg-white/10 hover:border-[#c247ac]/50 hover:scale-105 cursor-pointer'} group/pack`}
+                        className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${
+                          waitlistMode
+                            ? 'cursor-default'
+                            : 'hover:bg-white/10 hover:border-[#c247ac]/50 hover:scale-105 cursor-pointer'
+                        } group/pack`}
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -243,7 +241,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                             credits (25 hours)
                           </div>
                           <div className="flex items-center justify-center gap-1">
-                            {/* <Check className="w-4 h-4 text-green-400" /> */}
                             <HugeiconsIcon
                               icon={Tick02Icon}
                               color="oklch(79.2% 0.209 151.711)"
@@ -259,7 +256,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                   </div>
                 </div>
 
-                {/* Bottom Note */}
                 <div className="mt-6 pt-6 border-t border-white/10 text-center">
                   <p className="text-xs text-gray-500">
                     Credits never expire • Use them whenever you need • No
@@ -268,7 +264,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                 </div>
               </div>
             </div>
-            {/* Desktop version - with electric border */}
             <div className="hidden md:block">
               <ElectricBorder
                 color="#d856bf"
@@ -279,7 +274,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
               >
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="flex flex-col lg:flex-row items-center gap-8">
-                    {/* Left Section - Info */}
                     <div className="flex-1 text-center lg:text-left">
                       <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
                         <HugeiconsIcon
@@ -300,9 +294,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       </p>
                     </div>
 
-                    {/* Right Section - Credit Pack Options */}
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full pt-4">
-                      {/* Pack 1 */}
                       <div
                         className="pt-3"
                         onClick={
@@ -312,7 +304,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         }
                       >
                         <div
-                          className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:bg-white/10 hover:border-[#d856bf]/50 hover:scale-105 cursor-pointer'} group/pack`}
+                          className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${
+                            waitlistMode
+                              ? 'cursor-default'
+                              : 'hover:bg-white/10 hover:border-[#d856bf]/50 hover:scale-105 cursor-pointer'
+                          } group/pack`}
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -343,7 +339,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         </div>
                       </div>
 
-                      {/* Pack 2 - Popular */}
                       <div
                         className="relative pt-3"
                         onClick={
@@ -358,7 +353,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                           </span>
                         </div>
                         <div
-                          className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'} group/pack`}
+                          className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
+                            waitlistMode
+                              ? 'cursor-default'
+                              : 'hover:scale-105 cursor-pointer'
+                          } group/pack`}
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -389,7 +388,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         </div>
                       </div>
 
-                      {/* Pack 3 */}
                       <div
                         className="pt-3"
                         onClick={
@@ -399,7 +397,11 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         }
                       >
                         <div
-                          className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${waitlistMode ? 'opacity-75 cursor-not-allowed' : 'hover:bg-white/10 hover:border-[#c247ac]/50 hover:scale-105 cursor-pointer'} group/pack`}
+                          className={`bg-white/5 border border-white/10 rounded-2xl p-5 transition-all duration-300 h-full ${
+                            waitlistMode
+                              ? 'cursor-default'
+                              : 'hover:bg-white/10 hover:border-[#c247ac]/50 hover:scale-105 cursor-pointer'
+                          } group/pack`}
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
@@ -432,7 +434,6 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                     </div>
                   </div>
 
-                  {/* Bottom Note */}
                   <div className="mt-6 pt-6 border-t border-white/10 text-center">
                     <p className="text-xs text-gray-500">
                       Credits never expire • Use them whenever you need • No
@@ -446,24 +447,22 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
         </div>
       )}
 
-      {/* Additional Info */}
-      <div className={`text-center mt-12 ${waitlistMode ? 'opacity-60' : ''}`}>
+      <div className="text-center mt-12">
         <p className="text-gray-400 text-sm mb-4">
-          All plans include a 14-day free trial • No setup fees • Cancel anytime
+          {waitlistMode
+            ? 'Closed beta includes free usage while we finalize pricing • We’ll notify you before any billing begins'
+            : 'All plans include a 14-day free trial • No setup fees • Cancel anytime'}
         </p>
         <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            {/* <Zap className="w-4 h-4 text-[#03b3c3]" /> */}
             <HugeiconsIcon icon={ZapIcon} color="#03b3c3" size={20} />
             <span>99.9% uptime SLA</span>
           </div>
           <div className="flex items-center gap-2">
-            {/* <Zap className="w-4 h-4 text-[#d856bf]" /> */}
             <HugeiconsIcon icon={ZapIcon} color="#d856bf" size={20} />
             <span>SOC 2 compliant</span>
           </div>
           <div className="flex items-center gap-2">
-            {/* <Zap className="w-4 h-4 text-[#c247ac]" /> */}
             <HugeiconsIcon icon={ZapIcon} color="#c247ac" size={20} />
             <span>GDPR ready</span>
           </div>

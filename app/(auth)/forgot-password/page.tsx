@@ -2,7 +2,7 @@
 
 import { MailIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft, Mail } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { ForgotPasswordForm } from '@/components/forms/forgot-password-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
@@ -75,7 +75,6 @@ export default function ForgotPassword() {
           <div className="text-center mb-8">
             <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                {/* <Mail className="w-6 h-6" /> */}
                 <HugeiconsIcon icon={MailIcon} size={22} color="#99a1af " />
               </div>
               <h1 className="text-3xl font-medium font-['Satoshi']">

@@ -1,6 +1,13 @@
 'use client'
 
-import { CheckCircle, XCircle, RefreshCw, Users, Clock, CheckCheck } from 'lucide-react'
+import {
+  CheckCheck,
+  CheckCircle,
+  Clock,
+  RefreshCw,
+  Users,
+  XCircle
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -24,20 +31,22 @@ export default function AdminWaitlist() {
   const router = useRouter()
   const [data, setData] = useState<WaitlistData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [processingEmails, setProcessingEmails] = useState<Set<string>>(new Set())
+  const [processingEmails, setProcessingEmails] = useState<Set<string>>(
+    new Set()
+  )
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all')
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/admin/waitlist')
-      
+
       if (response.status === 401) {
         toast.error('Please sign in to access admin panel')
         router.push('/sign-in')
         return
       }
-      
+
       if (response.status === 403) {
         toast.error('Access denied - Admin only')
         router.push('/dashboard')
@@ -145,9 +154,7 @@ export default function AdminWaitlist() {
               <h1 className="text-3xl font-bold text-white mb-2">
                 Waitlist Management
               </h1>
-              <p className="text-gray-400">
-                Manage beta access approvals
-              </p>
+              <p className="text-gray-400">Manage beta access approvals</p>
             </div>
             <div className="flex gap-3">
               <Button
@@ -178,7 +185,9 @@ export default function AdminWaitlist() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Total Waitlist</p>
-                  <p className="text-2xl font-bold text-white">{data?.total || 0}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {data?.total || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -190,7 +199,9 @@ export default function AdminWaitlist() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Approved</p>
-                  <p className="text-2xl font-bold text-white">{data?.approved || 0}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {data?.approved || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -202,7 +213,9 @@ export default function AdminWaitlist() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Pending</p>
-                  <p className="text-2xl font-bold text-white">{data?.pending || 0}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {data?.pending || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -325,7 +338,10 @@ export default function AdminWaitlist() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12 text-center text-gray-400">
+                    <td
+                      colSpan={3}
+                      className="px-6 py-12 text-center text-gray-400"
+                    >
                       {filter === 'pending' ? (
                         <>No pending approvals</>
                       ) : filter === 'approved' ? (
@@ -344,4 +360,3 @@ export default function AdminWaitlist() {
     </div>
   )
 }
-

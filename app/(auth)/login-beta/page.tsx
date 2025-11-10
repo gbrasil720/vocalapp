@@ -53,8 +53,8 @@ export default function LoginBeta() {
             </h2>
 
             <p className="text-white/90 text-lg leading-relaxed mb-8">
-              Experience passwordless authentication with magic links or Google sign-in. 
-              Only approved beta testers can access the platform.
+              Experience passwordless authentication with magic links or Google
+              sign-in. Only approved beta testers can access the platform.
             </p>
 
             <div className="space-y-4">
@@ -64,9 +64,7 @@ export default function LoginBeta() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <span className="text-white/90">
-                  Magic link via email
-                </span>
+                <span className="text-white/90">Magic link via email</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -143,4 +141,3 @@ export default function LoginBeta() {
     </div>
   )
 }
-

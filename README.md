@@ -8,7 +8,7 @@ A powerful web application for transcribing audio files using OpenAI's Whisper A
 
 - 🎙️ Audio transcription using OpenAI Whisper
 - 💳 Credit-based billing system
-- 📦 Amazon S3 storage for audio files
+- 📦 Vercel Blob storage for audio files
 - 🔐 Authentication with Google OAuth
 - 💰 Stripe integration for payments
 - 📊 User dashboard with transcription history

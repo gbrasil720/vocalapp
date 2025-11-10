@@ -32,7 +32,6 @@ export const LazyHyperspeed = () => {
     setMounted(true)
     setIsMobile(isMobileDevice())
 
-    // Handle window resize to detect screen size changes
     const handleResize = () => {
       setIsMobile(isMobileDevice())
     }
@@ -41,7 +40,6 @@ export const LazyHyperspeed = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Don't render anything on server or on mobile
   if (!mounted || isMobile) {
     return (
       <div className="w-full h-full bg-gradient-to-b from-black via-gray-900 to-black" />

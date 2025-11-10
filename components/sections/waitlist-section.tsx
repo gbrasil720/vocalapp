@@ -57,7 +57,6 @@ export function WaitlistSection() {
 
   return (
     <section id="waitlist" className="relative z-10 py-20 px-6">
-      {/* Section Title */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
           <HugeiconsIcon icon={StarIcon} color="#03b3c3" size={20} />
@@ -75,11 +74,9 @@ export function WaitlistSection() {
         </p>
       </div>
 
-      {/* Main Waitlist Form */}
       <div className="max-w-2xl mx-auto mb-16">
         {success ? (
           <>
-            {/* Mobile version - no electric border */}
             <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 text-center">
                 <HugeiconsIcon
@@ -99,7 +96,6 @@ export function WaitlistSection() {
                 </p>
               </div>
             </div>
-            {/* Desktop version - with electric border */}
             <div className="hidden md:block">
               <ElectricBorder
                 color="#03b3c3"
@@ -130,7 +126,6 @@ export function WaitlistSection() {
           </>
         ) : (
           <>
-            {/* Mobile version - no electric border */}
             <div className="block md:hidden">
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,7 +158,6 @@ export function WaitlistSection() {
                 </p>
               </div>
             </div>
-            {/* Desktop version - with electric border */}
             <div className="hidden md:block">
               <ElectricBorder
                 color="#d856bf"
@@ -208,7 +202,6 @@ export function WaitlistSection() {
         )}
       </div>
 
-      {/* Benefits Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-3">

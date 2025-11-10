@@ -1,6 +1,7 @@
 'use client'
 
-import { AudioLines } from 'lucide-react'
+import { AudioWave01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 
 export function LoadingScreen() {
   return (
@@ -19,7 +20,7 @@ export function LoadingScreen() {
 
           <div className="relative w-20 h-20 rounded-full bg-gradient-to-r from-[#d856bf] to-[#03b3c3] flex items-center justify-center animate-pulse">
             <div className="w-[calc(100%-4px)] h-[calc(100%-4px)] rounded-full bg-black flex items-center justify-center">
-              <AudioLines className="w-10 h-10 text-[#03b3c3]" />
+              <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={46} />
             </div>
           </div>
         </div>

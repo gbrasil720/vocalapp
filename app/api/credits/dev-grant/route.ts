@@ -7,12 +7,7 @@ import {
 } from '@/lib/billing/credit-products'
 import { addCredits } from '@/lib/credits'
 
-/**
- * DEVELOPMENT ONLY: Manually grant credits after successful checkout
- * This bypasses the webhook requirement for local testing
- */
 export async function POST(req: Request) {
-  // Only allow in development
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { error: 'This endpoint is only available in development' },
@@ -21,7 +16,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -42,7 +36,6 @@ export async function POST(req: Request) {
 
     const pack = getCreditPack(packType)
 
-    // Add credits
     await addCredits(session.user.id, pack.credits, {
       type: 'purchase',
       description: `Purchased ${pack.name} credit pack (${pack.credits} credits) - DEV MODE`,

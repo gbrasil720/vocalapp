@@ -4,12 +4,8 @@ import { auth } from '@/lib/auth'
 import { sendBetaApprovalEmail } from '@/lib/email/beta-approval'
 import { approveEmail } from '@/lib/waitlist'
 
-/**
- * ADMIN ENDPOINT: Approve an email for beta access
- */
 export async function POST(request: Request) {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -18,7 +14,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user is admin
     const adminEmail = process.env.ADMIN_EMAIL || session.user.email
     if (session.user.email !== adminEmail) {
       return NextResponse.json(

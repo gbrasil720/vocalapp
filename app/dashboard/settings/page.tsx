@@ -29,19 +29,16 @@ export default function SettingsPage() {
   })
 
   const handleSave = () => {
-    // Save settings logic here
     console.log('Saving settings:', settings)
   }
 
   return (
     <>
-      {/* Background Animation */}
       <div className="hidden md:block fixed inset-0 z-0 opacity-40">
         <MemoizedHyperspeed />
       </div>
 
       <div className="relative min-h-screen z-10">
-        {/* Header */}
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
@@ -61,9 +58,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl">
-          {/* Profile Settings */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <User className="w-5 h-5 text-[#03b3c3]" />
@@ -110,7 +105,6 @@ export default function SettingsPage() {
             </SpotlightCard>
           </div>
 
-          {/* Notification Settings */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Bell className="w-5 h-5 text-[#c247ac]" />
@@ -230,7 +224,6 @@ export default function SettingsPage() {
             </SpotlightCard>
           </div>
 
-          {/* Language Settings */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Globe className="w-5 h-5 text-[#d856bf]" />
@@ -265,7 +258,6 @@ export default function SettingsPage() {
             </SpotlightCard>
           </div>
 
-          {/* Security */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-5 h-5 text-[#03b3c3]" />
@@ -295,7 +287,6 @@ export default function SettingsPage() {
             </SpotlightCard>
           </div>
 
-          {/* Danger Zone */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Trash2 className="w-5 h-5 text-red-400" />
@@ -317,7 +308,6 @@ export default function SettingsPage() {
             </SpotlightCard>
           </div>
 
-          {/* Save Button */}
           <div className="flex justify-end">
             <button
               type="button"

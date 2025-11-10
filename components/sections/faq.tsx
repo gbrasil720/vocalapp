@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import {
   Accordion,
   AccordionContent,
@@ -9,61 +10,40 @@ import {
 
 const faqData = [
   {
-    question: 'How accurate is the speech-to-text transcription?',
+    question: 'Who can join the closed beta?',
     answer:
-      'Our AI-powered transcription service delivers 99.9% accuracy for clear audio. We use advanced machine learning models trained on millions of audio samples to ensure the highest quality transcription for your content.'
+      'Right now we’re onboarding teams from our waitlist who have active transcription workflows and are willing to give regular feedback. If that sounds like you, request access through the waitlist and we’ll reach out.'
   },
   {
-    question: 'What file formats do you support?',
+    question: 'How long does it take to get approved?',
     answer:
-      'We support all major audio and video formats including MP3, WAV, MP4, MOV, AVI, and more. You can also record directly in our web interface or upload files up to 2GB in size.'
+      'We review new requests every Friday. You’ll get an email letting you know if you’re approved for the next cohort or if we need additional details to prioritize your team.'
   },
   {
-    question: 'How many languages can you transcribe?',
+    question: 'What features are available during beta?',
     answer:
-      'We support over 50 languages and dialects including English, Spanish, French, German, Chinese, Japanese, Arabic, and many more. Our AI automatically detects the language for seamless transcription.'
+      'Closed beta users get early access to our core transcription engine, real-time streaming, and collaboration tools. Some enterprise features are still in development, so we’ll invite you to try them as they unlock.'
   },
   {
-    question: 'Is my data secure and private?',
+    question: 'Is there a cost to participate?',
     answer:
-      "Absolutely. We use enterprise-grade encryption for all data transmission and storage. Your files are processed securely and automatically deleted after transcription unless you choose to store them. We're SOC 2 compliant and GDPR ready."
+      'Access is free during the closed beta. We’ll share pricing options ahead of general availability so you can plan ahead—no charges will be made without your opt-in.'
   },
   {
-    question: "Can I edit the transcription after it's generated?",
+    question: 'How should I share feedback or report issues?',
     answer:
-      'Yes! Our transcription editor allows you to make real-time edits, add speaker labels, timestamps, and export in multiple formats including SRT, VTT, TXT, and DOCX.'
+      'Every beta workspace includes an in-app feedback panel and a direct line to our product team. You can also reply to any onboarding email and we’ll jump into a call if needed.'
   },
   {
-    question: 'Do you offer real-time transcription?',
+    question: 'Can I invite my teammates?',
     answer:
-      'Yes, our Pro and Enterprise plans include real-time transcription capabilities. Perfect for live events, meetings, webinars, and interviews with instant text output.'
-  },
-  {
-    question: "What's the difference between the free and paid plans?",
-    answer:
-      'The free plan includes 100 hours/month with basic features. Paid plans offer unlimited usage, real-time transcription, API access, priority support, and advanced features like speaker identification and custom vocabulary.'
-  },
-  {
-    question: 'How fast is the transcription process?',
-    answer:
-      'Most transcriptions are completed in under 2 minutes for a 1-hour audio file. Real-time transcription provides instant results as you speak, making it perfect for live events and meetings.'
-  },
-  {
-    question: 'Can I integrate this with my existing workflow?',
-    answer:
-      'Yes! We offer API access, webhooks, and integrations with popular tools like Zoom, Google Meet, Slack, Notion, and Zapier. Custom integrations are available for Enterprise customers.'
-  },
-  {
-    question: "Do you offer refunds if I'm not satisfied?",
-    answer:
-      "We offer a 14-day free trial for all paid plans. If you're not completely satisfied within the first 30 days, we'll provide a full refund, no questions asked."
+      'Yes! Each beta account can add up to five teammates so you can test real workflows. Just send us their emails when you’re approved and we’ll arrange access.'
   }
 ]
 
 export function FAQ() {
   return (
     <section className="relative z-10 py-20 px-6">
-      {/* Section Title */}
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-3 mb-6">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight">
@@ -71,16 +51,14 @@ export function FAQ() {
           </h2>
         </div>
         <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
-          Everything you need to know about our AI-powered transcription
-          service. Can't find what you're looking for?{' '}
+          The essentials for teams joining our closed beta. Still curious?{' '}
           <span className="text-[#d856bf] cursor-pointer hover:underline">
-            Contact our support team
-          </span>
-          .
+            Reply to your invite email
+          </span>{' '}
+          and we’ll help out personally.
         </p>
       </div>
 
-      {/* FAQ Accordion */}
       <div className="max-w-4xl mx-auto">
         <Accordion
           type="single"
@@ -112,28 +90,26 @@ export function FAQ() {
         </Accordion>
       </div>
 
-      {/* Bottom CTA */}
       <div className="text-center mt-16">
         <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
           <h3 className="text-2xl font-bold text-white mb-4 font-['Satoshi']">
             Still have questions?
           </h3>
           <p className="text-gray-300 mb-6">
-            Our support team is here to help you get the most out of our
-            transcription service.
+            We’re building the beta with you—let us know what you need next.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              type="button"
+            <Link
+              href="/dashboard/feedback"
               className="px-8 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-semibold rounded-full hover:from-[#c247ac] hover:to-[#d856bf] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#d856bf]/25"
             >
-              Contact Support
-            </button>
+              Join the Conversation
+            </Link>
             <button
               type="button"
               className="px-8 py-3 bg-transparent border border-white/20 text-white font-semibold rounded-full hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
             >
-              View Documentation
+              Join the Waitlist
             </button>
           </div>
         </div>

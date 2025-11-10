@@ -8,7 +8,6 @@ export const maxDuration = 300 // 5 minutes max
 
 export async function GET(req: Request) {
   try {
-    // Verify cron secret to prevent unauthorized calls
     const authHeader = req.headers.get('authorization')
     const expectedAuth = `Bearer ${process.env.CRON_SECRET}`
 
@@ -19,10 +18,8 @@ export async function GET(req: Request) {
 
     console.log('🕐 Starting audio cleanup cron job...')
 
-    // Get date 7 days ago (minimum retention period)
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 
-    // Query optimization: only get transcriptions that could potentially be expired
     const candidates = await db
       .select({
         id: transcription.id,
@@ -50,24 +47,19 @@ export async function GET(req: Request) {
       try {
         checkedCount++
 
-        // Get user's subscription to determine retention period
         const [userSub] = await db
           .select()
           .from(subscription)
           .where(eq(subscription.referenceId, record.userId))
           .limit(1)
 
-        // Determine retention days based on subscription
         const retentionDays = getRetentionDays(userSub)
 
-        // Calculate expiration date
         const expirationDate = new Date(
           record.createdAt.getTime() + retentionDays * 24 * 60 * 60 * 1000
         )
 
-        // Check if audio has expired
         if (new Date() > expirationDate) {
-          // Delete from Vercel Blob
           if (record.fileUrl) {
             try {
               await deleteFromBlob(record.fileUrl)
@@ -81,7 +73,6 @@ export async function GET(req: Request) {
             }
           }
 
-          // Update database to set fileUrl to null
           await db
             .update(transcription)
             .set({ fileUrl: null })
@@ -129,20 +120,13 @@ export async function GET(req: Request) {
   }
 }
 
-/**
- * Determine retention period based on subscription
- * @param userSubscription User's subscription record
- * @returns Number of days to retain audio
- */
 function getRetentionDays(
   userSubscription: typeof subscription.$inferSelect | undefined
 ): number {
-  // No subscription or inactive = Free plan = 7 days
   if (!userSubscription || userSubscription.status !== 'active') {
     return 7
   }
 
-  // Check plan type
   const plan = userSubscription.plan?.toLowerCase()
 
   if (plan === 'pro') {
@@ -150,9 +134,8 @@ function getRetentionDays(
   }
 
   if (plan === 'enterprise') {
-    return Number.POSITIVE_INFINITY // Keep indefinitely
+    return Number.POSITIVE_INFINITY
   }
 
-  // Default to 7 days for any other case
   return 7
 }

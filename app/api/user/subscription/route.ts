@@ -7,7 +7,6 @@ import { auth } from '@/lib/auth'
 
 export async function GET() {
   try {
-    // Verify authentication
     const session = await auth.api.getSession({
       headers: await headers()
     })
@@ -18,7 +17,6 @@ export async function GET() {
 
     const userId = session.user.id
 
-    // Get subscription data
     const subscriptionData = await db
       .select()
       .from(subscription)

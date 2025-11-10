@@ -43,13 +43,10 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer className="relative z-10 border-t border-white/10 bg-transparent backdrop-blur-xl">
-      {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              {/* <AudioLines className="w-8 h-8 text-[#03b3c3]" /> */}
               <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
               <span className="text-2xl font-bold text-[#e5e5e5] font-['Satoshi']">
                 vocalapp
@@ -61,7 +58,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Product Links */}
           <div>
             <h3 className="text-white font-semibold mb-4 font-['Satoshi']">
               Product
@@ -80,7 +76,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Company Links */}
           <div>
             <h3 className="text-white font-semibold mb-4 font-['Satoshi']">
               Company
@@ -99,7 +94,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support Links */}
           <div>
             <h3 className="text-white font-semibold mb-4 font-['Satoshi']">
               Support
@@ -119,10 +113,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Social Links & Trust Badges */}
         <div className="mt-12 pt-8 border-t border-white/10">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            {/* Social Links */}
             <div className="flex items-center gap-6">
               <span className="text-gray-300 font-medium font-['Satoshi']">
                 Follow us:
@@ -137,7 +129,6 @@ export function Footer() {
                       className="p-2 bg-white/5 border border-white/20 rounded-lg text-gray-300 hover:text-[#03b3c3] hover:border-[#03b3c3]/50 transition-all duration-300 transform hover:scale-110"
                       aria-label={social.name}
                     >
-                      {/* <Icon className="w-5 h-5" /> */}
                       <HugeiconsIcon icon={Icon} size={22} />
                     </Link>
                   )
@@ -145,7 +136,6 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Trust Badges */}
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <div className="flex items-center gap-2">
                 <HugeiconsIcon icon={ZapIcon} size={18} color="#03b3c3" />
@@ -164,7 +154,6 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <div className="border-t border-white/10 bg-transparent backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">

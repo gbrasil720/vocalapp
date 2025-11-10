@@ -2,7 +2,7 @@
 
 import { MailIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { CheckCircle, Mail } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -102,7 +102,6 @@ export function ForgotPasswordForm() {
       {!isEmailSent ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
-            {/* <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /> */}
             <HugeiconsIcon
               icon={MailIcon}
               color="#99a1af"

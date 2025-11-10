@@ -30,7 +30,6 @@ export function ExpiredAudioMessage({
   return (
     <SpotlightCard className="bg-transparent backdrop-blur-xl">
       <div className="space-y-4">
-        {/* Header */}
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-gray-500/20">
             <Clock className="w-6 h-6 text-gray-400" />
@@ -45,7 +44,6 @@ export function ExpiredAudioMessage({
           </div>
         </div>
 
-        {/* Info Message */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-[#03b3c3] flex-shrink-0 mt-0.5" />
@@ -72,7 +70,6 @@ export function ExpiredAudioMessage({
           </div>
         </div>
 
-        {/* Upgrade CTA for Free Users */}
         {!isPro && (
           <div className="bg-gradient-to-r from-[#d856bf]/10 to-[#03b3c3]/10 border border-[#d856bf]/30 rounded-xl p-4">
             <div className="flex items-center justify-between">
@@ -94,7 +91,6 @@ export function ExpiredAudioMessage({
           </div>
         )}
 
-        {/* Note about transcription text */}
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <Info className="w-4 h-4" />
           <span>

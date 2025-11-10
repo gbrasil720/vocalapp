@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp
@@ -21,6 +22,60 @@ export const user = pgTable('user', {
   stripeCustomerId: text('stripe_customer_id'),
   credits: integer('credits').default(30).notNull(),
   isBetaUser: boolean('is_beta_user').default(true).notNull()
+})
+
+export const roadmapStatusEnum = pgEnum('roadmap_status', [
+  'planned',
+  'in_progress',
+  'shipped'
+])
+
+export const changelogTagEnum = pgEnum('changelog_tag', [
+  'feature',
+  'improvement',
+  'fix',
+  'announcement',
+  'other'
+])
+
+export const roadmapEntry = pgTable('roadmap_entry', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  title: text('title').notNull(),
+  status: roadmapStatusEnum('status').default('planned').notNull(),
+  category: text('category'),
+  content: text('content').notNull(),
+  published: boolean('published').default(false).notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  authorId: text('author_id').references(() => user.id, {
+    onDelete: 'set null'
+  }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull()
+})
+
+export const changelogEntry = pgTable('changelog_entry', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  title: text('title').notNull(),
+  tag: changelogTagEnum('tag').default('other').notNull(),
+  category: text('category'),
+  content: text('content').notNull(),
+  published: boolean('published').default(true).notNull(),
+  publishedAt: timestamp('published_at').defaultNow(),
+  authorId: text('author_id').references(() => user.id, {
+    onDelete: 'set null'
+  }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull()
 })
 
 export const session = pgTable('session', {

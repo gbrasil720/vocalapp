@@ -79,7 +79,6 @@ export default function MagicLinkEmail({
   )
 }
 
-// Styles
 const main = {
   backgroundColor: '#0a0a0a',
   fontFamily:
