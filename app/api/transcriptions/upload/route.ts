@@ -226,6 +226,10 @@ export async function POST(req: Request) {
     }
 
     const transcriptions = []
+    const processUrl = new URL(
+      '/api/transcriptions/process',
+      process.env.NEXT_PUBLIC_URL || req.url
+    )
 
     for (const fileDetail of fileDetailsArray) {
       const { metadata, duration, cost } = fileDetail
@@ -248,18 +252,15 @@ export async function POST(req: Request) {
 
       transcriptions.push(newTranscription)
 
-      fetch(
-        `${req.headers.get('origin') || process.env.NEXT_PUBLIC_URL}/api/transcriptions/process`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            transcriptionId: newTranscription.id
-          })
-        }
-      ).catch((error) => {
+      fetch(processUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          transcriptionId: newTranscription.id
+        })
+      }).catch((error) => {
         console.error('Error triggering transcription:', error)
       })
     }
