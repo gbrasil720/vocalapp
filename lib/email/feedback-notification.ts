@@ -1,5 +1,6 @@
 import { render } from '@react-email/components'
 import FeedbackNotificationEmail from '@/emails/feedback-notification'
+import { sendEmail } from './send-email'
 
 type FeedbackCategory = 'bug' | 'feature' | 'workflow' | 'praise' | 'other'
 type FeedbackImpact = 'blocking' | 'slowdown' | 'nice-to-have' | 'delight'
@@ -49,14 +50,7 @@ export async function sendFeedbackNotificationEmail({
     return
   }
 
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY is not configured')
-  }
-
-  const { Resend } = await import('resend')
-  const resend = new Resend(process.env.RESEND_API_KEY)
-
-  await resend.emails.send({
+  await sendEmail({
     from: process.env.EMAIL_FROM || 'Vocal Beta Feedback <hello@vocalapp.io>',
     to: process.env.FEEDBACK_INBOX || 'hello@vocalapp.io',
     subject: `Beta feedback: ${feedback.category} (${feedback.impact})`,
