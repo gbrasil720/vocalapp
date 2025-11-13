@@ -185,28 +185,7 @@ export default function DashboardPage() {
                 >
                   Billing
                 </Link>
-                {isBetaUser ? (
-                  <>
-                    <Link
-                      href="/dashboard/feedback"
-                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                    >
-                      Feedback
-                    </Link>
-                    <Link
-                      href="/dashboard/roadmap"
-                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                    >
-                      Roadmap
-                    </Link>
-                    <Link
-                      href="/dashboard/changelog"
-                      className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                    >
-                      Changelog
-                    </Link>
-                  </>
-                ) : null}
+
                 <UserNav />
               </div>
             </div>
@@ -326,7 +305,9 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="mt-4 text-xs text-gray-400">
-                50+ languages supported
+                {stats.plan.isActive
+                  ? `50+ languages supported`
+                  : '10 languages supported'}
               </div>
             </SpotlightCard>
           </div>
@@ -603,7 +584,7 @@ export default function DashboardPage() {
                     key={transcription.id}
                     href={`/dashboard/transcription/${transcription.id}`}
                   >
-                    <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-[1.02] transition-transform">
+                    <SpotlightCard className="bg-transparent backdrop-blur-xl mt-3 cursor-pointer hover:scale-[1.02] transition-transform">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 flex-1">
                           <div className="p-3 rounded-xl bg-white/5">
@@ -662,53 +643,6 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
-
-          {isBetaUser ? (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Beta Updates</h2>
-                <Link
-                  href="/dashboard/changelog"
-                  className="text-[#d856bf] hover:text-[#03b3c3] transition-colors text-sm flex items-center gap-1"
-                >
-                  View changelog
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                  <Link href="/dashboard/roadmap" className="block">
-                    <div className="text-start">
-                      <div className="p-4 rounded-full bg-[#03b3c3]/20 inline-block mb-4">
-                        <MapIcon className="w-6 h-6 text-[#03b3c3]" />
-                      </div>
-                      <h3 className="font-semibold text-white mb-2">
-                        Product Roadmap
-                      </h3>
-                      <p className="text-sm text-gray-400">
-                        Track what’s planned, in progress, and recently shipped.
-                      </p>
-                    </div>
-                  </Link>
-                </SpotlightCard>
-                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                  <Link href="/dashboard/changelog" className="block">
-                    <div className="text-start">
-                      <div className="p-4 rounded-full bg-[#d856bf]/20 inline-block mb-4">
-                        <Newspaper className="w-6 h-6 text-[#d856bf]" />
-                      </div>
-                      <h3 className="font-semibold text-white mb-2">
-                        Weekly Changelog
-                      </h3>
-                      <p className="text-sm text-gray-400">
-                        Catch the highlights from every release and bug fix.
-                      </p>
-                    </div>
-                  </Link>
-                </SpotlightCard>
-              </div>
-            </div>
-          ) : null}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">

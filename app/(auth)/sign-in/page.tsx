@@ -10,6 +10,7 @@ import { BetaBadge } from '@/components/beta-badge'
 import { SignInForm } from '@/components/forms/sign-in-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import { OAuthButton } from '@/components/oauth-button'
+import { env } from '@/lib/env'
 
 export default function SignIn() {
   const router = useRouter()
@@ -114,7 +115,7 @@ export default function SignIn() {
           </div>
 
           <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-6 lg:p-8">
-            {process.env.NEXT_PUBLIC_BETA_MODE === 'true' && (
+            {env.BETA_MODE && (
               <div className="mb-6 p-4 bg-[#03b3c3]/10 border border-[#03b3c3]/30 rounded-lg">
                 <p className="text-sm text-center text-white">
                   🚀 <span className="font-semibold">Beta Program Active!</span>{' '}

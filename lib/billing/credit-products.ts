@@ -1,3 +1,5 @@
+import { env } from '../env'
+
 export type CreditPackType = 'basic' | 'popular' | 'premium'
 
 export interface CreditPack {
@@ -16,8 +18,7 @@ export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
     name: 'Basic',
     price: 5,
     credits: 120,
-    priceId:
-      process.env.STRIPE_CREDIT_BASIC_PRICE_ID || 'price_BASIC_PLACEHOLDER',
+    priceId: env.STRIPE_CREDIT_BASIC_PRICE_ID || 'price_BASIC_PLACEHOLDER',
     description: '120 credits (2 hours)',
     costPerMinute: 0.042
   },
@@ -26,8 +27,7 @@ export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
     name: 'Popular',
     price: 15,
     credits: 450,
-    priceId:
-      process.env.STRIPE_CREDIT_POPULAR_PRICE_ID || 'price_POPULAR_PLACEHOLDER',
+    priceId: env.STRIPE_CREDIT_POPULAR_PRICE_ID || 'price_POPULAR_PLACEHOLDER',
     description: '450 credits (7.5 hours)',
     costPerMinute: 0.033
   },
@@ -36,8 +36,7 @@ export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
     name: 'Premium',
     price: 40,
     credits: 1500,
-    priceId:
-      process.env.STRIPE_CREDIT_PREMIUM_PRICE_ID || 'price_PREMIUM_PLACEHOLDER',
+    priceId: env.STRIPE_CREDIT_PREMIUM_PRICE_ID || 'price_PREMIUM_PLACEHOLDER',
     description: '1,500 credits (25 hours)',
     costPerMinute: 0.027
   }

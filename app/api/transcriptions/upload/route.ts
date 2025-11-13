@@ -7,6 +7,7 @@ import { subscription, transcription } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { getUserCredits } from '@/lib/credits'
 import { calculateTranscriptionCost } from '@/lib/credits/transcription-billing'
+import { env } from '@/lib/env'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -228,7 +229,7 @@ export async function POST(req: Request) {
     const transcriptions = []
     const processUrl = new URL(
       '/api/transcriptions/process',
-      process.env.NEXT_PUBLIC_URL || req.url
+      env.NEXT_PUBLIC_URL || req.url
     )
 
     for (const fileDetail of fileDetailsArray) {

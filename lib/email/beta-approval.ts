@@ -1,5 +1,6 @@
 import { render } from '@react-email/components'
 import BetaApprovalEmail from '@/emails/beta-approval'
+import { env } from '../env'
 import { sendEmail } from './send-email'
 
 const DEFAULT_BASE_URL = 'https://vocalapp.io'
@@ -10,7 +11,7 @@ function buildLoginUrl(baseUrl?: string): string {
 }
 
 export async function sendBetaApprovalEmail(email: string): Promise<void> {
-  const loginUrl = buildLoginUrl(process.env.NEXT_PUBLIC_URL)
+  const loginUrl = buildLoginUrl(env.NEXT_PUBLIC_URL)
 
   const emailHtml = render(
     BetaApprovalEmail({

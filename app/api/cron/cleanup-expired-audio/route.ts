@@ -2,6 +2,7 @@ import { and, eq, isNotNull, lt } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { subscription, transcription } from '@/db/schema'
+import { env } from '@/lib/env'
 import { deleteFromBlob } from '@/lib/storage/vercel-blob'
 
 export const maxDuration = 300 // 5 minutes max
@@ -9,9 +10,9 @@ export const maxDuration = 300 // 5 minutes max
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get('authorization')
-    const expectedAuth = `Bearer ${process.env.CRON_SECRET}`
+    const expectedAuth = `Bearer ${env.CRON_SECRET}`
 
-    if (!process.env.CRON_SECRET || authHeader !== expectedAuth) {
+    if (!env.CRON_SECRET || authHeader !== expectedAuth) {
       console.error('Unauthorized cron job attempt')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

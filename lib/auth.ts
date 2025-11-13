@@ -10,6 +10,7 @@ import { isBetaUserByEmail } from './beta-access'
 import { stripeClient } from './billing/stripe-client'
 import { addCredits } from './credits'
 import { sendMagicLinkEmail } from './email/magic-link'
+import { env } from './env'
 import { isEmailApproved } from './waitlist'
 
 export const auth = betterAuth({
@@ -30,8 +31,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET
     }
   },
   database: drizzleAdapter(db, {
@@ -53,10 +54,10 @@ export const auth = betterAuth({
           console.log('🚨 DATABASE HOOK CALLED for user creation:', {
             email: user.email,
             name: user.name,
-            betaMode: process.env.BETA_MODE
+            betaMode: env.BETA_MODE
           })
 
-          if (process.env.BETA_MODE === 'true') {
+          if (env.BETA_MODE) {
             const isApproved = await isEmailApproved(user.email)
             const existingBetaUser = await isBetaUserByEmail(user.email)
 
@@ -108,11 +109,11 @@ export const auth = betterAuth({
       sendMagicLink: async ({ email, token, url }) => {
         console.log('🔍 Magic Link Request:', {
           email,
-          betaMode: process.env.BETA_MODE,
-          isBetaModeActive: process.env.BETA_MODE === 'true'
+          betaMode: env.BETA_MODE,
+          isBetaModeActive: env.BETA_MODE === true
         })
 
-        if (process.env.BETA_MODE === 'true') {
+        if (env.BETA_MODE) {
           const isApproved = await isEmailApproved(email)
           console.log(`✅ Waitlist approval check for ${email}:`, isApproved)
 
@@ -144,7 +145,7 @@ export const auth = betterAuth({
     }),
     stripe({
       stripeClient,
-      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET as string,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
       createCustomerOnSignUp: true,
       onEvent: async (event) => {
         console.log('stripe event', event)

@@ -1,21 +1,7 @@
-import { ArrowLeft, Megaphone, Route, Sparkles } from 'lucide-react'
+import { ArrowLeft, Megaphone } from 'lucide-react'
 import Link from 'next/link'
 
 const adminSections = [
-  {
-    title: 'Changelog Manager',
-    description:
-      'Create and schedule release notes to keep beta testers up to date.',
-    href: '/admin/changelog',
-    icon: Sparkles
-  },
-  {
-    title: 'Roadmap Manager',
-    description:
-      'Plan, prioritize, and publish roadmap entries as initiatives evolve.',
-    href: '/admin/roadmap',
-    icon: Route
-  },
   {
     title: 'Waitlist Approvals',
     description:

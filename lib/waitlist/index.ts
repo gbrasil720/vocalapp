@@ -1,8 +1,9 @@
 import { Redis } from '@upstash/redis'
+import { env } from '../env'
 
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN
 })
 
 const WAITLIST_SET_KEY = 'waitlist:set'
