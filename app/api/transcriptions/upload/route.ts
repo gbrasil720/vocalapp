@@ -58,6 +58,99 @@ function isValidFileType(mimeType: string, fileName: string): boolean {
   return false
 }
 
+async function fetchWithRetry(
+  url: string,
+  options: { retries?: number; delay?: number; initialDelay?: number } = {}
+): Promise<Response> {
+  const { retries = 5, delay = 1000, initialDelay = 500 } = options
+
+  // Add initial delay to account for blob propagation delay
+  if (initialDelay > 0) {
+    await new Promise((resolve) => setTimeout(resolve, initialDelay))
+  }
+
+  let lastError: Error | null = null
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      })
+
+      if (response.ok) {
+        return response
+      }
+
+      // Retry 404s with exponential backoff - blob storage may have propagation delay
+      if (response.status === 404) {
+        if (attempt < retries) {
+          const waitTime = delay * 2 ** (attempt - 1) // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+          console.warn(
+            `Attempt ${attempt}/${retries}: File not found (404) - may be propagation delay. Retrying in ${waitTime}ms...`
+          )
+          await new Promise((resolve) => setTimeout(resolve, waitTime))
+          continue
+        }
+        // Last attempt failed with 404
+        throw new Error(
+          `File not found at blob URL (404) after ${retries} attempts. This may indicate the file was not uploaded successfully or the URL is incorrect.`
+        )
+      }
+
+      // Retry on server errors (5xx) or network errors
+      if (
+        attempt < retries &&
+        (response.status >= 500 || response.status === 0)
+      ) {
+        const waitTime = delay * 2 ** (attempt - 1) // Exponential backoff
+        console.warn(
+          `Attempt ${attempt}/${retries} failed with status ${response.status}. Retrying in ${waitTime}ms...`
+        )
+        await new Promise((resolve) => setTimeout(resolve, waitTime))
+        continue
+      }
+
+      throw new Error(
+        `Failed to fetch file: ${response.status} ${response.statusText}`
+      )
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+
+      if (attempt === retries) {
+        throw lastError
+      }
+
+      // Retry on network errors (but not if it's a 404 we already handled)
+      if (
+        error instanceof Error &&
+        !error.message.includes('not found') &&
+        !error.message.includes('404')
+      ) {
+        const waitTime = delay * 2 ** (attempt - 1)
+        console.warn(
+          `Attempt ${attempt}/${retries} failed: ${error.message}. Retrying in ${waitTime}ms...`
+        )
+        await new Promise((resolve) => setTimeout(resolve, waitTime))
+        continue
+      }
+
+      // If it's a 404 error from our throw above, don't retry again
+      if (error instanceof Error && error.message.includes('404')) {
+        throw error
+      }
+
+      // For other errors, retry
+      const waitTime = delay * 2 ** (attempt - 1)
+      console.warn(
+        `Attempt ${attempt}/${retries} failed: ${error instanceof Error ? error.message : String(error)}. Retrying in ${waitTime}ms...`
+      )
+      await new Promise((resolve) => setTimeout(resolve, waitTime))
+    }
+  }
+
+  throw lastError || new Error('Failed to fetch file after retries')
+}
+
 interface FileMetadata {
   fileUrl: string
   fileName: string
@@ -126,6 +219,13 @@ export async function POST(req: Request) {
         )
       }
 
+      // Warn if blobPathname is missing (helpful for debugging)
+      if (!file.blobPathname) {
+        console.warn(
+          `⚠️  blobPathname not provided for file: ${file.fileName}. This may make debugging blob URL issues more difficult.`
+        )
+      }
+
       if (file.fileSize === 0) {
         return NextResponse.json(
           {
@@ -163,13 +263,30 @@ export async function POST(req: Request) {
 
     for (const fileMetadata of files) {
       try {
-        console.log(`⬇️  Downloading file from Blob: ${fileMetadata.fileUrl}`)
-        const fileResponse = await fetch(fileMetadata.fileUrl)
-        if (!fileResponse.ok) {
+        // Log both URL and pathname for debugging
+        console.log(`⬇️  Downloading file from Blob:`, {
+          fileName: fileMetadata.fileName,
+          fileUrl: fileMetadata.fileUrl,
+          blobPathname: fileMetadata.blobPathname || 'not provided'
+        })
+
+        // Validate URL format
+        const fileUrl = fileMetadata.fileUrl
+        try {
+          new URL(fileUrl)
+        } catch {
           throw new Error(
-            `Failed to download file from Blob: ${fileResponse.statusText}`
+            `Invalid file URL format: "${fileUrl}". The blob URL appears to be malformed.`
           )
         }
+
+        // Attempt to fetch with retry logic
+        // Increased retries and added initial delay to handle blob propagation delay
+        const fileResponse = await fetchWithRetry(fileUrl, {
+          retries: 5, // More retries for eventual consistency
+          delay: 1000, // Base delay of 1 second
+          initialDelay: 500 // Wait 500ms before first attempt
+        })
 
         const fileBuffer = await fileResponse.arrayBuffer()
         const metadata = await parseBuffer(
@@ -197,13 +314,65 @@ export async function POST(req: Request) {
           cost
         })
       } catch (error) {
-        console.error(
-          `Error extracting duration from ${fileMetadata.fileName}:`,
-          error
-        )
+        console.error(`Error processing file ${fileMetadata.fileName}:`, error)
+        console.error('File metadata:', {
+          fileName: fileMetadata.fileName,
+          fileUrl: fileMetadata.fileUrl,
+          blobPathname: fileMetadata.blobPathname,
+          fileSize: fileMetadata.fileSize,
+          mimeType: fileMetadata.mimeType
+        })
+
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown error'
+
+        // Provide specific error messages based on error type
+        if (
+          errorMessage.includes('not found') ||
+          errorMessage.includes('404')
+        ) {
+          return NextResponse.json(
+            {
+              error: `File "${fileMetadata.fileName}" was not found at the provided blob URL. The file may not have been uploaded successfully. Please try uploading again.`,
+              details:
+                process.env.NODE_ENV === 'development'
+                  ? {
+                      fileUrl: fileMetadata.fileUrl,
+                      blobPathname: fileMetadata.blobPathname
+                    }
+                  : undefined
+            },
+            { status: 404 }
+          )
+        }
+
+        if (
+          errorMessage.includes('timeout') ||
+          errorMessage.includes('timeout')
+        ) {
+          return NextResponse.json(
+            {
+              error: `Timeout while downloading "${fileMetadata.fileName}". The file may be too large or the network connection is slow. Please try again.`
+            },
+            { status: 408 }
+          )
+        }
+
+        if (errorMessage.includes('Invalid file URL')) {
+          return NextResponse.json(
+            {
+              error: `Invalid blob URL for file "${fileMetadata.fileName}". Please try uploading again.`
+            },
+            { status: 400 }
+          )
+        }
+
+        // Generic error for other cases (parsing, etc.)
         return NextResponse.json(
           {
-            error: `Failed to extract audio duration from "${fileMetadata.fileName}". Please ensure it's a valid audio file.`
+            error: `Failed to process file "${fileMetadata.fileName}". ${errorMessage.includes('duration') ? 'Could not extract audio duration.' : "Please ensure it's a valid audio file and try again."}`,
+            details:
+              process.env.NODE_ENV === 'development' ? errorMessage : undefined
           },
           { status: 400 }
         )

@@ -35,6 +35,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
+    "groq-sdk": "^0.36.0",
     "jszip": "^3.10.1",
     "lenis": "^1.3.11",
     "lucide-react": "^0.545.0",
