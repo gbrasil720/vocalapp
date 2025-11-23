@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import OpenAI from 'openai'
+import Groq from 'groq-sdk' // Mudança aqui
 import { db } from '@/db'
 import { transcription as transcriptionTable } from '@/db/schema'
 import { canUseLanguage } from '../billing/plan-limits'
@@ -14,8 +14,9 @@ import {
   isNewLanguage
 } from './language-tracking'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+// Inicializa o cliente da Groq
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
 })
 
 export async function processTranscription(transcriptionId: string) {
@@ -42,6 +43,7 @@ export async function processTranscription(transcriptionId: string) {
 
     fileUrl = record.fileUrl
 
+    // Download do arquivo (Mantido igual, funciona bem com a Groq)
     const fileResponse = await fetch(record.fileUrl)
     if (!fileResponse.ok) {
       throw new Error('Failed to download file')
@@ -98,20 +100,27 @@ export async function processTranscription(transcriptionId: string) {
     const normalizedLanguage = normalizeLanguageCode(transcriptionLanguage)
 
     console.log(
-      `📝 Transcribing with language: ${normalizedLanguage} (detected: ${detectedLanguage}, original: ${transcriptionLanguage})`
+      `📝 Transcribing with Groq (Language: ${normalizedLanguage}, Original: ${transcriptionLanguage})`
     )
-    const transcriptionResult = await openai.audio.transcriptions.create({
+
+    // --- CORREÇÃO AQUI ---
+    // Usamos 'as any' aqui porque o SDK da Groq ainda não tipa corretamente
+    // o retorno do 'verbose_json' automaticamente no TypeScript.
+    const transcriptionResult = (await groq.audio.transcriptions.create({
       file: file,
-      model: 'whisper-1',
+      model: 'whisper-large-v3-turbo',
       language: normalizedLanguage,
-      response_format: 'verbose_json'
-    })
+      response_format: 'verbose_json',
+      temperature: 0.0
+    })) as any
+    // ---------------------
 
     const creditsUsed = Math.ceil(record.duration / 60)
 
     const finalMetadata = {
       ...metadata,
-      language: transcriptionResult.language,
+      // Agora o TypeScript não vai reclamar, pois tratamos como 'any'
+      language: transcriptionResult.language || normalizedLanguage,
       segments: transcriptionResult.segments?.slice(0, 10),
       ...(languageLimitExceeded && {
         originalDetectedLanguage: detectedLanguage,
