@@ -1,8 +1,7 @@
 import OpenAI from 'openai'
-import { env } from '../env'
 
 const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 })
 
 const LANGUAGE_MAP: Record<string, string> = {

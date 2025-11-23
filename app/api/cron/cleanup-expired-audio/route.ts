@@ -2,7 +2,6 @@ import { and, eq, isNotNull, lt } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { subscription, transcription } from '@/db/schema'
-import { env } from '@/lib/env'
 import { deleteFromBlob } from '@/lib/storage/vercel-blob'
 
 export const maxDuration = 300 // 5 minutes max
@@ -10,9 +9,9 @@ export const maxDuration = 300 // 5 minutes max
 export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get('authorization')
-    const expectedAuth = `Bearer ${env.CRON_SECRET}`
+    const expectedAuth = `Bearer ${process.env.CRON_SECRET}`
 
-    if (!env.CRON_SECRET || authHeader !== expectedAuth) {
+    if (!process.env.CRON_SECRET || authHeader !== expectedAuth) {
       console.error('Unauthorized cron job attempt')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -42,12 +41,14 @@ export async function GET(req: Request) {
     let checkedCount = 0
     let deletedCount = 0
     let errorCount = 0
+    let skippedCount = 0
     const errors: string[] = []
 
     for (const record of candidates) {
       try {
         checkedCount++
 
+        // Look up subscription for this user
         const [userSub] = await db
           .select()
           .from(subscription)
@@ -55,16 +56,34 @@ export async function GET(req: Request) {
           .limit(1)
 
         const retentionDays = getRetentionDays(userSub)
+        const fileAgeDays = Math.floor(
+          (Date.now() - record.createdAt.getTime()) / (24 * 60 * 60 * 1000)
+        )
+
+        // Log subscription lookup results for debugging
+        if (userSub) {
+          console.log(
+            `📋 File: ${record.fileName} | User: ${record.userId} | Plan: ${userSub.plan} | Status: ${userSub.status} | Retention: ${retentionDays} days | Age: ${fileAgeDays} days`
+          )
+        } else {
+          console.log(
+            `📋 File: ${record.fileName} | User: ${record.userId} | No subscription found | Retention: ${retentionDays} days (default) | Age: ${fileAgeDays} days`
+          )
+        }
 
         const expirationDate = new Date(
           record.createdAt.getTime() + retentionDays * 24 * 60 * 60 * 1000
         )
+        const now = new Date()
+        const isExpired = now > expirationDate
 
-        if (new Date() > expirationDate) {
+        if (isExpired) {
           if (record.fileUrl) {
             try {
               await deleteFromBlob(record.fileUrl)
-              console.log(`✓ Deleted blob: ${record.fileName}`)
+              console.log(
+                `✓ Deleted blob: ${record.fileName} (expired after ${retentionDays} days, age: ${fileAgeDays} days)`
+              )
             } catch (blobError) {
               console.error(
                 `Failed to delete blob for ${record.id}:`,
@@ -80,8 +99,10 @@ export async function GET(req: Request) {
             .where(eq(transcription.id, record.id))
 
           deletedCount++
+        } else {
+          skippedCount++
           console.log(
-            `✓ Expired audio cleanup: ${record.fileName} (${retentionDays} day retention)`
+            `⏳ Skipped: ${record.fileName} (not expired, expires in ${Math.ceil((expirationDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))} days)`
           )
         }
       } catch (error) {
@@ -100,6 +121,7 @@ export async function GET(req: Request) {
         candidatesFound: candidates.length,
         filesChecked: checkedCount,
         filesDeleted: deletedCount,
+        filesSkipped: skippedCount,
         errors: errorCount
       },
       errorDetails: errors.length > 0 ? errors : undefined
@@ -124,19 +146,38 @@ export async function GET(req: Request) {
 function getRetentionDays(
   userSubscription: typeof subscription.$inferSelect | undefined
 ): number {
-  if (!userSubscription || userSubscription.status !== 'active') {
+  // If no subscription found, default to free plan retention (7 days)
+  if (!userSubscription) {
     return 7
   }
 
-  const plan = userSubscription.plan?.toLowerCase()
+  // Check if subscription is active
+  const isActive = userSubscription.status === 'active'
+  if (!isActive) {
+    console.log(
+      `⚠️ Subscription found but not active: plan=${userSubscription.plan}, status=${userSubscription.status}`
+    )
+    return 7
+  }
+
+  // Normalize plan name for comparison (handle case variations)
+  const plan = userSubscription.plan?.toLowerCase().trim()
 
   if (plan === 'pro') {
+    console.log(`✓ Pro plan detected: ${userSubscription.plan} -> 90 days retention`)
     return 90
   }
 
   if (plan === 'enterprise') {
+    console.log(
+      `✓ Enterprise plan detected: ${userSubscription.plan} -> infinite retention`
+    )
     return Number.POSITIVE_INFINITY
   }
 
+  // Unknown plan or free plan - default to 7 days
+  console.log(
+    `⚠️ Unknown or free plan: ${userSubscription.plan} -> 7 days retention`
+  )
   return 7
 }

@@ -331,6 +331,18 @@ export default function TranscriptionsPage() {
                 >
                   Billing
                 </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Analytics
+                </Link>
+                <Link
+                  href="/dashboard/feedback"
+                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Feedback
+                </Link>
                 <UserNav />
               </div>
             </div>

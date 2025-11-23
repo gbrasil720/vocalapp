@@ -12,19 +12,22 @@ import SpotlightCard from '../SpotlightCard'
 
 export function Features() {
   return (
-    <section className="relative z-10 py-20 px-6" id="features">
+    <section
+      className="relative z-10 py-16 md:py-20 px-6 md:px-6"
+      id="features"
+    >
       <div className="text-center mb-16 max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
+        <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
           Elevate Your Productivity with Precision
         </h2>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           Unlock the power of enterprise-grade AI transcription that transforms
           audio into actionable insights, delivering unmatched accuracy and
           speed for modern professionals.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 w-full max-w-7xl mx-auto">
         <SpotlightCard className="md:col-span-2 lg:col-span-2 lg:row-span-2 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full justify-between">
             <div>
@@ -42,7 +45,7 @@ export function Features() {
                 Transform any audio into precise text in seconds.
               </p>
             </div>
-            <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#d856bf]/20 to-[#03b3c3]/20 border border-white/10">
+            <div className="mt-6 p-4 rounded-xl bg-[#03b3c3]/20 border border-white/10">
               <p className="text-sm text-gray-400">
                 "The future of transcription is here"
               </p>

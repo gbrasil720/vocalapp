@@ -28,18 +28,21 @@ const placeholders = [
 
 export function BetaTestimonials() {
   return (
-    <section className="relative z-10 py-20 px-6" id="beta-testimonials">
+    <section
+      className="relative z-10 py-16 md:py-20 px-6 md:px-6"
+      id="beta-testimonials"
+    >
       <div className="text-center mb-16 max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
+        <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
           Beta Stories Coming Soon
         </h2>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           We’re onboarding the next wave of teams now. Once feedback lands,
           you’ll see real voices and results here— straight from the beta.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
         {placeholders.map((item) => (
           <div
             key={item.title}

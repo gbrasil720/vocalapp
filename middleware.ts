@@ -2,9 +2,8 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { isBetaUser } from '@/lib/beta-access'
-import { env } from './lib/env'
 
-const BETA_MODE = env.BETA_MODE
+const BETA_MODE = process.env.BETA_MODE
 
 export const config = {
   matcher: [

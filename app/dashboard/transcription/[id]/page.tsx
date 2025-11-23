@@ -389,10 +389,10 @@ export default function TranscriptionDetailPage() {
                 </button>
               </div>
               <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                <div className="p-6">
+                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words">
                     {transcription.text}
-                  </p>
+                  </div>
                 </div>
               </SpotlightCard>
             </div>

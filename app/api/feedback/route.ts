@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { auth } from '@/lib/auth'
 import { sendFeedbackNotificationEmail } from '@/lib/email/feedback-notification'
-import { env } from '@/lib/env'
 
 const FeedbackSchema = z.object({
   category: z.enum(['bug', 'feature', 'workflow', 'praise', 'other']),
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
 
     const feedback = result.data
 
-    if (process.env.NODE_ENV === 'development' || !env.RESEND_API_KEY) {
+    if (process.env.NODE_ENV === 'development' || !process.env.RESEND_API_KEY) {
       console.log('='.repeat(60))
       console.log('📝 Beta feedback received')
       console.log('Name:', session?.user?.name ?? 'not provided')

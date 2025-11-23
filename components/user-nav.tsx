@@ -1,6 +1,14 @@
 'use client'
 
-import { ChevronDown, CreditCard, LogOut, Settings, User } from 'lucide-react'
+import {
+  BarChart3,
+  ChevronDown,
+  CreditCard,
+  LogOut,
+  MessageSquare,
+  Settings,
+  User
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
@@ -50,15 +58,34 @@ export function UserNav() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 rounded-full bg-white/5 hover:bg-white/10 transition-all pl-1 pr-4 py-1"
       >
-        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#d856bf] to-[#03b3c3] flex items-center justify-center text-white text-sm font-semibold">
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold relative overflow-hidden ${
+            session.user.image
+              ? ''
+              : 'bg-gradient-to-r from-[#d856bf] to-[#03b3c3]'
+          }`}
+        >
           {session.user.image ? (
-            <Image
-              src={session.user.image}
-              alt={session.user.name || 'User'}
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-full"
-            />
+            <>
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(45deg, #1a1a1a 25%, transparent 25%), linear-gradient(-45deg, #1a1a1a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1a1a1a 75%), linear-gradient(-45deg, transparent 75%, #1a1a1a 75%)',
+                  backgroundSize: '4px 4px',
+                  backgroundPosition: '0 0, 0 2px, 2px -2px, -2px 0px'
+                }}
+              />
+              <Image
+                src={session.user.image}
+                alt={session.user.name || 'User'}
+                width={32}
+                height={32}
+                className="rounded-full relative z-10"
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                unoptimized
+              />
+            </>
           ) : (
             getInitials(session.user.name)
           )}
@@ -104,6 +131,24 @@ export function UserNav() {
             >
               <CreditCard className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-white">Billing</span>
+            </Link>
+
+            <Link
+              href="/dashboard/analytics"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              <BarChart3 className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-white">Analytics</span>
+            </Link>
+
+            <Link
+              href="/dashboard/feedback"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              <MessageSquare className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-white">Feedback</span>
             </Link>
 
             <Link

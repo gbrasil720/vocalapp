@@ -24,7 +24,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
     }
   }
   return (
-    <section id="pricing" className="relative z-10 py-20 px-6">
+    <section id="pricing" className="relative z-10 py-16 md:py-20 px-6 md:px-6">
       <div className="text-center mb-16 max-w-4xl mx-auto">
         {waitlistMode && (
           <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
@@ -34,17 +34,17 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
             </span>
           </div>
         )}
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
+        <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
           {waitlistMode ? 'Future Pricing Plans' : 'Choose Your Power Plan'}
         </h2>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           {waitlistMode
             ? 'Preview the plans we’ll roll out at launch. Closed beta access is free—reserve your spot now for early pricing options.'
             : 'Scale your productivity with flexible pricing designed for every professional, from individual creators to enterprise teams.'}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
         <PricingCard
           title="Starter"
           description="Perfect to test the waters"
@@ -101,7 +101,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
               <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                 <div className="flex flex-col lg:flex-row items-center gap-8">
                   <div className="flex-1 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
+                    <div className="inline-flex items-center gap-2 bg-[#03b3c3] rounded-full px-4 py-1.5 mb-4">
                       <HugeiconsIcon icon={ZapIcon} color="#ffffff" size={22} />
                       <span className="text-sm font-semibold text-white">
                         Out of Credits?
@@ -170,12 +170,12 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       }
                     >
                       <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 z-10">
-                        <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
+                        <span className="bg-[#d856bf] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
                           Best Value
                         </span>
                       </div>
                       <div
-                        className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
+                        className={`bg-[#d856bf]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
                           waitlistMode
                             ? 'cursor-default'
                             : 'hover:scale-105 cursor-pointer'
@@ -275,7 +275,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                 <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
                   <div className="flex flex-col lg:flex-row items-center gap-8">
                     <div className="flex-1 text-center lg:text-left">
-                      <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full px-4 py-1.5 mb-4">
+                      <div className="inline-flex items-center gap-2 bg-[#03b3c3] rounded-full px-4 py-1.5 mb-4">
                         <HugeiconsIcon
                           icon={ZapIcon}
                           color="#ffffff"
@@ -348,12 +348,12 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         }
                       >
                         <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 z-10">
-                          <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
+                          <span className="bg-[#d856bf] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
                             Best Value
                           </span>
                         </div>
                         <div
-                          className={`bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
+                          className={`bg-[#d856bf]/20 border-2 border-[#d856bf]/50 rounded-2xl p-5 transition-all duration-300 h-full ${
                             waitlistMode
                               ? 'cursor-default'
                               : 'hover:scale-105 cursor-pointer'

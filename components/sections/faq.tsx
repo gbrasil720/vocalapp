@@ -43,14 +43,14 @@ const faqData = [
 
 export function FAQ() {
   return (
-    <section className="relative z-10 py-20 px-6">
+    <section className="relative z-10 py-16 md:py-20 px-6 md:px-6">
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-3 mb-6">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight">
+          <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight">
             Frequently Asked Questions
           </h2>
         </div>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           The essentials for teams joining our closed beta. Still curious?{' '}
           <span className="text-[#d856bf] cursor-pointer hover:underline">
             Reply to your invite email
@@ -101,7 +101,7 @@ export function FAQ() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/dashboard/feedback"
-              className="px-8 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-semibold rounded-full hover:from-[#c247ac] hover:to-[#d856bf] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#d856bf]/25"
+              className="px-8 py-3 bg-[#d856bf] text-white font-semibold rounded-full hover:bg-[#d856bf]/90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#d856bf]/25"
             >
               Join the Conversation
             </Link>

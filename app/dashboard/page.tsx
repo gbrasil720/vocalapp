@@ -1,6 +1,15 @@
 'use client'
 
 import {
+  Clock01Icon,
+  EarthIcon,
+  File02Icon,
+  GlobeIcon,
+  Upload01Icon,
+  ZapIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
   AudioLines,
   BarChart3,
   ChevronRight,
@@ -21,12 +30,15 @@ import { redirect } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { BetaBadge } from '@/components/beta-badge'
+import { DashboardFooter } from '@/components/dashboard-footer'
 import ElectricBorder from '@/components/ElectricBorder'
 import { FileUpload } from '@/components/file-upload'
 import { LazyHyperspeed } from '@/components/lazy-hyperspeed'
 import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
+import { TranscriptionCard } from '@/components/transcription-card'
 import { UserNav } from '@/components/user-nav'
+import { UserPlanCard } from '@/components/user-plan-card'
 import { authClient } from '@/lib/auth-client'
 
 interface UserStats {
@@ -100,35 +112,6 @@ export default function DashboardPage() {
     }
   }, [])
 
-  const formatDuration = useCallback((seconds: number | null): string => {
-    if (!seconds) return 'N/A'
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    }
-    return `${minutes}:${secs.toString().padStart(2, '0')}`
-  }, [])
-
-  const formatRelativeTime = useCallback((dateString: string): string => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60)
-      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`
-    if (diffHours < 24)
-      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
-    return date.toLocaleDateString()
-  }, [])
-
   useEffect(() => {
     if (session) {
       fetchStats()
@@ -185,6 +168,18 @@ export default function DashboardPage() {
                 >
                   Billing
                 </Link>
+                <Link
+                  href="/dashboard/analytics"
+                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Analytics
+                </Link>
+                <Link
+                  href="/dashboard/feedback"
+                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  Feedback
+                </Link>
 
                 <UserNav />
               </div>
@@ -195,7 +190,7 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent">
+              <h1 className="font-['Satoshi'] text-4xl md:text-5xl font-bold text-primary">
                 Welcome back, {session.user.name?.split(' ')[0] || 'there'}!
               </h1>
               {isBetaUser ? <BetaBadge variant="large" /> : null}
@@ -225,7 +220,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <div className="p-2 rounded-xl bg-[#03b3c3]/20">
-                  <Zap className="w-5 h-5 text-[#03b3c3]" />
+                  <HugeiconsIcon icon={ZapIcon} size={22} color="#03b3c3" />
                 </div>
               </div>
               <div className="mt-4 w-full bg-white/5 rounded-full h-2">
@@ -251,11 +246,11 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-500">total</p>
                 </div>
                 <div className="p-2 rounded-xl bg-[#c247ac]/20">
-                  <Clock className="w-5 h-5 text-[#c247ac]" />
+                  <HugeiconsIcon icon={Clock01Icon} size={22} color="#c247ac" />
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-1 text-gray-400">
-                <FileText className="w-3 h-3" />
+                <HugeiconsIcon icon={File02Icon} size={16} />
                 <span className="text-xs">
                   {stats.usage.transcriptionsCount} transcription
                   {stats.usage.transcriptionsCount !== 1 ? 's' : ''}
@@ -276,7 +271,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-500">completed</p>
                 </div>
                 <div className="p-2 rounded-xl bg-[#d856bf]/20">
-                  <FileText className="w-5 h-5 text-[#d856bf]" />
+                  <HugeiconsIcon icon={File02Icon} size={22} color="#d856bf" />
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-1 text-gray-400">
@@ -301,7 +296,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-500">available</p>
                 </div>
                 <div className="p-2 rounded-xl bg-[#03b3c3]/20">
-                  <Globe className="w-5 h-5 text-[#03b3c3]" />
+                  <HugeiconsIcon icon={GlobeIcon} size={22} color="#03b3c3" />
                 </div>
               </div>
               <div className="mt-4 text-xs text-gray-400">
@@ -317,7 +312,7 @@ export default function DashboardPage() {
               <div className="block md:hidden bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">
+                    <h2 className="font-['Satoshi'] text-2xl font-bold text-primary mb-2">
                       Upload Audio
                     </h2>
                     <p className="text-gray-400 text-sm">
@@ -372,7 +367,7 @@ export default function DashboardPage() {
                   <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 h-full">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h2 className="text-2xl font-bold text-white mb-2">
+                        <h2 className="font-['Satoshi'] text-2xl font-bold text-primary mb-2">
                           Upload Audio
                         </h2>
                         <p className="text-gray-400 text-sm">
@@ -380,7 +375,11 @@ export default function DashboardPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-2xl bg-[#d856bf]/20">
-                        <Upload className="w-6 h-6 text-[#d856bf]" />
+                        <HugeiconsIcon
+                          icon={Upload01Icon}
+                          size={22}
+                          color="#d856bf"
+                        />
                       </div>
                     </div>
 
@@ -422,135 +421,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl h-full">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-white">Your Plan</h2>
-                    <Crown className="w-5 h-5 text-[#d856bf]" />
-                  </div>
-
-                  <div className="flex-1">
-                    <div
-                      className={`inline-flex items-center gap-2 ${
-                        stats.plan.isActive
-                          ? 'bg-gradient-to-r from-[#d856bf]/20 to-[#c247ac]/20 border border-[#d856bf]/30'
-                          : 'bg-white/5 border border-white/10'
-                      } rounded-full px-4 py-2 mb-4`}
-                    >
-                      {stats.plan.isActive ? (
-                        <Crown className="w-4 h-4 text-[#d856bf]" />
-                      ) : (
-                        <Sparkles className="w-4 h-4 text-gray-400" />
-                      )}
-                      <span className="text-sm font-semibold text-white">
-                        {stats.plan.name
-                          .split(' ')
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() +
-                              word.slice(1).toLowerCase()
-                          )
-                          .join(' ')}
-                      </span>
-                    </div>
-
-                    <div className="space-y-4 mb-6">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-2 h-2 rounded-full ${stats.plan.isActive ? 'bg-green-400' : 'bg-gray-400'}`}
-                        />
-                        <span className="text-sm text-gray-300">
-                          {stats.plan.totalCredits} credits
-                          {stats.plan.isActive ? '/month' : ' free'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-2 h-2 rounded-full ${stats.plan.isActive ? 'bg-green-400' : 'bg-gray-400'}`}
-                        />
-                        <span className="text-sm text-gray-300">
-                          50+ languages
-                        </span>
-                      </div>
-                      {stats.plan.isActive && (
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-green-400" />
-                          <span className="text-sm text-gray-300">
-                            Priority support
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {stats.plan.isActive && stats.plan.nextBillingDate ? (
-                      <div className="bg-white/5 rounded-2xl p-4 mb-4">
-                        <p className="text-xs text-gray-400 mb-2">
-                          Next billing
-                        </p>
-                        <p className="text-sm font-semibold text-white">
-                          {stats.plan.nextBillingDate}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          $10.00/month
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="bg-white/5 rounded-2xl p-4 mb-4">
-                        <p className="text-xs text-gray-400 mb-2">
-                          Want more credits?
-                        </p>
-                        <p className="text-sm font-semibold text-white">
-                          Upgrade to Pro
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          600 credits/month
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {stats.plan.isActive ? (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          const response = await fetch('/api/billing/portal', {
-                            method: 'POST'
-                          })
-                          if (response.ok) {
-                            const { url } = await response.json()
-                            window.location.href = url
-                          } else {
-                            const errorData = await response.json()
-                            if (errorData.error?.includes('configuration')) {
-                              toast.error(
-                                'Billing portal not configured yet. Please use the billing page.'
-                              )
-                            } else {
-                              toast.error('Failed to open billing portal')
-                            }
-                          }
-                        } catch (error) {
-                          console.error('Error opening portal:', error)
-                          toast.error('Failed to open billing portal')
-                        }
-                      }}
-                      className="w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full hover:bg-white/5 transition-all text-center"
-                    >
-                      Manage Plan
-                    </button>
-                  ) : (
-                    <Link
-                      href="/#pricing"
-                      className="w-full py-3 px-6 border border-white/20 text-white font-semibold rounded-full hover:bg-white/5 transition-all text-center"
-                    >
-                      Upgrade Plan
-                    </Link>
-                  )}
-                </div>
-              </SpotlightCard>
-            </div>
+            <UserPlanCard stats={stats} />
           </div>
 
           <div className="mb-8">
@@ -580,96 +451,45 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 recentTranscriptions.map((transcription) => (
-                  <Link
+                  <TranscriptionCard
+                    transcription={transcription}
                     key={transcription.id}
-                    href={`/dashboard/transcription/${transcription.id}`}
-                  >
-                    <SpotlightCard className="bg-transparent backdrop-blur-xl mt-3 cursor-pointer hover:scale-[1.02] transition-transform">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="p-3 rounded-xl bg-white/5">
-                            <FileText className="w-5 h-5 text-[#03b3c3]" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-white mb-1">
-                              {transcription.fileName}
-                            </h3>
-                            <div className="flex items-center gap-4 text-xs text-gray-400">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {formatDuration(transcription.duration)}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Globe className="w-3 h-3" />
-                                {transcription.language || 'Unknown'}
-                              </span>
-                              <span>
-                                {formatRelativeTime(transcription.createdAt)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          {transcription.status === 'completed' ? (
-                            <>
-                              <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full">
-                                Completed
-                              </span>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                }}
-                                className="p-2 rounded-full hover:bg-white/5 transition-colors"
-                              >
-                                <Download className="w-4 h-4 text-gray-400 hover:text-white" />
-                              </button>
-                            </>
-                          ) : transcription.status === 'failed' ? (
-                            <span className="px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full">
-                              Failed
-                            </span>
-                          ) : (
-                            <span className="px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse">
-                              Processing...
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </SpotlightCard>
-                  </Link>
+                  />
                 ))
               )}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-center">
-                <div className="p-4 rounded-full bg-[#03b3c3]/20 inline-block mb-4">
-                  <BarChart3 className="w-6 h-6 text-[#03b3c3]" />
+            <Link href="/dashboard/analytics">
+              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                <div className="text-center">
+                  <div className="p-4 rounded-full bg-[#03b3c3]/20 inline-block mb-4">
+                    <BarChart3 className="w-6 h-6 text-[#03b3c3]" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">
+                    View Analytics
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    Track your usage and performance metrics
+                  </p>
                 </div>
-                <h3 className="font-semibold text-white mb-2">
-                  View Analytics
-                </h3>
-                <p className="text-sm text-gray-400">
-                  Track your usage and performance metrics
-                </p>
-              </div>
-            </SpotlightCard>
+              </SpotlightCard>
+            </Link>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-center">
-                <div className="p-4 rounded-full bg-[#c247ac]/20 inline-block mb-4">
-                  <Zap className="w-6 h-6 text-[#c247ac]" />
+            <Link href="/dashboard/billing">
+              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                <div className="text-center">
+                  <div className="p-4 rounded-full bg-[#c247ac]/20 inline-block mb-4">
+                    <Zap className="w-6 h-6 text-[#c247ac]" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Buy Credits</h3>
+                  <p className="text-sm text-gray-400">
+                    Top up your account with credit packs
+                  </p>
                 </div>
-                <h3 className="font-semibold text-white mb-2">Buy Credits</h3>
-                <p className="text-sm text-gray-400">
-                  Top up your account with credit packs
-                </p>
-              </div>
-            </SpotlightCard>
+              </SpotlightCard>
+            </Link>
 
             <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
               <div className="text-center">
@@ -683,6 +503,8 @@ export default function DashboardPage() {
               </div>
             </SpotlightCard>
           </div>
+
+          <DashboardFooter isBetaUser={isBetaUser} />
         </div>
       </div>
     </>

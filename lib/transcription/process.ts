@@ -4,7 +4,6 @@ import { db } from '@/db'
 import { transcription as transcriptionTable } from '@/db/schema'
 import { canUseLanguage } from '../billing/plan-limits'
 import { deductTranscriptionCredits } from '../credits/transcription-billing'
-import { env } from '../env'
 import {
   detectLanguageFromUrl,
   normalizeLanguageCode
@@ -16,7 +15,7 @@ import {
 } from './language-tracking'
 
 const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY
 })
 
 export async function processTranscription(transcriptionId: string) {

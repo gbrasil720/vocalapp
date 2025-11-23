@@ -1,18 +1,20 @@
 'use client'
 
 import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  ChevronRight,
-  Crown,
-  DollarSign,
-  RefreshCw,
-  Zap
-} from 'lucide-react'
+  ArrowLeft02Icon,
+  Calendar02Icon,
+  Crown03Icon,
+  Dollar01Icon,
+  RefreshIcon,
+  Tick02Icon,
+  ZapIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { BetaPaymentNotice } from '@/components/beta-payment-notice'
 import ElectricBorder from '@/components/ElectricBorder'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
@@ -42,6 +44,9 @@ interface SubscriptionData {
     nextBillingDate: string | null
   } | null
 }
+
+// Set to false when exiting beta to show current plan section
+const IS_BETA_MODE = true
 
 export default function BillingPage() {
   const [credits, setCredits] = useState<number>(0)
@@ -217,7 +222,7 @@ export default function BillingPage() {
                 href="/dashboard"
                 className="p-2 rounded-full hover:bg-white/5 transition-colors"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <HugeiconsIcon icon={ArrowLeft02Icon} size={22} />
               </Link>
               <div className="flex-1 flex items-center justify-between">
                 <div>
@@ -233,7 +238,11 @@ export default function BillingPage() {
                       className="p-2 rounded-full hover:bg-white/10 transition-colors"
                       title="Refresh data"
                     >
-                      <RefreshCw className="w-4 h-4 text-gray-400 hover:text-white" />
+                      <HugeiconsIcon
+                        icon={RefreshIcon}
+                        size={18}
+                        className="text-gray-400"
+                      />
                     </button>
                   </div>
                   <p className="text-sm text-gray-400">
@@ -246,342 +255,389 @@ export default function BillingPage() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {loading ? (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-white mb-4">
-                Current Plan
-              </h2>
-              <ElectricBorder
-                color="#d856bf"
-                speed={1.5}
-                chaos={0.6}
-                thickness={2}
-                className="rounded-3xl"
-              >
-                <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-2xl bg-white/5 animate-pulse">
-                          <div className="w-6 h-6 bg-white/10 rounded" />
+          <BetaPaymentNotice />
+          {!IS_BETA_MODE &&
+            (loading ? (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Current Plan
+                </h2>
+                <ElectricBorder
+                  color="#d856bf"
+                  speed={1.5}
+                  chaos={0.6}
+                  thickness={2}
+                  className="rounded-3xl"
+                >
+                  <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-2xl bg-white/5 animate-pulse">
+                            <div className="w-6 h-6 bg-white/10 rounded" />
+                          </div>
+                          <div className="space-y-2 flex-1">
+                            <div className="h-8 bg-white/10 rounded-lg w-32 animate-pulse" />
+                            <div className="h-4 bg-white/5 rounded w-20 animate-pulse" />
+                          </div>
                         </div>
-                        <div className="space-y-2 flex-1">
-                          <div className="h-8 bg-white/10 rounded-lg w-32 animate-pulse" />
-                          <div className="h-4 bg-white/5 rounded w-20 animate-pulse" />
+
+                        <div className="space-y-4">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
+                              <div className="h-4 bg-white/10 rounded flex-1 animate-pulse" />
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="bg-white/5 rounded-2xl p-4 space-y-2">
+                          <div className="h-3 bg-white/10 rounded w-24 animate-pulse" />
+                          <div className="h-4 bg-white/10 rounded w-full animate-pulse" />
                         </div>
                       </div>
 
-                      <div className="space-y-4">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded-full bg-white/10 animate-pulse" />
-                            <div className="h-4 bg-white/10 rounded flex-1 animate-pulse" />
+                      <div className="space-y-6">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="bg-white/5 border border-white/10 rounded-2xl p-6"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-2 flex-1">
+                                <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
+                                <div className="h-6 bg-white/10 rounded w-32 animate-pulse" />
+                              </div>
+                              <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                            </div>
+                            {i === 3 && (
+                              <div className="mt-4 w-full bg-white/5 rounded-full h-2">
+                                <div className="h-2 bg-gradient-to-r from-[#d856bf]/30 to-[#03b3c3]/30 rounded-full w-2/3 animate-pulse" />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
-
-                      <div className="bg-white/5 rounded-2xl p-4 space-y-2">
-                        <div className="h-3 bg-white/10 rounded w-24 animate-pulse" />
-                        <div className="h-4 bg-white/10 rounded w-full animate-pulse" />
-                      </div>
                     </div>
 
-                    <div className="space-y-6">
-                      {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="bg-white/5 border border-white/10 rounded-2xl p-6"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-2 flex-1">
-                              <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
-                              <div className="h-6 bg-white/10 rounded w-32 animate-pulse" />
-                            </div>
-                            <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                    <div className="mt-6 flex items-center justify-center gap-2">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#d856bf] animate-bounce" />
+                        <div className="w-2 h-2 rounded-full bg-[#c247ac] animate-bounce animation-delay-200" />
+                        <div className="w-2 h-2 rounded-full bg-[#03b3c3] animate-bounce animation-delay-400" />
+                      </div>
+                      <span className="text-sm text-gray-400 ml-2">
+                        Loading subscription...
+                      </span>
+                    </div>
+                  </div>
+                </ElectricBorder>
+              </div>
+            ) : hasSubscription && subscriptionData?.subscription ? (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Current Plan
+                </h2>
+                <ElectricBorder
+                  color="#d856bf"
+                  speed={1.5}
+                  chaos={0.6}
+                  thickness={2}
+                  className="rounded-3xl"
+                >
+                  <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="p-3 rounded-2xl bg-[#d856bf]/20">
+                            <HugeiconsIcon
+                              icon={Crown03Icon}
+                              size={22}
+                              color="#d856bf"
+                            />
                           </div>
-                          {i === 3 && (
-                            <div className="mt-4 w-full bg-white/5 rounded-full h-2">
-                              <div className="h-2 bg-gradient-to-r from-[#d856bf]/30 to-[#03b3c3]/30 rounded-full w-2/3 animate-pulse" />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex items-center justify-center gap-2">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 rounded-full bg-[#d856bf] animate-bounce" />
-                      <div className="w-2 h-2 rounded-full bg-[#c247ac] animate-bounce animation-delay-200" />
-                      <div className="w-2 h-2 rounded-full bg-[#03b3c3] animate-bounce animation-delay-400" />
-                    </div>
-                    <span className="text-sm text-gray-400 ml-2">
-                      Loading subscription...
-                    </span>
-                  </div>
-                </div>
-              </ElectricBorder>
-            </div>
-          ) : hasSubscription && subscriptionData?.subscription ? (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-white mb-4">
-                Current Plan
-              </h2>
-              <ElectricBorder
-                color="#d856bf"
-                speed={1.5}
-                chaos={0.6}
-                thickness={2}
-                className="rounded-3xl"
-              >
-                <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="p-3 rounded-2xl bg-[#d856bf]/20">
-                          <Crown className="w-6 h-6 text-[#d856bf]" />
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-bold text-white">
-                            {subscriptionData.subscription.plan
-                              .split(' ')
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() +
-                                  word.slice(1).toLowerCase()
-                              )
-                              .join(' ')}
-                          </h3>
-                          <p className="text-sm text-green-400">
-                            {subscriptionData.subscription.status === 'active'
-                              ? 'Active'
-                              : 'Inactive'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 mb-6">
-                        <div className="flex items-center gap-3">
-                          <Check className="w-5 h-5 text-green-400" />
-                          <span className="text-gray-300">
-                            600 credits per month
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Check className="w-5 h-5 text-green-400" />
-                          <span className="text-gray-300">50+ languages</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Check className="w-5 h-5 text-green-400" />
-                          <span className="text-gray-300">
-                            Priority support
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Check className="w-5 h-5 text-green-400" />
-                          <span className="text-gray-300">
-                            Multiple files processing
-                          </span>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={handleManageSubscription}
-                        className="w-full py-3 px-6 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
-                      >
-                        Manage Subscription
-                      </button>
-
-                      <p className="text-xs text-gray-400 text-center mt-3">
-                        Update payment method, view invoices, or cancel
-                        subscription
-                      </p>
-                    </div>
-
-                    <div className="space-y-6">
-                      <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                        <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm text-gray-400 mb-1">Amount</p>
-                            <p className="text-2xl font-bold text-white">
-                              $10.00
-                              <span className="text-sm text-gray-400 ml-2">
-                                /month
-                              </span>
+                            <h3 className="text-2xl font-bold text-white">
+                              {subscriptionData.subscription.plan
+                                .split(' ')
+                                .map(
+                                  (word) =>
+                                    word.charAt(0).toUpperCase() +
+                                    word.slice(1).toLowerCase()
+                                )
+                                .join(' ')}
+                            </h3>
+                            <p className="text-sm text-green-400">
+                              {subscriptionData.subscription.status === 'active'
+                                ? 'Active'
+                                : 'Inactive'}
                             </p>
                           </div>
-                          <DollarSign className="w-8 h-8 text-[#03b3c3]" />
                         </div>
-                      </SpotlightCard>
 
-                      {subscriptionData.subscription.nextBillingDate && (
+                        <div className="space-y-4 mb-6">
+                          <div className="flex items-center gap-3">
+                            <HugeiconsIcon
+                              icon={Tick02Icon}
+                              size={18}
+                              className="text-green-400"
+                            />
+                            <span className="text-gray-300">
+                              600 credits per month
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <HugeiconsIcon
+                              icon={Tick02Icon}
+                              size={18}
+                              className="text-green-400"
+                            />
+                            <span className="text-gray-300">50+ languages</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <HugeiconsIcon
+                              icon={Tick02Icon}
+                              size={18}
+                              className="text-green-400"
+                            />
+                            <span className="text-gray-300">
+                              Priority support
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <HugeiconsIcon
+                              icon={Tick02Icon}
+                              size={18}
+                              className="text-green-400"
+                            />
+                            <span className="text-gray-300">
+                              Multiple files processing
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleManageSubscription}
+                          className="w-full py-3 px-6 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                        >
+                          Manage Subscription
+                        </button>
+
+                        <p className="text-xs text-gray-400 text-center mt-3">
+                          Update payment method, view invoices, or cancel
+                          subscription
+                        </p>
+                      </div>
+
+                      <div className="space-y-6">
                         <SpotlightCard className="bg-transparent backdrop-blur-xl">
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="text-sm text-gray-400 mb-1">
-                                Next Billing
+                                Amount
                               </p>
-                              <p className="text-lg font-semibold text-white">
-                                {subscriptionData.subscription.nextBillingDate}
+                              <p className="text-2xl font-bold text-white">
+                                $10.00
+                                <span className="text-sm text-gray-400 ml-2">
+                                  /month
+                                </span>
                               </p>
                             </div>
-                            <Calendar className="w-8 h-8 text-[#c247ac]" />
+                            <HugeiconsIcon
+                              icon={Dollar01Icon}
+                              size={32}
+                              className="text-[#03b3c3]"
+                            />
                           </div>
                         </SpotlightCard>
-                      )}
 
-                      <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <p className="text-sm text-gray-400 mb-1">
-                              Current Balance
-                            </p>
-                            <p className="text-3xl font-bold text-white">
-                              {credits}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              credits available
-                            </p>
+                        {subscriptionData.subscription.nextBillingDate && (
+                          <SpotlightCard className="bg-transparent backdrop-blur-xl">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm text-gray-400 mb-1">
+                                  Next Billing
+                                </p>
+                                <p className="text-lg font-semibold text-white">
+                                  {
+                                    subscriptionData.subscription
+                                      .nextBillingDate
+                                  }
+                                </p>
+                              </div>
+                              <HugeiconsIcon
+                                icon={Calendar02Icon}
+                                size={32}
+                                className="text-[#c247ac]"
+                              />
+                            </div>
+                          </SpotlightCard>
+                        )}
+
+                        <SpotlightCard className="bg-transparent backdrop-blur-xl">
+                          <div className="flex items-center justify-between mb-4">
+                            <div>
+                              <p className="text-sm text-gray-400 mb-1">
+                                Current Balance
+                              </p>
+                              <p className="text-3xl font-bold text-white">
+                                {credits}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                credits available
+                              </p>
+                            </div>
+                            <HugeiconsIcon
+                              icon={ZapIcon}
+                              size={32}
+                              className="text-[#d856bf]"
+                            />
                           </div>
-                          <Zap className="w-8 h-8 text-[#d856bf]" />
-                        </div>
-                        <div className="pt-4 border-t border-white/10 space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">
-                              Monthly allowance:
-                            </span>
-                            <span className="text-white font-semibold">
-                              {planCredits} credits
-                            </span>
+                          <div className="pt-4 border-t border-white/10 space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-400">
+                                Monthly allowance:
+                              </span>
+                              <span className="text-white font-semibold">
+                                {planCredits} credits
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-400">
+                                Used this period:
+                              </span>
+                              <span className="text-white font-semibold">
+                                {creditsUsed} credits
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-400">
-                              Used this period:
-                            </span>
-                            <span className="text-white font-semibold">
-                              {creditsUsed} credits
-                            </span>
-                          </div>
-                        </div>
-                      </SpotlightCard>
+                        </SpotlightCard>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </ElectricBorder>
-            </div>
-          ) : (
+                </ElectricBorder>
+              </div>
+            ) : (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-white mb-4">
+                  Current Plan
+                </h2>
+                <SpotlightCard className="bg-transparent backdrop-blur-xl">
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 mb-4">
+                      <HugeiconsIcon
+                        icon={ZapIcon}
+                        size={18}
+                        className="text-gray-400"
+                      />
+                      <span className="text-sm font-semibold text-white">
+                        Free Plan
+                      </span>
+                    </div>
+                    <p className="text-gray-400 mb-6">
+                      You're on the free plan with {credits} credits
+                    </p>
+                    <Link
+                      href="/#pricing"
+                      className="inline-flex px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                    >
+                      Upgrade to Pro
+                    </Link>
+                  </div>
+                </SpotlightCard>
+              </div>
+            ))}
+
+          {!IS_BETA_MODE && (
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4">
-                Current Plan
+                Buy Credit Packs
               </h2>
-              <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 mb-4">
-                    <Zap className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-semibold text-white">
-                      Free Plan
-                    </span>
-                  </div>
-                  <p className="text-gray-400 mb-6">
-                    You're on the free plan with {credits} credits
-                  </p>
-                  <Link
-                    href="/#pricing"
-                    className="inline-flex px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
-                  >
-                    Upgrade to Pro
-                  </Link>
-                </div>
-              </SpotlightCard>
-            </div>
-          )}
-
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-white mb-4">
-              Buy Credit Packs
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <p className="text-sm text-[#03b3c3] font-semibold mb-2">
-                    Basic
-                  </p>
-                  <div className="flex items-baseline justify-center mb-2">
-                    <span className="text-3xl font-bold text-white">$5</span>
-                  </div>
-                  <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                    120
-                  </div>
-                  <p className="text-xs text-gray-400 mb-4">
-                    credits (2 hours)
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleCreditPurchase('basic')}
-                    className="w-full py-2 px-4 bg-gradient-to-r from-[#03b3c3] to-[#0e5ea5] rounded-full text-white font-semibold hover:scale-105 transition-transform"
-                  >
-                    Buy Now
-                  </button>
-                </div>
-              </SpotlightCard>
-
-              <div className="relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                  <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
-                    Best Value
-                  </span>
-                </div>
-                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform border-2 border-[#d856bf]/50">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
                   <div className="text-center">
-                    <p className="text-sm text-[#03b3c3] font-semibold mb-2 mt-2">
-                      Popular
+                    <p className="text-sm text-[#03b3c3] font-semibold mb-2">
+                      Basic
                     </p>
                     <div className="flex items-baseline justify-center mb-2">
-                      <span className="text-3xl font-bold text-white">$15</span>
+                      <span className="text-3xl font-bold text-white">$5</span>
                     </div>
                     <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                      450
+                      120
                     </div>
                     <p className="text-xs text-gray-400 mb-4">
-                      credits (7.5 hours)
+                      credits (2 hours)
                     </p>
                     <button
                       type="button"
-                      onClick={() => handleCreditPurchase('popular')}
-                      className="w-full py-2 px-4 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                      onClick={() => handleCreditPurchase('basic')}
+                      className="w-full py-2 px-4 bg-gradient-to-r from-[#03b3c3] to-[#0e5ea5] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                </SpotlightCard>
+
+                <div className="relative">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
+                      Best Value
+                    </span>
+                  </div>
+                  <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform border-2 border-[#d856bf]/50">
+                    <div className="text-center">
+                      <p className="text-sm text-[#03b3c3] font-semibold mb-2 mt-2">
+                        Popular
+                      </p>
+                      <div className="flex items-baseline justify-center mb-2">
+                        <span className="text-3xl font-bold text-white">
+                          $15
+                        </span>
+                      </div>
+                      <div className="text-2xl font-bold text-[#d856bf] mb-3">
+                        450
+                      </div>
+                      <p className="text-xs text-gray-400 mb-4">
+                        credits (7.5 hours)
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleCreditPurchase('popular')}
+                        className="w-full py-2 px-4 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                      >
+                        Buy Now
+                      </button>
+                    </div>
+                  </SpotlightCard>
+                </div>
+
+                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                  <div className="text-center">
+                    <p className="text-sm text-[#03b3c3] font-semibold mb-2">
+                      Premium
+                    </p>
+                    <div className="flex items-baseline justify-center mb-2">
+                      <span className="text-3xl font-bold text-white">$40</span>
+                    </div>
+                    <div className="text-2xl font-bold text-[#d856bf] mb-3">
+                      1,500
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">
+                      credits (25 hours)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleCreditPurchase('premium')}
+                      className="w-full py-2 px-4 bg-gradient-to-r from-[#c247ac] to-[#d856bf] rounded-full text-white font-semibold hover:scale-105 transition-transform"
                     >
                       Buy Now
                     </button>
                   </div>
                 </SpotlightCard>
               </div>
-
-              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <p className="text-sm text-[#03b3c3] font-semibold mb-2">
-                    Premium
-                  </p>
-                  <div className="flex items-baseline justify-center mb-2">
-                    <span className="text-3xl font-bold text-white">$40</span>
-                  </div>
-                  <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                    1,500
-                  </div>
-                  <p className="text-xs text-gray-400 mb-4">
-                    credits (25 hours)
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleCreditPurchase('premium')}
-                    className="w-full py-2 px-4 bg-gradient-to-r from-[#c247ac] to-[#d856bf] rounded-full text-white font-semibold hover:scale-105 transition-transform"
-                  >
-                    Buy Now
-                  </button>
-                </div>
-              </SpotlightCard>
             </div>
-          </div>
+          )}
 
           <div>
             <h2 className="text-xl font-bold text-white mb-4">
@@ -620,9 +676,17 @@ export default function BillingPage() {
                         <div className="flex items-center gap-4">
                           <div className="p-2 rounded-xl bg-white/5">
                             {isPositive ? (
-                              <Zap className="w-5 h-5 text-[#03b3c3]" />
+                              <HugeiconsIcon
+                                icon={ZapIcon}
+                                size={18}
+                                className="text-[#03b3c3]"
+                              />
                             ) : (
-                              <DollarSign className="w-5 h-5 text-[#d856bf]" />
+                              <HugeiconsIcon
+                                icon={Dollar01Icon}
+                                size={18}
+                                className="text-[#d856bf]"
+                              />
                             )}
                           </div>
                           <div>

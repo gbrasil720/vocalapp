@@ -33,10 +33,10 @@ export function Contributors() {
   return (
     <section className="relative z-10 py-20 px-6" id="contributors">
       <div className="text-center mb-16 max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
+        <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
           Community Contributors
         </h2>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           Vocal is open source. This space highlights the builders who keep the
           project moving—your name can live here next.
         </p>

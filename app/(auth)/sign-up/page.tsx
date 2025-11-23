@@ -2,12 +2,11 @@
 
 import { UserIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft, User } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { SignUpForm } from '@/components/forms/sign-up-form'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import { OAuthButton } from '@/components/oauth-button'
-import { env } from '@/lib/env'
 
 export default function SignUp() {
   return (
@@ -93,7 +92,7 @@ export default function SignUp() {
           </div>
 
           <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-            {env.BETA_MODE && (
+            {process.env.BETA_MODE && (
               <div className="mb-6 p-4 bg-[#03b3c3]/10 border border-[#03b3c3]/30 rounded-lg">
                 <p className="text-sm text-center text-white">
                   🚀 <span className="font-semibold">Beta Program Active!</span>{' '}

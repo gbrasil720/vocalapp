@@ -56,7 +56,10 @@ export function WaitlistSection() {
   }
 
   return (
-    <section id="waitlist" className="relative z-10 py-20 px-6">
+    <section
+      id="waitlist"
+      className="relative z-10 py-16 md:py-20 px-6 md:px-6"
+    >
       <div className="text-center mb-16 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-[#03b3c3]/20 border border-[#03b3c3]/50 rounded-full px-4 py-2 mb-6">
           <HugeiconsIcon icon={StarIcon} color="#03b3c3" size={20} />
@@ -64,10 +67,10 @@ export function WaitlistSection() {
             Closed Beta
           </span>
         </div>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent leading-tight mb-6">
+        <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
           Join the Exclusive Waitlist
         </h2>
-        <p className="text-xl text-[#03b3c3]/90 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
           Be among the first to experience the future of AI-powered
           transcription. Get early access, exclusive perks, and priority
           support.
@@ -132,7 +135,7 @@ export function WaitlistSection() {
                   <div className="relative">
                     <HugeiconsIcon
                       icon={Mail01Icon}
-                      color="#03b3c3"
+                      color="#d856bf"
                       size={22}
                       className="absolute left-4 top-1/2 -translate-y-1/2"
                     />
@@ -148,7 +151,7 @@ export function WaitlistSection() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
+                    className="w-full h-14 bg-[#d856bf] hover:bg-[#d856bf]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
                   >
                     {loading ? 'Joining...' : 'Secure Your Spot'}
                   </Button>
@@ -171,7 +174,7 @@ export function WaitlistSection() {
                     <div className="relative">
                       <HugeiconsIcon
                         icon={Mail01Icon}
-                        color="#03b3c3"
+                        color="#d856bf"
                         size={22}
                         className="absolute left-4 top-1/2 -translate-y-1/2"
                       />
@@ -187,7 +190,7 @@ export function WaitlistSection() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="cursor-pointer w-full h-14 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#d856bf]/90 hover:to-[#c247ac]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
+                      className="cursor-pointer w-full h-14 bg-[#d856bf] hover:bg-[#d856bf]/90 text-white font-semibold text-lg rounded-full border-0 transition-all duration-300 hover:scale-105"
                     >
                       {loading ? 'Joining...' : 'Secure Your Spot'}
                     </Button>
@@ -202,11 +205,11 @@ export function WaitlistSection() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#d856bf] to-[#c247ac]">
-              <HugeiconsIcon icon={ZapIcon} color="#ffffff" size={24} />
+            <div className="p-3 rounded-xl bg-primary">
+              <HugeiconsIcon icon={ZapIcon} color="#222" size={24} />
             </div>
             <h3 className="text-xl font-bold text-white">Early Access</h3>
           </div>
@@ -218,8 +221,8 @@ export function WaitlistSection() {
 
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#d856bf] to-[#c247ac]">
-              <HugeiconsIcon icon={GiftIcon} color="#ffffff" size={24} />
+            <div className="p-3 rounded-xl bg-primary">
+              <HugeiconsIcon icon={GiftIcon} color="#222" size={24} />
             </div>
             <h3 className="text-xl font-bold text-white">Exclusive Perks</h3>
           </div>
@@ -231,8 +234,8 @@ export function WaitlistSection() {
 
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#d856bf] to-[#c247ac]">
-              <HugeiconsIcon icon={StarIcon} color="#ffffff" size={24} />
+            <div className="p-3 rounded-xl bg-primary">
+              <HugeiconsIcon icon={StarIcon} color="#222" size={24} />
             </div>
             <h3 className="text-xl font-bold text-white">Priority Support</h3>
           </div>

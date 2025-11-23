@@ -1,13 +1,14 @@
+import { HugeiconsIcon } from '@hugeicons/react'
 import type { LucideIcon } from 'lucide-react'
-import { memo } from 'react'
+import { type ElementType, isValidElement, memo, type ReactNode } from 'react'
 import SpotlightCard from '@/components/SpotlightCard'
 
 interface StatCardProps {
   title: string
   value: string | number
   subtitle: string
-  icon: LucideIcon
-  iconColor: string
+  icon: ElementType | ReactNode | any
+  iconColor?: string
   iconBgColor: string
   spotlightColor: `rgba(${number}, ${number}, ${number}, ${number})`
   showProgress?: boolean
@@ -23,7 +24,7 @@ export const StatCard = memo(function StatCard({
   title,
   value,
   subtitle,
-  icon: Icon,
+  icon,
   iconColor,
   iconBgColor,
   spotlightColor,
@@ -32,6 +33,14 @@ export const StatCard = memo(function StatCard({
   progressColors = 'from-[#03b3c3] to-[#d856bf]',
   footer
 }: StatCardProps) {
+  const renderIcon = () => {
+    if (isValidElement(icon)) {
+      return icon
+    }
+    const IconComponent = icon as ElementType<{ className?: string }>
+    return <IconComponent className={`w-5 h-5 ${iconColor ?? ''}`} />
+  }
+
   return (
     <SpotlightCard
       className="bg-transparent backdrop-blur-xl"
@@ -44,7 +53,8 @@ export const StatCard = memo(function StatCard({
           <p className="text-xs text-gray-500">{subtitle}</p>
         </div>
         <div className={`p-2 rounded-xl ${iconBgColor}`}>
-          <Icon className={`w-5 h-5 ${iconColor}`} />
+          {/* <HugeiconsIcon icon={icon} size={22} color={iconColor} /> */}
+          {renderIcon()}
         </div>
       </div>
       {showProgress && (

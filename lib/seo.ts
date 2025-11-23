@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { env } from './env'
 
-const baseUrl = env.NEXT_PUBLIC_URL || 'https://vocalapp.io'
+const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://vocalapp.io'
 const siteName = 'vocalapp'
 const defaultTitle = 'vocalapp - AI-Powered Audio Transcription'
 const defaultDescription =

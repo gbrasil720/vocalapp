@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { env } from '@/lib/env'
 
-const baseUrl = env.NEXT_PUBLIC_URL || 'https://vocalapp.io'
+const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://vocalapp.io'
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -11,16 +11,14 @@ import {
 import { type FC, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-// Device detection utility
+// --- Utilitários ---
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false
-  const userAgent = navigator.userAgent || navigator.vendor
-  const isMobileUA =
+  return (
     /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-      userAgent.toLowerCase()
-    )
-  const isSmallScreen = window.innerWidth < 768
-  return isMobileUA || isSmallScreen
+      navigator.userAgent.toLowerCase()
+    ) || window.innerWidth < 768
+  )
 }
 
 function prefersReducedMotion(): boolean {
@@ -76,13 +74,13 @@ interface HyperspeedOptions {
   carShiftX: [number, number]
   carFloorSeparation: [number, number]
   colors: Colors
-  isHyper?: boolean
 }
 
 interface HyperspeedProps {
   effectOptions?: Partial<HyperspeedOptions>
 }
 
+// --- OTIMIZAÇÃO: Valores reduzidos para performance ---
 const defaultOptions: HyperspeedOptions = {
   onSpeedUp: () => {},
   onSlowDown: () => {},
@@ -95,8 +93,8 @@ const defaultOptions: HyperspeedOptions = {
   fovSpeedUp: 150,
   speedUp: 2,
   carLightsFade: 0.4,
-  totalSideLightSticks: 20,
-  lightPairsPerRoadWay: 40,
+  totalSideLightSticks: 10, // Otimizado
+  lightPairsPerRoadWay: 30, // Otimizado (menos objetos)
   shoulderLinesWidthPercentage: 0.05,
   brokenLinesWidthPercentage: 0.1,
   brokenLinesLengthPercentage: 0.5,
@@ -121,14 +119,14 @@ const defaultOptions: HyperspeedOptions = {
   }
 }
 
-// Mobile-optimized options with reduced complexity
 function getMobileOptimizedOptions(
   baseOptions: HyperspeedOptions
 ): HyperspeedOptions {
   return {
     ...baseOptions,
-    totalSideLightSticks: 10, // Reduced from 20
-    lightPairsPerRoadWay: 20 // Reduced from 40
+    totalSideLightSticks: 5,
+    lightPairsPerRoadWay: 15,
+    lanesPerRoad: 2
   }
 }
 
@@ -198,71 +196,6 @@ const distortions: Distortions = {
       return distortion.multiply(lookAtAmp).add(lookAtOffset)
     }
   },
-  xyDistortion: {
-    uniforms: xyUniforms,
-    getDistortion: `
-      uniform vec2 uFreq;
-      uniform vec2 uAmp;
-      #define PI 3.14159265358979
-      vec3 getDistortion(float progress){
-        float movementProgressFix = 0.02;
-        return vec3( 
-          cos(progress * PI * uFreq.x + uTime) * uAmp.x - cos(movementProgressFix * PI * uFreq.x + uTime) * uAmp.x,
-          sin(progress * PI * uFreq.y + PI/2. + uTime) * uAmp.y - sin(movementProgressFix * PI * uFreq.y + PI/2. + uTime) * uAmp.y,
-          0.
-        );
-      }
-    `,
-    getJS: (progress: number, time: number) => {
-      const movementProgressFix = 0.02
-      const uFreq = xyUniforms.uFreq.value
-      const uAmp = xyUniforms.uAmp.value
-      const distortion = new THREE.Vector3(
-        Math.cos(progress * Math.PI * uFreq.x + time) * uAmp.x -
-          Math.cos(movementProgressFix * Math.PI * uFreq.x + time) * uAmp.x,
-        Math.sin(progress * Math.PI * uFreq.y + time + Math.PI / 2) * uAmp.y -
-          Math.sin(
-            movementProgressFix * Math.PI * uFreq.y + time + Math.PI / 2
-          ) *
-            uAmp.y,
-        0
-      )
-      const lookAtAmp = new THREE.Vector3(2, 0.4, 1)
-      const lookAtOffset = new THREE.Vector3(0, 0, -3)
-      return distortion.multiply(lookAtAmp).add(lookAtOffset)
-    }
-  },
-  LongRaceDistortion: {
-    uniforms: LongRaceUniforms,
-    getDistortion: `
-      uniform vec2 uFreq;
-      uniform vec2 uAmp;
-      #define PI 3.14159265358979
-      vec3 getDistortion(float progress){
-        float camProgress = 0.0125;
-        return vec3( 
-          sin(progress * PI * uFreq.x + uTime) * uAmp.x - sin(camProgress * PI * uFreq.x + uTime) * uAmp.x,
-          sin(progress * PI * uFreq.y + uTime) * uAmp.y - sin(camProgress * PI * uFreq.y + uTime) * uAmp.y,
-          0.
-        );
-      }
-    `,
-    getJS: (progress: number, time: number) => {
-      const camProgress = 0.0125
-      const uFreq = LongRaceUniforms.uFreq.value
-      const uAmp = LongRaceUniforms.uAmp.value
-      const distortion = new THREE.Vector3(
-        Math.sin(progress * Math.PI * uFreq.x + time) * uAmp.x -
-          Math.sin(camProgress * Math.PI * uFreq.x + time) * uAmp.x,
-        Math.sin(progress * Math.PI * uFreq.y + time) * uAmp.y -
-          Math.sin(camProgress * Math.PI * uFreq.y + time) * uAmp.y,
-        0
-      )
-      const lookAtAmp = new THREE.Vector3(1, 1, 0)
-      const lookAtOffset = new THREE.Vector3(0, 0, -5)
-      return distortion.multiply(lookAtAmp).add(lookAtOffset)
-    }
-  },
   turbulentDistortion: {
     uniforms: turbulentUniforms,
     getDistortion: `
@@ -311,114 +244,6 @@ const distortions: Distortions = {
         0
       )
       const lookAtAmp = new THREE.Vector3(-2, -5, 0)
-      const lookAtOffset = new THREE.Vector3(0, 0, -10)
-      return distortion.multiply(lookAtAmp).add(lookAtOffset)
-    }
-  },
-  turbulentDistortionStill: {
-    uniforms: turbulentUniforms,
-    getDistortion: `
-      uniform vec4 uFreq;
-      uniform vec4 uAmp;
-      float nsin(float val){
-        return sin(val) * 0.5 + 0.5;
-      }
-      #define PI 3.14159265358979
-      float getDistortionX(float progress){
-        return (
-          cos(PI * progress * uFreq.r) * uAmp.r +
-          pow(cos(PI * progress * uFreq.g * (uFreq.g / uFreq.r)), 2. ) * uAmp.g
-        );
-      }
-      float getDistortionY(float progress){
-        return (
-          -nsin(PI * progress * uFreq.b) * uAmp.b +
-          -pow(nsin(PI * progress * uFreq.a / (uFreq.b / uFreq.a)), 5.) * uAmp.a
-        );
-      }
-      vec3 getDistortion(float progress){
-        return vec3(
-          getDistortionX(progress) - getDistortionX(0.02),
-          getDistortionY(progress) - getDistortionY(0.02),
-          0.
-        );
-      }
-    `
-  },
-  deepDistortionStill: {
-    uniforms: deepUniforms,
-    getDistortion: `
-      uniform vec4 uFreq;
-      uniform vec4 uAmp;
-      uniform vec2 uPowY;
-      float nsin(float val){
-        return sin(val) * 0.5 + 0.5;
-      }
-      #define PI 3.14159265358979
-      float getDistortionX(float progress){
-        return (
-          sin(progress * PI * uFreq.x) * uAmp.x * 2.
-        );
-      }
-      float getDistortionY(float progress){
-        return (
-          pow(abs(progress * uPowY.x), uPowY.y) + sin(progress * PI * uFreq.y) * uAmp.y
-        );
-      }
-      vec3 getDistortion(float progress){
-        return vec3(
-          getDistortionX(progress) - getDistortionX(0.02),
-          getDistortionY(progress) - getDistortionY(0.05),
-          0.
-        );
-      }
-    `
-  },
-  deepDistortion: {
-    uniforms: deepUniforms,
-    getDistortion: `
-      uniform vec4 uFreq;
-      uniform vec4 uAmp;
-      uniform vec2 uPowY;
-      float nsin(float val){
-        return sin(val) * 0.5 + 0.5;
-      }
-      #define PI 3.14159265358979
-      float getDistortionX(float progress){
-        return (
-          sin(progress * PI * uFreq.x + uTime) * uAmp.x
-        );
-      }
-      float getDistortionY(float progress){
-        return (
-          pow(abs(progress * uPowY.x), uPowY.y) + sin(progress * PI * uFreq.y + uTime) * uAmp.y
-        );
-      }
-      vec3 getDistortion(float progress){
-        return vec3(
-          getDistortionX(progress) - getDistortionX(0.02),
-          getDistortionY(progress) - getDistortionY(0.02),
-          0.
-        );
-      }
-    `,
-    getJS: (progress: number, time: number) => {
-      const uFreq = deepUniforms.uFreq.value
-      const uAmp = deepUniforms.uAmp.value
-      const uPowY = deepUniforms.uPowY.value
-
-      const getX = (p: number) =>
-        Math.sin(p * Math.PI * uFreq.x + time) * uAmp.x
-      const getY = (p: number) =>
-        (p * uPowY.x) ** uPowY.y +
-        Math.sin(p * Math.PI * uFreq.y + time) * uAmp.y
-
-      const distortion = new THREE.Vector3(
-        getX(progress) - getX(progress + 0.01),
-        getY(progress) - getY(progress + 0.01),
-        0
-      )
-      const lookAtAmp = new THREE.Vector3(-2, -4, 0)
       const lookAtOffset = new THREE.Vector3(0, 0, -10)
       return distortion.multiply(lookAtAmp).add(lookAtOffset)
     }
@@ -506,7 +331,8 @@ class CarLights {
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(0, 0, -1)
     )
-    const geometry = new THREE.TubeGeometry(curve, 40, 1, 8, false)
+    // OTIMIZAÇÃO: Geometria reduzida
+    const geometry = new THREE.TubeGeometry(curve, 20, 1, 4, false)
 
     const instanced = new THREE.InstancedBufferGeometry().copy(
       geometry as any
@@ -514,7 +340,6 @@ class CarLights {
     instanced.instanceCount = options.lightPairsPerRoadWay * 2
 
     const laneWidth = options.roadWidth / options.lanesPerRoad
-
     const aOffset: number[] = []
     const aMetrics: number[] = []
     const aColor: number[] = []
@@ -533,7 +358,6 @@ class CarLights {
 
       const carLane = i % options.lanesPerRoad
       let laneX = carLane * laneWidth - options.roadWidth / 2 + laneWidth / 2
-
       const carWidth = random(options.carWidthPercentage) * laneWidth
       const carShiftX = random(options.carShiftX) * laneWidth
       laneX += carShiftX
@@ -541,30 +365,14 @@ class CarLights {
       const offsetY = random(options.carFloorSeparation) + radius * 1.3
       const offsetZ = -random(options.length)
 
-      aOffset.push(laneX - carWidth / 2)
-      aOffset.push(offsetY)
-      aOffset.push(offsetZ)
-
-      aOffset.push(laneX + carWidth / 2)
-      aOffset.push(offsetY)
-      aOffset.push(offsetZ)
-
-      aMetrics.push(radius)
-      aMetrics.push(length)
-      aMetrics.push(spd)
-
-      aMetrics.push(radius)
-      aMetrics.push(length)
-      aMetrics.push(spd)
+      aOffset.push(laneX - carWidth / 2, offsetY, offsetZ)
+      aOffset.push(laneX + carWidth / 2, offsetY, offsetZ)
+      aMetrics.push(radius, length, spd)
+      aMetrics.push(radius, length, spd)
 
       const color = pickRandom<THREE.Color>(colorArray)
-      aColor.push(color.r)
-      aColor.push(color.g)
-      aColor.push(color.b)
-
-      aColor.push(color.r)
-      aColor.push(color.g)
-      aColor.push(color.b)
+      aColor.push(color.r, color.g, color.b)
+      aColor.push(color.r, color.g, color.b)
     }
 
     instanced.setAttribute(
@@ -705,12 +513,8 @@ class LightsSticks {
       aOffset.push((i - 1) * stickoffset * 2 + stickoffset * Math.random())
 
       const color = pickRandom<THREE.Color>(colorArray)
-      aColor.push(color.r)
-      aColor.push(color.g)
-      aColor.push(color.b)
-
-      aMetrics.push(width)
-      aMetrics.push(height)
+      aColor.push(color.r, color.g, color.b)
+      aMetrics.push(width, height)
     }
 
     instanced.setAttribute(
@@ -775,10 +579,10 @@ const sideSticksVertex = `
   varying vec3 vColor;
   mat4 rotationY( in float angle ) {
     return mat4(
-      cos(angle),		0,		sin(angle),	0,
-      0,		        1.0,	0,			0,
-      -sin(angle),	    0,		cos(angle),	0,
-      0, 		        0,		0,			1
+      cos(angle),   0,    sin(angle), 0,
+      0,            1.0,  0,      0,
+      -sin(angle),  0,    cos(angle), 0,
+      0,            0,    0,      1
     );
   }
   #include <getDistortion_vertex>
@@ -833,11 +637,12 @@ class Road {
   createPlane(side: number, isRoad: boolean) {
     const options = this.options
     const isMobile = isMobileDevice()
-    const segments = isMobile ? 50 : 100 // Reduced segments on mobile
+    // OTIMIZAÇÃO: Menos segmentos
+    const segments = isMobile ? 30 : 60
     const geometry = new THREE.PlaneGeometry(
       isRoad ? options.roadWidth : options.islandWidth,
       options.length,
-      20,
+      10,
       segments
     )
 
@@ -1024,6 +829,8 @@ class App {
   speedUpTarget: number
   speedUp: number
   timeOffset: number
+  isVisible: boolean = true
+  animationFrameId: number | null = null
 
   constructor(container: HTMLElement, options: HyperspeedOptions) {
     this.options = options
@@ -1037,13 +844,15 @@ class App {
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: false,
-      alpha: true
+      alpha: true,
+      powerPreference: 'high-performance'
     })
+
     this.renderer.setSize(container.offsetWidth, container.offsetHeight, false)
     const isMobile = isMobileDevice()
-    this.renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, isMobile ? 1 : 2)
-    )
+
+    // OTIMIZAÇÃO: Cap de DPR
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
 
     this.composer = new EffectComposer(this.renderer)
     container.appendChild(this.renderer.domElement)
@@ -1105,12 +914,28 @@ class App {
     this.setSize = this.setSize.bind(this)
     this.onMouseDown = this.onMouseDown.bind(this)
     this.onMouseUp = this.onMouseUp.bind(this)
-
     this.onTouchStart = this.onTouchStart.bind(this)
     this.onTouchEnd = this.onTouchEnd.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
 
+    // Handler para Visibility Change
+    this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
+    document.addEventListener('visibilitychange', this.handleVisibilityChange)
+
     window.addEventListener('resize', this.onWindowResize.bind(this))
+  }
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      this.isVisible = false
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId)
+        this.animationFrameId = null
+      }
+    } else {
+      this.isVisible = true
+      this.tick()
+    }
   }
 
   onWindowResize() {
@@ -1129,14 +954,13 @@ class App {
 
     this.renderPass = new RenderPass(this.scene, this.camera)
 
-    // Skip Bloom on mobile or if user prefers reduced motion for better performance
     if (!isMobile && !reduceMotion) {
       this.bloomPass = new EffectPass(
         this.camera,
         new BloomEffect({
           luminanceThreshold: 0.2,
           luminanceSmoothing: 0,
-          resolutionScale: 1
+          resolutionScale: 0.5 // Bloom meia resolução
         })
       )
       this.bloomPass.renderToScreen = false
@@ -1299,6 +1123,13 @@ class App {
 
   dispose() {
     this.disposed = true
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId)
+    }
+    document.removeEventListener(
+      'visibilitychange',
+      this.handleVisibilityChange
+    )
 
     if (this.renderer) {
       this.renderer.dispose()
@@ -1328,7 +1159,7 @@ class App {
   }
 
   tick() {
-    if (this.disposed || !this) return
+    if (this.disposed || !this || !this.isVisible) return
     if (resizeRendererToDisplaySize(this.renderer, this.setSize)) {
       const canvas = this.renderer.domElement
       this.camera.aspect = canvas.clientWidth / canvas.clientHeight
@@ -1337,7 +1168,7 @@ class App {
     const delta = this.clock.getDelta()
     this.render(delta)
     this.update(delta)
-    requestAnimationFrame(this.tick)
+    this.animationFrameId = requestAnimationFrame(this.tick)
   }
 }
 
@@ -1349,7 +1180,6 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = {} }) => {
     ...effectOptions
   }
 
-  // Apply mobile optimizations if needed
   const mergedOptions: HyperspeedOptions = isMobile
     ? getMobileOptimizedOptions(baseOptions)
     : baseOptions
