@@ -1,23 +1,31 @@
 'use client'
 
 import {
-  BarChart3,
-  ChevronDown,
-  CreditCard,
-  LogOut,
-  MessageSquare,
-  Settings,
-  User
-} from 'lucide-react'
+  BarChartHorizontalIcon,
+  CreditCardIcon,
+  Home01Icon,
+  Logout01Icon,
+  MessageIcon,
+  Settings01Icon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
+import { Kbd, KbdGroup } from './ui/kbd'
 
 export function UserNav() {
   const { data: session } = authClient.useSession()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  const handleSignOut = useCallback(async () => {
+    await authClient.signOut()
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,15 +37,46 @@ export function UserNav() {
       }
     }
 
+    function navigateWithKeyboard(event: KeyboardEvent) {
+      const isCtrlOrCmdBeingPressed = event.metaKey || event.ctrlKey
+
+      // Only handle shortcuts when Cmd/Ctrl is pressed
+      if (!isCtrlOrCmdBeingPressed) return
+
+      const key = event.key.toLowerCase()
+
+      // Dashboard routes mapping
+      const routeMap: Record<string, string> = {
+        d: '/dashboard',
+        a: '/dashboard/analytics',
+        b: '/dashboard/billing',
+        f: '/dashboard/feedback',
+        s: '/dashboard/settings'
+      }
+
+      if (key in routeMap) {
+        event.preventDefault()
+        router.push(routeMap[key])
+        setIsOpen(false)
+        return
+      }
+
+      // Handle sign out
+      if (key === 'q') {
+        event.preventDefault()
+        handleSignOut()
+        setIsOpen(false)
+        return
+      }
+    }
+
     document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', navigateWithKeyboard)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', navigateWithKeyboard)
     }
-  }, [])
-
-  const handleSignOut = async () => {
-    await authClient.signOut()
-  }
+  }, [router, handleSignOut])
 
   if (!session) return null
 
@@ -120,17 +159,14 @@ export function UserNav() {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
             >
-              <User className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Dashboard</span>
-            </Link>
-
-            <Link
-              href="/dashboard/billing"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
-            >
-              <CreditCard className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Billing</span>
+              <HugeiconsIcon icon={Home01Icon} size={20} color="#9ca3af" />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Dashboard{' '}
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>D</Kbd>
+                </KbdGroup>
+              </span>
             </Link>
 
             <Link
@@ -138,8 +174,33 @@ export function UserNav() {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
             >
-              <BarChart3 className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Analytics</span>
+              <HugeiconsIcon
+                icon={BarChartHorizontalIcon}
+                size={20}
+                color="#9ca3af"
+              />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Analytics{' '}
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>A</Kbd>
+                </KbdGroup>
+              </span>
+            </Link>
+
+            <Link
+              href="/dashboard/billing"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              <HugeiconsIcon icon={CreditCardIcon} size={20} color="#9ca3af" />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Billing{' '}
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>B</Kbd>
+                </KbdGroup>
+              </span>
             </Link>
 
             <Link
@@ -147,8 +208,14 @@ export function UserNav() {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
             >
-              <MessageSquare className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Feedback</span>
+              <HugeiconsIcon icon={MessageIcon} size={20} color="#9ca3af" />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Feedback{' '}
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>F</Kbd>
+                </KbdGroup>
+              </span>
             </Link>
 
             <Link
@@ -156,8 +223,14 @@ export function UserNav() {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
             >
-              <Settings className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Settings</span>
+              <HugeiconsIcon icon={Settings01Icon} size={20} color="#9ca3af" />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Settings{' '}
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>S</Kbd>
+                </KbdGroup>
+              </span>
             </Link>
           </div>
 
@@ -167,8 +240,14 @@ export function UserNav() {
               onClick={handleSignOut}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors w-full text-left"
             >
-              <LogOut className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-white">Sign Out</span>
+              <HugeiconsIcon icon={Logout01Icon} size={20} color="#9ca3af" />
+              <span className="text-sm text-white gap-2 flex justify-between w-full">
+                Sign Out
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>Q</Kbd>
+                </KbdGroup>
+              </span>
             </button>
           </div>
         </div>

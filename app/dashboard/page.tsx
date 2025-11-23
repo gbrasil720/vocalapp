@@ -30,6 +30,7 @@ import { redirect } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { BetaBadge } from '@/components/beta-badge'
+import { CommandInput } from '@/components/command-input'
 import { DashboardFooter } from '@/components/dashboard-footer'
 import ElectricBorder from '@/components/ElectricBorder'
 import { FileUpload } from '@/components/file-upload'
@@ -156,30 +157,7 @@ export default function DashboardPage() {
               </Link>
 
               <div className="flex items-center gap-4">
-                <Link
-                  href="/dashboard"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/dashboard/billing"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Billing
-                </Link>
-                <Link
-                  href="/dashboard/analytics"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Analytics
-                </Link>
-                <Link
-                  href="/dashboard/feedback"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Feedback
-                </Link>
+                <CommandInput />
 
                 <UserNav />
               </div>
