@@ -157,7 +157,9 @@ export default function DashboardPage() {
               </Link>
 
               <div className="flex items-center gap-4">
-                <CommandInput />
+                <div className="hidden md:block">
+                  <CommandInput />
+                </div>
 
                 <UserNav />
               </div>

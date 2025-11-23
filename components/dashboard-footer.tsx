@@ -1,14 +1,9 @@
 export function DashboardFooter({ isBetaUser }: { isBetaUser: boolean }) {
   const helpfulLinks = [
     {
-      label: 'Product Roadmap',
-      href: 'https://trello.com/b/roadmap',
+      label: 'Roadmap & Changelog on Trello',
+      href: 'https://trello.com/b/SNQlyVqS/vocalapp-roadmap-beta-feedback',
       description: 'Track upcoming launches and vote on the next priorities.'
-    },
-    {
-      label: 'Changelog',
-      href: 'https://trello.com/b/changelog',
-      description: 'Review the latest improvements, fixes, and feature drops.'
     }
   ]
 

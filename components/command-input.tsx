@@ -77,18 +77,10 @@ const dashboardPages: DashboardPage[] = [
   },
   {
     id: 'roadmap',
-    label: 'Roadmap',
-    path: '/dashboard/roadmap',
+    label: 'Roadmap & Changelog',
+    path: 'https://trello.com/b/SNQlyVqS/vocalapp-roadmap-beta-feedback',
     icon: MapIcon,
     shortcut: 'R',
-    group: 'content'
-  },
-  {
-    id: 'changelog',
-    label: 'Changelog',
-    path: '/dashboard/changelog',
-    icon: History,
-    shortcut: 'C',
     group: 'content'
   },
   {

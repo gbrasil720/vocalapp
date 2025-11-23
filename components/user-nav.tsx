@@ -162,10 +162,10 @@ export function UserNav() {
               <HugeiconsIcon icon={Home01Icon} size={20} color="#9ca3af" />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Dashboard{' '}
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>D</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </Link>
 
@@ -181,10 +181,10 @@ export function UserNav() {
               />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Analytics{' '}
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>A</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </Link>
 
@@ -196,10 +196,10 @@ export function UserNav() {
               <HugeiconsIcon icon={CreditCardIcon} size={20} color="#9ca3af" />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Billing{' '}
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>B</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </Link>
 
@@ -211,10 +211,10 @@ export function UserNav() {
               <HugeiconsIcon icon={MessageIcon} size={20} color="#9ca3af" />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Feedback{' '}
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>F</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </Link>
 
@@ -226,10 +226,10 @@ export function UserNav() {
               <HugeiconsIcon icon={Settings01Icon} size={20} color="#9ca3af" />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Settings{' '}
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>S</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </Link>
           </div>
@@ -243,10 +243,10 @@ export function UserNav() {
               <HugeiconsIcon icon={Logout01Icon} size={20} color="#9ca3af" />
               <span className="text-sm text-white gap-2 flex justify-between w-full">
                 Sign Out
-                <KbdGroup>
+                <span className="hidden md:inline-flex"><KbdGroup>
                   <Kbd>⌘</Kbd>
                   <Kbd>Q</Kbd>
-                </KbdGroup>
+                </KbdGroup></span>
               </span>
             </button>
           </div>
