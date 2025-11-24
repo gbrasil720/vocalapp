@@ -45,6 +45,14 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-hidden">
+      <head>
+        <script
+          defer
+          data-website-id="dfid_Q8dg2tqJ0bQE484A4sIDy"
+          data-domain="vocalapp.io"
+          src="https://datafa.st/js/script.js"
+        ></script>
+      </head>
       <body className={`${satoshi.variable} ${inter.variable} antialiased`}>
         <StructuredData />
         <ThemeProvider
