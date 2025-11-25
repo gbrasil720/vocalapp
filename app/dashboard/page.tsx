@@ -418,9 +418,9 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recentTranscriptions.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="col-span-full text-center py-12">
                   <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                   <p className="text-gray-400 text-lg mb-2">
                     No transcriptions yet

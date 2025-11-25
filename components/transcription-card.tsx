@@ -7,6 +7,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import { useCallback } from 'react'
+import { getLanguageName } from '@/lib/utils'
 import SpotlightCard from './SpotlightCard'
 
 interface TranscriptionProps {
@@ -60,34 +61,41 @@ export function TranscriptionCard({
     <Link
       key={transcription.id}
       href={`/dashboard/transcription/${transcription.id}`}
+      className="block h-full w-full"
     >
-      <SpotlightCard className="bg-transparent backdrop-blur-xl mt-3 cursor-pointer hover:scale-[1.02] transition-transform">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 flex-1">
-            <div className="p-3 rounded-xl bg-white/5">
-              <HugeiconsIcon icon={File02Icon} size={20} color="#03b3c3" />
+      <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-[1.02] transition-transform h-full w-full !p-4 sm:!p-6">
+        <div className="flex flex-col gap-3 h-full">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="p-2 rounded-xl bg-white/5 flex-shrink-0">
+              <HugeiconsIcon icon={File02Icon} size={18} color="#03b3c3" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-white mb-1">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-white mb-2 truncate text-sm sm:text-base">
                 {transcription.fileName}
               </h3>
-              <div className="flex items-center gap-4 text-xs text-gray-400">
-                <span className="flex items-center gap-1">
-                  <HugeiconsIcon icon={Clock01Icon} size={16} color="#03b3c3" />
-                  {formatDuration(transcription.duration)}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                <span className="flex items-center gap-1 flex-shrink-0">
+                  <HugeiconsIcon icon={Clock01Icon} size={14} color="#03b3c3" />
+                  <span className="whitespace-nowrap">
+                    {formatDuration(transcription.duration)}
+                  </span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <HugeiconsIcon icon={GlobeIcon} size={16} color="#03b3c3" />
-                  {transcription.language || 'Unknown'}
+                <span className="flex items-center gap-1 flex-shrink-0">
+                  <HugeiconsIcon icon={GlobeIcon} size={14} color="#03b3c3" />
+                  <span className="whitespace-nowrap">
+                    {getLanguageName(transcription.language)}
+                  </span>
                 </span>
-                <span>{formatRelativeTime(transcription.createdAt)}</span>
+                <span className="whitespace-nowrap">
+                  {formatRelativeTime(transcription.createdAt)}
+                </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-1">
             {transcription.status === 'completed' ? (
               <>
-                <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full">
+                <span className="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
                   Completed
                 </span>
                 <button
@@ -96,21 +104,21 @@ export function TranscriptionCard({
                     e.preventDefault()
                     e.stopPropagation()
                   }}
-                  className="p-2 rounded-full hover:bg-white/5 transition-colors"
+                  className="p-1.5 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
                 >
                   <HugeiconsIcon
                     icon={Download01Icon}
-                    size={16}
+                    size={14}
                     color="#03b3c3"
                   />
                 </button>
               </>
             ) : transcription.status === 'failed' ? (
-              <span className="px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full">
+              <span className="px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
                 Failed
               </span>
             ) : (
-              <span className="px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse">
+              <span className="px-2 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
                 Processing...
               </span>
             )}

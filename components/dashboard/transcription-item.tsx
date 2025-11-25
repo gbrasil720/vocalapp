@@ -1,6 +1,7 @@
 import { Clock, Download, FileText, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { memo } from 'react'
+import { getLanguageName } from '@/lib/utils'
 import SpotlightCard from '@/components/SpotlightCard'
 
 interface TranscriptionItemProps {
@@ -41,7 +42,7 @@ export const TranscriptionItem = memo(function TranscriptionItem({
                 </span>
                 <span className="flex items-center gap-1">
                   <Globe className="w-3 h-3" />
-                  {language || 'Unknown'}
+                  {getLanguageName(language)}
                 </span>
                 <span>{formatRelativeTime(createdAt)}</span>
               </div>

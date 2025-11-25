@@ -21,6 +21,7 @@ import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+import { getLanguageName } from '@/lib/utils'
 
 interface Transcription {
   id: string
@@ -402,8 +403,8 @@ export default function TranscriptionsPage() {
           </div>
 
           {/* Filter and Action Bar */}
-          <SpotlightCard className="bg-transparent backdrop-blur-xl mb-6">
-            <div className="space-y-4">
+          <SpotlightCard className="bg-transparent backdrop-blur-xl mb-6 !p-4 sm:!p-6">
+            <div className="space-y-3 sm:space-y-4">
               {/* Status Filter Tabs */}
               <div className="flex items-center gap-2 flex-wrap">
                 {(
@@ -508,7 +509,7 @@ export default function TranscriptionsPage() {
           </SpotlightCard>
 
           {/* Transcriptions List */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {displayedTranscriptions.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
@@ -528,57 +529,61 @@ export default function TranscriptionsPage() {
                 {displayedTranscriptions.map((transcription) => (
                   <SpotlightCard
                     key={transcription.id}
-                    className="bg-transparent backdrop-blur-xl hover:scale-[1.01] transition-transform"
+                    className="bg-transparent backdrop-blur-xl hover:scale-[1.01] transition-transform !p-4 sm:!p-6"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                       <input
                         type="checkbox"
                         checked={selectedIds.has(transcription.id)}
                         onChange={() => toggleSelection(transcription.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-5 h-5 rounded border-2 border-white/20 bg-white/5 checked:bg-gradient-to-r checked:from-[#d856bf] checked:to-[#c247ac] focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 cursor-pointer flex-shrink-0"
+                        className="w-5 h-5 rounded border-2 border-white/20 bg-white/5 checked:bg-gradient-to-r checked:from-[#d856bf] checked:to-[#c247ac] focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 cursor-pointer flex-shrink-0 self-start sm:self-center"
                       />
 
                       <Link
                         href={`/dashboard/transcription/${transcription.id}`}
-                        className="flex-1 flex items-center justify-between"
+                        className="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0"
                       >
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="p-3 rounded-xl bg-white/5">
-                            <FileText className="w-5 h-5 text-[#03b3c3]" />
+                        <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                          <div className="p-2 sm:p-3 rounded-xl bg-white/5 flex-shrink-0">
+                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#03b3c3]" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-white mb-1 truncate">
+                            <h3 className="font-semibold text-white mb-1 sm:mb-1 truncate text-sm sm:text-base">
                               {transcription.fileName}
                             </h3>
-                            <div className="flex items-center gap-4 text-xs text-gray-400 flex-wrap">
-                              <span className="flex items-center gap-1">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                              <span className="flex items-center gap-1 flex-shrink-0">
                                 <Clock className="w-3 h-3" />
-                                {formatDuration(transcription.duration)}
+                                <span className="whitespace-nowrap">
+                                  {formatDuration(transcription.duration)}
+                                </span>
                               </span>
-                              <span className="flex items-center gap-1">
+                              <span className="flex items-center gap-1 flex-shrink-0">
                                 <Globe className="w-3 h-3" />
-                                {transcription.language || 'Unknown'}
+                                <span className="whitespace-nowrap">
+                                  {getLanguageName(transcription.language)}
+                                </span>
                               </span>
-                              <span>
+                              <span className="whitespace-nowrap">
                                 {formatRelativeTime(transcription.createdAt)}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-end sm:justify-start gap-2 sm:gap-3 flex-shrink-0">
                           {transcription.status === 'completed' ? (
-                            <span className="px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full flex items-center gap-1">
+                            <span className="px-2 sm:px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full flex items-center gap-1 whitespace-nowrap">
                               <Check className="w-3 h-3" />
                               Completed
                             </span>
                           ) : transcription.status === 'failed' ? (
-                            <span className="px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full">
+                            <span className="px-2 sm:px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
                               Failed
                             </span>
                           ) : (
-                            <span className="px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse flex items-center gap-1">
+                            <span className="px-2 sm:px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse flex items-center gap-1 whitespace-nowrap">
                               <Loader2 className="w-3 h-3 animate-spin" />
                               Processing
                             </span>

@@ -77,6 +77,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
   const [retryCount, setRetryCount] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const lastSelectedFilesRef = useRef<File[]>([])
+  const isOpeningRef = useRef(false)
 
   const getFileExtension = (fileName: string) => {
     const dotIndex = fileName.lastIndexOf('.')
@@ -390,6 +391,9 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Reset the opening flag when file picker closes (with or without selection)
+    isOpeningRef.current = false
+    
     const deviceType = isIOS() ? 'iOS' : isAndroid() ? 'Android' : isMobileDevice() ? 'Mobile' : 'Desktop'
     console.log(`[FileUpload] onChange event fired on ${deviceType}`)
     
@@ -458,8 +462,25 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
     }
   }
 
-  const handleClick = () => {
+  const handleClick = (e?: React.MouseEvent) => {
+    // Prevent double-triggering
+    if (isOpeningRef.current) {
+      return
+    }
+    
+    // Stop propagation if event is provided (from button click)
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+    
+    isOpeningRef.current = true
     fileInputRef.current?.click()
+    
+    // Reset the flag after a short delay to allow the file picker to open
+    setTimeout(() => {
+      isOpeningRef.current = false
+    }, 300)
   }
 
   // Clear error when component unmounts or when new files are selected
@@ -481,7 +502,15 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
-      onClick={handleClick}
+      onClick={(e) => {
+        // Don't trigger if clicking on a button or other interactive element
+        const target = e.target as HTMLElement
+        if (target.tagName === 'BUTTON' || target.closest('button')) {
+          return
+        }
+        // Only trigger file picker if clicking directly on the section background
+        handleClick(e)
+      }}
     >
       <input
         ref={fileInputRef}
@@ -548,7 +577,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
         <button
           type="button"
           disabled={uploading}
-          onClick={handleClick}
+          onClick={(e) => handleClick(e)}
           className="px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
         >
           {uploading ? 'Uploading...' : 'Browse Files'}
