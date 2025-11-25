@@ -132,13 +132,13 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0">
       <audio ref={audioRef} src={src} preload="metadata">
         <source src={src} type={mimeType} />
         <track kind="captions" />
       </audio>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 min-w-0">
         <div className="space-y-2">
           <div
             className="relative h-3 bg-white/10 rounded-full cursor-pointer group"
@@ -182,7 +182,7 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-start gap-6">
+        <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6 min-w-0">
           <button
             type="button"
             onClick={togglePlay}
@@ -202,7 +202,7 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             )}
           </button>
 
-          <div className="flex items-center gap-3 w-64 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-64 flex-shrink-0 min-w-0">
             <button
               type="button"
               onClick={toggleMute}
@@ -215,7 +215,7 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
               )}
             </button>
 
-            <div className="relative flex-1 h-2 bg-white/10 rounded-full">
+            <div className="relative flex-1 h-2 bg-white/10 rounded-full min-w-0">
               <div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#03b3c3] to-[#c247ac] rounded-full"
                 style={{ width: `${isMuted ? 0 : volume * 100}%` }}
@@ -233,9 +233,9 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
             </div>
           </div>
 
-          <div className="hidden lg:block h-8 w-px bg-white/10" />
+          <div className="hidden lg:block h-8 w-px bg-white/10 flex-shrink-0" />
 
-          <div className="hidden lg:flex items-center gap-1 flex-1 max-w-md">
+          <div className="hidden lg:flex items-center gap-1 flex-1 min-w-0 max-w-md">
             {[...Array(20)].map((_, i) => {
               const height = Math.floor(Math.random() * 20 + 10)
               const animDuration = (Math.random() * 1 + 0.5).toFixed(2)

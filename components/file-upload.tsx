@@ -512,7 +512,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
     accept: acceptConfig,
     multiple: isPro,
     maxSize: MAX_FILE_SIZE,
-    noClick: !isMobileDevice(), // Allow clicking anywhere on mobile, use button on desktop
+    noClick: false, // Allow clicking dropzone to open file picker
     noKeyboard: true,
     // Disable preventDefault on mobile to ensure native file picker works
     preventDropOnDocument: !isMobileDevice(),
@@ -528,6 +528,26 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
     }
   })
 
+  // Wrap getRootProps to prevent double-triggering when clicking dropzone
+  const rootProps = getRootProps()
+  const originalOnClick = rootProps.onClick
+  rootProps.onClick = (e: React.MouseEvent) => {
+    // Don't handle clicks on buttons (they have their own handler)
+    if ((e.target as HTMLElement).closest('button')) {
+      return
+    }
+    // Prevent double-triggering
+    if (!isOpeningRef.current) {
+      isOpeningRef.current = true
+      if (originalOnClick) {
+        originalOnClick(e)
+      }
+      setTimeout(() => {
+        isOpeningRef.current = false
+      }, 300)
+    }
+  }
+
   // Clear error when component unmounts
   useEffect(() => {
     return () => {
@@ -537,7 +557,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
 
   return (
     <section
-      {...getRootProps()}
+      {...rootProps}
       aria-label="File upload area"
       className={`cursor-pointer border-2 border-dashed rounded-2xl p-12 text-center transition-all group w-full ${
         isDragActive
@@ -609,15 +629,18 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
           type="button"
           disabled={uploading}
           onClick={(e) => {
+            // Stop propagation to prevent dropzone from also handling this click
             e.stopPropagation()
             e.preventDefault()
-            // On mobile, the dropzone handles clicks, so only call open() on desktop
-            // This prevents double-triggering the file picker on mobile browsers
-            if (!isMobileDevice()) {
+            // Prevent double-triggering
+            if (!isOpeningRef.current) {
+              isOpeningRef.current = true
               open()
+              // Reset the flag after a short delay to allow file picker to open
+              setTimeout(() => {
+                isOpeningRef.current = false
+              }, 300)
             }
-            // On mobile, clicking the button will trigger the dropzone's click handler
-            // which is already configured to open the file picker
           }}
           className="px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
         >

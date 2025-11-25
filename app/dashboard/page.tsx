@@ -471,17 +471,19 @@ export default function DashboardPage() {
               </SpotlightCard>
             </Link>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-center">
-                <div className="p-4 rounded-full bg-[#d856bf]/20 inline-block mb-4">
-                  <Settings className="w-6 h-6 text-[#d856bf]" />
+            <Link href="/dashboard/settings">
+              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
+                <div className="text-center">
+                  <div className="p-4 rounded-full bg-[#d856bf]/20 inline-block mb-4">
+                    <Settings className="w-6 h-6 text-[#d856bf]" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Settings</h3>
+                  <p className="text-sm text-gray-400">
+                    Customize your preferences and settings
+                  </p>
                 </div>
-                <h3 className="font-semibold text-white mb-2">Settings</h3>
-                <p className="text-sm text-gray-400">
-                  Customize your preferences and settings
-                </p>
-              </div>
-            </SpotlightCard>
+              </SpotlightCard>
+            </Link>
           </div>
 
           <DashboardFooter isBetaUser={isBetaUser} />

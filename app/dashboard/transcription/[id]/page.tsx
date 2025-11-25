@@ -21,6 +21,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { getLanguageName } from '@/lib/utils'
 
 interface TranscriptionData {
   id: string
@@ -182,12 +183,12 @@ export default function TranscriptionDetailPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard"
-                className="p-2 rounded-full hover:bg-white/5 transition-colors"
+                className="p-2 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-white">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl font-bold text-white truncate">
                   {transcription.fileName}
                 </h1>
                 <p className="text-sm text-gray-400">
@@ -198,7 +199,7 @@ export default function TranscriptionDetailPage() {
                 <button
                   type="button"
                   onClick={downloadTranscription}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform flex-shrink-0"
                 >
                   <Download className="w-4 h-4" />
                   Download
@@ -283,8 +284,8 @@ export default function TranscriptionDetailPage() {
               <div className="space-y-3 text-sm">
                 <div>
                   <p className="text-gray-400">Language</p>
-                  <p className="text-white font-medium capitalize">
-                    {transcription.language || 'Auto-detected'}
+                  <p className="text-white font-medium">
+                    {transcription.language ? getLanguageName(transcription.language) : 'Auto-detected'}
                   </p>
                 </div>
                 <div>
