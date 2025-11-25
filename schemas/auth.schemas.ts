@@ -47,5 +47,13 @@ export const signUpSchema = z
     path: ['confirmPassword']
   })
 
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .email({ message: 'Please enter a valid email address' })
+    .min(1, { message: 'Email is required' })
+})
+
 export type SignInSchema = z.infer<typeof signInSchema>
 export type SignUpSchema = z.infer<typeof signUpSchema>
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>

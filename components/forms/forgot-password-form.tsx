@@ -1,139 +1,140 @@
+/** biome-ignore-all lint/correctness/noChildrenProp: tanform field requires children prop */
 'use client'
 
 import { MailIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useForm } from '@tanstack/react-form'
 import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'
+import { cn } from '@/lib/utils'
+import { forgotPasswordSchema } from '@/schemas/auth.schemas'
 
 export function ForgotPasswordForm() {
-  const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [sentEmail, setSentEmail] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [toast, setToast] = useState<{
-    type: 'success' | 'error' | 'info'
-    message: string
-  } | null>(null)
 
-  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
-    setToast({ type, message })
-    setTimeout(() => setToast(null), 4000)
-  }
-
-  const validateForm = (email: string) => {
-    const newErrors: Record<string, string> = {}
-
-    if (!email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-
-    return newErrors
-  }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get('email') as string
-
-    const newErrors = validateForm(email)
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      showToast('error', 'Please enter a valid email address')
-      return
-    }
-
-    setErrors({})
-    setIsLoading(true)
-
-    try {
+  const form = useForm({
+    defaultValues: {
+      email: ''
+    },
+    validators: {
+      onSubmit: forgotPasswordSchema
+    },
+    onSubmit: async (values) => {
       await authClient.forgetPassword(
         {
-          email,
+          email: values.value.email,
           redirectTo: `${window.location.origin}/reset-password`
         },
         {
           onSuccess: () => {
-            setSentEmail(email)
+            setSentEmail(values.value.email)
             setIsEmailSent(true)
-            showToast('success', 'Reset link sent to your email!')
+            toast.success('Reset link sent to your email!')
           },
           onError: (ctx) => {
             const errorMessage =
               ctx.error.message ||
               'Failed to send reset link. Please try again.'
-            showToast('error', errorMessage)
-            setErrors({ submit: errorMessage })
+            toast.error(errorMessage)
           }
         }
       )
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-      showToast('error', errorMessage)
-      setErrors({ submit: errorMessage })
-    } finally {
-      setIsLoading(false)
     }
-  }
+  })
 
   return (
     <>
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg backdrop-blur-xl border transition-all duration-300 ${
-            toast.type === 'success'
-              ? 'bg-green-500/20 border-green-500/30 text-green-400'
-              : toast.type === 'error'
-                ? 'bg-red-500/20 border-red-500/30 text-red-400'
-                : 'bg-blue-500/20 border-blue-500/30 text-blue-400'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-medium">{toast.message}</span>
-          </div>
-        </div>
-      )}
-
       {!isEmailSent ? (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="relative">
-            <HugeiconsIcon
-              icon={MailIcon}
-              color="#99a1af"
-              className="absolute left-3 top-1/2 transform -translate-y-1/2"
-              size={22}
-            />
-            <input
-              type="email"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+          className="space-y-6"
+          id="forgot-password-form"
+        >
+          <FieldGroup>
+            <form.Field
               name="email"
-              className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                errors.email
-                  ? 'border-red-500/50 focus:ring-red-500/30'
-                  : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
-              }`}
-              placeholder="john@example.com"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel
+                      htmlFor={field.name}
+                      className="block text-sm font-medium text-gray-300"
+                    >
+                      Email Address
+                    </FieldLabel>
+                    <FieldContent>
+                      <div className="relative">
+                        <HugeiconsIcon
+                          icon={MailIcon}
+                          size={22}
+                          color="#99a1af "
+                          className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                        />
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
+                          className={cn(
+                            'w-full pl-10 pr-12 py-6 placeholder:text-md bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors duration-200',
+                            isInvalid
+                              ? 'border-red-500/50 focus:ring-red-500/30'
+                              : 'border-white/20 focus:ring-[#03b3c3]/30 focus:border-[#03b3c3]/50'
+                          )}
+                          placeholder="john@example.com"
+                          autoComplete="off"
+                        />
+                      </div>
+                      {isInvalid && (
+                        <FieldError
+                          errors={[
+                            {
+                              message:
+                                typeof field.state.meta.errors[0] === 'string'
+                                  ? field.state.meta.errors[0]
+                                  : field.state.meta.errors[0]?.message ||
+                                    'Please enter a valid email address'
+                            }
+                          ]}
+                        />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )
+              }}
             />
-          </div>
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-          {errors.submit && (
-            <p className="text-red-500 text-sm">{errors.submit}</p>
-          )}
+          </FieldGroup>
 
           <Button
             type="submit"
-            disabled={isLoading}
+            form="forgot-password-form"
+            disabled={form.state.isSubmitting}
             className="w-full py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:from-[#c247ac] hover:to-[#d856bf] text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            {isLoading ? (
+            {form.state.isSubmitting ? (
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <Spinner />
                 Sending Reset Link...
               </div>
             ) : (

@@ -4,7 +4,7 @@ import { Upload01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { upload } from '@vercel/blob/client'
 import { AlertCircle, RefreshCw } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type FileRejection, useDropzone } from 'react-dropzone'
 import { toast } from 'sonner'
 
@@ -529,24 +529,35 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
   })
 
   // Wrap getRootProps to prevent double-triggering when clicking dropzone
-  const rootProps = getRootProps()
-  const originalOnClick = rootProps.onClick
-  rootProps.onClick = (e: React.MouseEvent) => {
-    // Don't handle clicks on buttons (they have their own handler)
-    if ((e.target as HTMLElement).closest('button')) {
-      return
-    }
-    // Prevent double-triggering
-    if (!isOpeningRef.current) {
-      isOpeningRef.current = true
-      if (originalOnClick) {
-        originalOnClick(e)
+  // Memoize to ensure the modified onClick handler persists across renders
+  // getRootProps() returns a new object each render, so we need to memoize the modified version
+  const rootProps = useMemo(() => {
+    const props = getRootProps()
+    const originalOnClick = props.onClick
+    return {
+      ...props,
+      onClick: (e: React.MouseEvent) => {
+        // Don't handle clicks on buttons (they have their own handler)
+        if ((e.target as HTMLElement).closest('button')) {
+          return
+        }
+        // Prevent double-triggering - defer reset to next event loop tick
+        // This prevents race condition while still allowing rapid legitimate clicks
+        if (!isOpeningRef.current) {
+          isOpeningRef.current = true
+          if (originalOnClick) {
+            originalOnClick(e)
+          }
+          // Reset on next tick - prevents race condition but allows rapid clicks
+          // File picker dialog opening blocks further clicks anyway
+          setTimeout(() => {
+            isOpeningRef.current = false
+          }, 0)
+        }
       }
-      setTimeout(() => {
-        isOpeningRef.current = false
-      }, 300)
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getRootProps])
 
   // Clear error when component unmounts
   useEffect(() => {
@@ -632,14 +643,16 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
             // Stop propagation to prevent dropzone from also handling this click
             e.stopPropagation()
             e.preventDefault()
-            // Prevent double-triggering
+            // Prevent double-triggering - defer reset to next event loop tick
+            // This prevents race condition while still allowing rapid legitimate clicks
             if (!isOpeningRef.current) {
               isOpeningRef.current = true
               open()
-              // Reset the flag after a short delay to allow file picker to open
+              // Reset on next tick - prevents race condition but allows rapid clicks
+              // File picker dialog opening blocks further clicks anyway
               setTimeout(() => {
                 isOpeningRef.current = false
-              }, 300)
+              }, 0)
             }
           }}
           className="px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
