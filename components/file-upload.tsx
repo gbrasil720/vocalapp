@@ -536,7 +536,7 @@ export function FileUpload({ onUploadComplete, isPro }: FileUploadProps) {
     const originalOnClick = props.onClick
     return {
       ...props,
-      onClick: (e: React.MouseEvent) => {
+      onClick: (e: React.MouseEvent<HTMLElement>) => {
         // Don't handle clicks on buttons (they have their own handler)
         if ((e.target as HTMLElement).closest('button')) {
           return

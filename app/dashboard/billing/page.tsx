@@ -413,176 +413,179 @@ export default function BillingPage() {
                     className="rounded-3xl"
                   >
                     <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      <div>
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="p-3 rounded-2xl bg-[#d856bf]/20">
-                            <HugeiconsIcon
-                              icon={Crown03Icon}
-                              size={22}
-                              color="#d856bf"
-                            />
-                          </div>
-                          <div>
-                            <h3 className="text-2xl font-bold text-white">
-                              {subscriptionData.subscription.plan
-                                .split(' ')
-                                .map(
-                                  (word) =>
-                                    word.charAt(0).toUpperCase() +
-                                    word.slice(1).toLowerCase()
-                                )
-                                .join(' ')}
-                            </h3>
-                            <p className="text-sm text-green-400">
-                              {subscriptionData.subscription.status === 'active'
-                                ? 'Active'
-                                : 'Inactive'}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4 mb-6">
-                          <div className="flex items-center gap-3">
-                            <HugeiconsIcon
-                              icon={Tick02Icon}
-                              size={18}
-                              className="text-green-400"
-                            />
-                            <span className="text-gray-300">
-                              600 credits per month
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <HugeiconsIcon
-                              icon={Tick02Icon}
-                              size={18}
-                              className="text-green-400"
-                            />
-                            <span className="text-gray-300">50+ languages</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <HugeiconsIcon
-                              icon={Tick02Icon}
-                              size={18}
-                              className="text-green-400"
-                            />
-                            <span className="text-gray-300">
-                              Priority support
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <HugeiconsIcon
-                              icon={Tick02Icon}
-                              size={18}
-                              className="text-green-400"
-                            />
-                            <span className="text-gray-300">
-                              Multiple files processing
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={handleManageSubscription}
-                          className="w-full py-3 px-6 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
-                        >
-                          Manage Subscription
-                        </button>
-
-                        <p className="text-xs text-gray-400 text-center mt-3">
-                          Update payment method, view invoices, or cancel
-                          subscription
-                        </p>
-                      </div>
-
-                      <div className="space-y-6">
-                        <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                          <div className="flex items-center justify-between">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="p-3 rounded-2xl bg-[#d856bf]/20">
+                              <HugeiconsIcon
+                                icon={Crown03Icon}
+                                size={22}
+                                color="#d856bf"
+                              />
+                            </div>
                             <div>
-                              <p className="text-sm text-gray-400 mb-1">
-                                Amount
-                              </p>
-                              <p className="text-2xl font-bold text-white">
-                                $10.00
-                                <span className="text-sm text-gray-400 ml-2">
-                                  /month
-                                </span>
+                              <h3 className="text-2xl font-bold text-white">
+                                {subscriptionData.subscription.plan
+                                  .split(' ')
+                                  .map(
+                                    (word) =>
+                                      word.charAt(0).toUpperCase() +
+                                      word.slice(1).toLowerCase()
+                                  )
+                                  .join(' ')}
+                              </h3>
+                              <p className="text-sm text-green-400">
+                                {subscriptionData.subscription.status ===
+                                'active'
+                                  ? 'Active'
+                                  : 'Inactive'}
                               </p>
                             </div>
-                            <HugeiconsIcon
-                              icon={Dollar01Icon}
-                              size={32}
-                              className="text-[#03b3c3]"
-                            />
                           </div>
-                        </SpotlightCard>
 
-                        {subscriptionData.subscription.nextBillingDate && (
+                          <div className="space-y-4 mb-6">
+                            <div className="flex items-center gap-3">
+                              <HugeiconsIcon
+                                icon={Tick02Icon}
+                                size={18}
+                                className="text-green-400"
+                              />
+                              <span className="text-gray-300">
+                                600 credits per month
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <HugeiconsIcon
+                                icon={Tick02Icon}
+                                size={18}
+                                className="text-green-400"
+                              />
+                              <span className="text-gray-300">
+                                50+ languages
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <HugeiconsIcon
+                                icon={Tick02Icon}
+                                size={18}
+                                className="text-green-400"
+                              />
+                              <span className="text-gray-300">
+                                Priority support
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <HugeiconsIcon
+                                icon={Tick02Icon}
+                                size={18}
+                                className="text-green-400"
+                              />
+                              <span className="text-gray-300">
+                                Multiple files processing
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleManageSubscription}
+                            className="w-full py-3 px-6 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                          >
+                            Manage Subscription
+                          </button>
+
+                          <p className="text-xs text-gray-400 text-center mt-3">
+                            Update payment method, view invoices, or cancel
+                            subscription
+                          </p>
+                        </div>
+
+                        <div className="space-y-6">
                           <SpotlightCard className="bg-transparent backdrop-blur-xl">
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="text-sm text-gray-400 mb-1">
-                                  Next Billing
+                                  Amount
                                 </p>
-                                <p className="text-lg font-semibold text-white">
-                                  {
-                                    subscriptionData.subscription
-                                      .nextBillingDate
-                                  }
+                                <p className="text-2xl font-bold text-white">
+                                  $10.00
+                                  <span className="text-sm text-gray-400 ml-2">
+                                    /month
+                                  </span>
                                 </p>
                               </div>
                               <HugeiconsIcon
-                                icon={Calendar02Icon}
+                                icon={Dollar01Icon}
                                 size={32}
-                                className="text-[#c247ac]"
+                                className="text-[#03b3c3]"
                               />
                             </div>
                           </SpotlightCard>
-                        )}
 
-                        <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                          <div className="flex items-center justify-between mb-4">
-                            <div>
-                              <p className="text-sm text-gray-400 mb-1">
-                                Current Balance
-                              </p>
-                              <p className="text-3xl font-bold text-white">
-                                {credits}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                credits available
-                              </p>
+                          {subscriptionData.subscription.nextBillingDate && (
+                            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm text-gray-400 mb-1">
+                                    Next Billing
+                                  </p>
+                                  <p className="text-lg font-semibold text-white">
+                                    {
+                                      subscriptionData.subscription
+                                        .nextBillingDate
+                                    }
+                                  </p>
+                                </div>
+                                <HugeiconsIcon
+                                  icon={Calendar02Icon}
+                                  size={32}
+                                  className="text-[#c247ac]"
+                                />
+                              </div>
+                            </SpotlightCard>
+                          )}
+
+                          <SpotlightCard className="bg-transparent backdrop-blur-xl">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <p className="text-sm text-gray-400 mb-1">
+                                  Current Balance
+                                </p>
+                                <p className="text-3xl font-bold text-white">
+                                  {credits}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  credits available
+                                </p>
+                              </div>
+                              <HugeiconsIcon
+                                icon={ZapIcon}
+                                size={32}
+                                className="text-[#d856bf]"
+                              />
                             </div>
-                            <HugeiconsIcon
-                              icon={ZapIcon}
-                              size={32}
-                              className="text-[#d856bf]"
-                            />
-                          </div>
-                          <div className="pt-4 border-t border-white/10 space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-400">
-                                Monthly allowance:
-                              </span>
-                              <span className="text-white font-semibold">
-                                {planCredits} credits
-                              </span>
+                            <div className="pt-4 border-t border-white/10 space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-400">
+                                  Monthly allowance:
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {planCredits} credits
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-400">
+                                  Used this period:
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {creditsUsed} credits
+                                </span>
+                              </div>
                             </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-400">
-                                Used this period:
-                              </span>
-                              <span className="text-white font-semibold">
-                                {creditsUsed} credits
-                              </span>
-                            </div>
-                          </div>
-                        </SpotlightCard>
+                          </SpotlightCard>
+                        </div>
                       </div>
                     </div>
-                  </div>
                   </ElectricBorder>
                 </div>
                 <div className="md:hidden">

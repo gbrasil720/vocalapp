@@ -2,7 +2,7 @@ import { stripe } from '@better-auth/stripe'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
-import { admin, lastLoginMethod, magicLink, openAPI } from 'better-auth/plugins'
+import { admin, lastLoginMethod, magicLink, openAPI, twoFactor } from 'better-auth/plugins'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
@@ -13,6 +13,7 @@ import { sendMagicLinkEmail } from './email/magic-link'
 import { isEmailApproved } from './waitlist'
 
 export const auth = betterAuth({
+  appName: 'VocalApp',
   additionalUserFields: {
     credits: {
       type: 'number',
@@ -27,6 +28,11 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true
+  },
+  user: {
+    deleteUser: {
+      enabled: true
+    }
   },
   socialProviders: {
     google: {
@@ -104,6 +110,9 @@ export const auth = betterAuth({
     openAPI(),
     admin({ defaultRole: 'user' }),
     lastLoginMethod(),
+    twoFactor({
+      issuer: 'VocalApp'
+    }),
     magicLink({
       sendMagicLink: async ({ email, token, url }) => {
         console.log('🔍 Magic Link Request:', {

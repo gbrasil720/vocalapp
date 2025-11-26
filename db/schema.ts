@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import {
   boolean,
   integer,
@@ -23,63 +24,10 @@ export const user = pgTable('user', {
   banned: boolean('banned').default(false),
   banReason: text('ban_reason'),
   banExpires: timestamp('ban_expires'),
+  twoFactorEnabled: boolean('two_factor_enabled').default(false),
   stripeCustomerId: text('stripe_customer_id'),
   credits: integer('credits').default(30).notNull(),
   isBetaUser: boolean('is_beta_user').default(true).notNull()
-})
-
-export const roadmapStatusEnum = pgEnum('roadmap_status', [
-  'planned',
-  'in_progress',
-  'shipped'
-])
-
-export const changelogTagEnum = pgEnum('changelog_tag', [
-  'feature',
-  'improvement',
-  'fix',
-  'announcement',
-  'other'
-])
-
-export const roadmapEntry = pgTable('roadmap_entry', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  title: text('title').notNull(),
-  status: roadmapStatusEnum('status').default('planned').notNull(),
-  category: text('category'),
-  content: text('content').notNull(),
-  published: boolean('published').default(false).notNull(),
-  sortOrder: integer('sort_order').default(0).notNull(),
-  authorId: text('author_id').references(() => user.id, {
-    onDelete: 'set null'
-  }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull()
-})
-
-export const changelogEntry = pgTable('changelog_entry', {
-  id: text('id')
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  title: text('title').notNull(),
-  tag: changelogTagEnum('tag').default('other').notNull(),
-  category: text('category'),
-  content: text('content').notNull(),
-  published: boolean('published').default(true).notNull(),
-  publishedAt: timestamp('published_at').defaultNow(),
-  authorId: text('author_id').references(() => user.id, {
-    onDelete: 'set null'
-  }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull()
 })
 
 export const session = pgTable('session', {
@@ -128,6 +76,15 @@ export const verification = pgTable('verification', {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull()
+})
+
+export const twoFactor = pgTable('two_factor', {
+  id: text('id').primaryKey(),
+  secret: text('secret').notNull(),
+  backupCodes: text('backup_codes').notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' })
 })
 
 export const subscription = pgTable('subscription', {
@@ -187,3 +144,30 @@ export const transcription = pgTable('transcription', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   completedAt: timestamp('completed_at')
 })
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  twoFactors: many(twoFactor)
+}))
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id]
+  })
+}))
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id]
+  })
+}))
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
+    references: [user.id]
+  })
+}))
