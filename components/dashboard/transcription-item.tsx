@@ -1,8 +1,8 @@
 import { Clock, Download, FileText, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { memo } from 'react'
-import { getLanguageName } from '@/lib/utils'
 import SpotlightCard from '@/components/SpotlightCard'
+import { getLanguageName } from '@/lib/utils'
 
 interface TranscriptionItemProps {
   id: string
