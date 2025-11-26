@@ -25,6 +25,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
+import HoldButton from '@/components/ui/hold-button'
 import { authClient } from '@/lib/auth-client'
 
 export default function SettingsPage() {
@@ -233,7 +234,13 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmation !== 'DELETE') {
+    // For mobile (text confirmation), validate the input
+    // For desktop (hold button), we skip this check as the hold action is the confirmation
+    const isMobile = window.innerWidth < 768 // Simple check, but we'll rely on the UI state mostly
+    
+    // If we're using the text input (which is visible on mobile), validate it
+    // We can check if the deleteConfirmation state is being used
+    if (deleteConfirmation !== '' && deleteConfirmation !== 'DELETE') {
       toast.error('Please type DELETE to confirm')
       return
     }
@@ -719,7 +726,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 block md:hidden">
               <label
                 htmlFor="delete-confirmation"
                 className="block text-sm font-medium text-gray-300"
@@ -738,26 +745,48 @@ export default function SettingsPage() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500 focus:ring-[3px] focus:ring-red-500/20 transition-all duration-200 font-mono"
               />
             </div>
+            
+            <div className="hidden md:block p-4 bg-red-500/5 border border-red-500/10 rounded-xl text-center">
+               <p className="text-sm text-gray-400 mb-2">
+                 Hold the button below for 2 seconds to confirm deletion.
+               </p>
+            </div>
           </div>
 
-          <DialogFooter className="pt-4 border-t border-white/5">
+          <DialogFooter className="pt-4 border-t border-white/5 flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               onClick={() => {
                 setShowDeleteAccountDialog(false)
                 setDeleteConfirmation('')
               }}
-              className="border-white/10 text-white hover:bg-white/5 transition-all duration-200"
+              className="border-white/10 text-white hover:bg-white/5 transition-all duration-200 w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleDeleteAccount}
-              disabled={deleteConfirmation !== 'DELETE' || isDeletingAccount}
-              className="bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            >
-              {isDeletingAccount ? <Spinner /> : 'Delete My Account'}
-            </Button>
+            
+            {/* Mobile: Text Confirmation Button */}
+            <div className="block md:hidden w-full sm:w-auto">
+              <Button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmation !== 'DELETE' || isDeletingAccount}
+                className="w-full bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                {isDeletingAccount ? <Spinner /> : 'Delete My Account'}
+              </Button>
+            </div>
+
+            {/* Desktop: Hold Button */}
+            <div className="hidden md:block">
+              <HoldButton
+                variant="red"
+                holdDuration={2000}
+                onHoldComplete={handleDeleteAccount}
+                className="w-full sm:w-auto"
+              >
+                {isDeletingAccount ? <Spinner /> : 'Hold to Delete'}
+              </HoldButton>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
