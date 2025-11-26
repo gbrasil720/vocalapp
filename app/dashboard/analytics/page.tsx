@@ -69,6 +69,7 @@ interface CreditTransaction {
   type: 'purchase' | 'usage' | 'refund' | 'subscription_grant'
   description: string | null
   stripePaymentIntentId: string | null
+  dodoPaymentsPaymentId: string | null
   createdAt: string
 }
 

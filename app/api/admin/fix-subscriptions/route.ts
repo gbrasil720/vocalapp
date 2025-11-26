@@ -35,7 +35,8 @@ export async function POST() {
           await addCredits(userRecord.id, 600, {
             type: 'subscription_grant',
             description: 'Pro Plan monthly credits (manual grant)',
-            stripeSubscriptionId: sub.stripeSubscriptionId ?? undefined
+            stripeSubscriptionId: sub.stripeSubscriptionId ?? undefined,
+            dodoPaymentsSubscriptionId: sub.dodoPaymentsSubscriptionId ?? undefined
           })
 
           results.push({

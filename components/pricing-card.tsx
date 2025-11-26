@@ -38,13 +38,17 @@ export function PricingCard({
 
   const handleUpgradeToPro = async () => {
     try {
-      await authClient.subscription.upgrade({
-        plan: 'Pro Plan',
-        annual: false,
-        seats: 1,
-        successUrl: `${window.location.origin}/api/stripe/subscription-success`,
-        cancelUrl: `${window.location.origin}/`
+      const { data, error } = await authClient.dodopayments.checkout({
+        slug: 'pro-plan',
       })
+      
+      if (error) {
+        throw error
+      }
+
+      if (data?.url) {
+        window.location.href = data.url
+      }
     } catch (e) {
       console.error('Error upgrading to pro', e)
     }

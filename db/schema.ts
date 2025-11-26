@@ -26,6 +26,7 @@ export const user = pgTable('user', {
   banExpires: timestamp('ban_expires'),
   twoFactorEnabled: boolean('two_factor_enabled').default(false),
   stripeCustomerId: text('stripe_customer_id'),
+  dodoPaymentsCustomerId: text('dodo_payments_customer_id'),
   credits: integer('credits').default(30).notNull(),
   isBetaUser: boolean('is_beta_user').default(true).notNull()
 })
@@ -93,6 +94,7 @@ export const subscription = pgTable('subscription', {
   referenceId: text('reference_id').notNull(),
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
+  dodoPaymentsSubscriptionId: text('dodo_payments_subscription_id'),
   status: text('status').default('incomplete'),
   periodStart: timestamp('period_start'),
   periodEnd: timestamp('period_end'),
@@ -115,6 +117,7 @@ export const creditTransaction = pgTable('credit_transaction', {
   }).notNull(),
   description: text('description'),
   stripePaymentIntentId: text('stripe_payment_intent_id'),
+  dodoPaymentsPaymentId: text('dodo_payments_payment_id'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').defaultNow().notNull()
 })

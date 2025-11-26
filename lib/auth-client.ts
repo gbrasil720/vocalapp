@@ -1,4 +1,4 @@
-import { stripeClient } from '@better-auth/stripe/client'
+import { dodopaymentsClient } from '@dodopayments/better-auth'
 import {
   adminClient,
   lastLoginMethodClient,
@@ -11,9 +11,7 @@ export const authClient = createAuthClient({
   plugins: [
     lastLoginMethodClient(),
     magicLinkClient(),
-    stripeClient({
-      subscription: true
-    }),
+    dodopaymentsClient(),
     adminClient(),
     twoFactorClient()
   ]

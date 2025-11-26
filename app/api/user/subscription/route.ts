@@ -40,6 +40,7 @@ export async function GET() {
         plan: sub.plan,
         status: sub.status,
         stripeSubscriptionId: sub.stripeSubscriptionId,
+        dodoPaymentsSubscriptionId: sub.dodoPaymentsSubscriptionId,
         periodStart: sub.periodStart,
         periodEnd: sub.periodEnd,
         cancelAtPeriodEnd: sub.cancelAtPeriodEnd,

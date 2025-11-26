@@ -18,6 +18,7 @@ import { BetaPaymentNotice } from '@/components/beta-payment-notice'
 import ElectricBorder from '@/components/ElectricBorder'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
+import { authClient } from '@/lib/auth-client'
 import type { CreditPackType } from '@/lib/billing/credit-products'
 import { purchaseCredits } from '@/lib/billing/purchase-credits'
 
@@ -179,24 +180,14 @@ export default function BillingPage() {
 
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch('/api/billing/portal', {
-        method: 'POST'
-      })
+      const { data, error } = await authClient.dodopayments.customer.portal()
 
-      if (response.ok) {
-        const { url } = await response.json()
-        window.location.href = url
-      } else {
-        const errorData = await response.json()
-        console.error('Portal error:', errorData)
+      if (error) {
+        throw error
+      }
 
-        if (errorData.error?.includes('configuration')) {
-          toast.error(
-            'Stripe Customer Portal needs to be configured. Please contact support or visit your Stripe dashboard settings.'
-          )
-        } else {
-          toast.error('Failed to open billing portal. Please try again.')
-        }
+      if (data?.url) {
+        window.location.href = data.url
       }
     } catch (error) {
       console.error('Error opening billing portal:', error)

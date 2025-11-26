@@ -1,3 +1,4 @@
+import { authClient } from '@/lib/auth-client'
 import type { CreditPackType } from './credit-products'
 
 export async function purchaseCredits(packType: CreditPackType): Promise<void> {
@@ -6,21 +7,15 @@ export async function purchaseCredits(packType: CreditPackType): Promise<void> {
       sessionStorage.setItem('pending_credit_pack', packType)
     }
 
-    const response = await fetch('/api/credits/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ packType })
+    const { data, error } = await authClient.dodopayments.checkout({
+      slug: `${packType}-credits`, // Assumes slugs are like 'basic-credits', 'popular-credits'
     })
 
-    if (!response.ok) {
-      throw new Error('Failed to create checkout session')
+    if (error) {
+      throw error
     }
 
-    const data = await response.json()
-
-    if (data.url) {
+    if (data?.url) {
       window.location.href = data.url
     } else {
       throw new Error('No checkout URL returned')
