@@ -5,8 +5,10 @@ import {
   GlobeIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { isTranscriptionStuck } from '@/lib/transcription-utils'
 import { getLanguageName } from '@/lib/utils'
 import SpotlightCard from './SpotlightCard'
 
@@ -56,6 +58,11 @@ export function TranscriptionCard({
     if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
     return date.toLocaleDateString()
   }, [])
+
+  const isStuck = useMemo(() => {
+    if (transcription.status !== 'processing') return false
+    return isTranscriptionStuck(transcription.fileSize, transcription.createdAt)
+  }, [transcription.status, transcription.fileSize, transcription.createdAt])
 
   return (
     <Link
@@ -116,6 +123,11 @@ export function TranscriptionCard({
             ) : transcription.status === 'failed' ? (
               <span className="px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
                 Failed
+              </span>
+            ) : isStuck ? (
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-400/20 text-orange-400 text-xs rounded-full whitespace-nowrap">
+                <AlertTriangle className="w-3 h-3" />
+                Delayed
               </span>
             ) : (
               <span className="px-2 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">

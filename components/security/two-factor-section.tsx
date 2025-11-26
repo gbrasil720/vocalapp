@@ -31,7 +31,7 @@ import {
   FieldLabel
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
+import { AnimatedOTPInput } from '@/components/ui/animated-otp-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'
@@ -626,40 +626,18 @@ export function TwoFactorSection({ twoFactorEnabled }: TwoFactorSectionProps) {
                     Enter the 6-digit code from your authenticator app
                   </FieldLabel>
                   <FieldContent>
-                    <InputOTP
-                      maxLength={6}
-                      value={verificationCode}
-                      onChange={(value) => setVerificationCode(value)}
-                      containerClassName="justify-center"
-                      autoFocus
-                    >
-                      <InputOTPGroup className="gap-2">
-                        <InputOTPSlot
-                          index={0}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                        <InputOTPSlot
-                          index={1}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                        <InputOTPSlot
-                          index={2}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                        <InputOTPSlot
-                          index={3}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                        <InputOTPSlot
-                          index={4}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                        <InputOTPSlot
-                          index={5}
-                          className="w-12 h-14 rounded-xl border-white/10 bg-white/5 text-white text-xl font-mono data-[active=true]:border-[#03b3c3] data-[active=true]:ring-[#03b3c3]/20"
-                        />
-                      </InputOTPGroup>
-                    </InputOTP>
+                    <div className="flex justify-center">
+                      <AnimatedOTPInput
+                        maxLength={6}
+                        value={verificationCode}
+                        onChange={(value) => setVerificationCode(value)}
+                        onComplete={(value) => {
+                          setVerificationCode(value)
+                          // Optional: Auto-submit when complete
+                          // handleVerify2FA()
+                        }}
+                      />
+                    </div>
                   </FieldContent>
                 </Field>
               </FieldGroup>

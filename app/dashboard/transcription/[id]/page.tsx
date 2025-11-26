@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  AlertTriangle,
   ArrowLeft,
   Calendar,
   Check,
@@ -9,10 +10,11 @@ import {
   FileAudio,
   FileText,
   Globe,
-  Loader2
+  Loader2,
+  Trash2
 } from 'lucide-react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { CustomAudioPlayer } from '@/components/custom-audio-player'
@@ -21,6 +23,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { getElapsedTime, isTranscriptionStuck } from '@/lib/transcription-utils'
 import { getLanguageName } from '@/lib/utils'
 
 interface TranscriptionData {
@@ -42,6 +45,7 @@ interface TranscriptionData {
 
 export default function TranscriptionDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const id = params.id as string
   const { data: session } = authClient.useSession()
 
@@ -51,6 +55,7 @@ export default function TranscriptionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [polling, setPolling] = useState(false)
   const [isPro, setIsPro] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const fetchTranscription = async () => {
@@ -159,6 +164,35 @@ export default function TranscriptionDetailPage() {
     return `${minutes}:${secs.toString().padStart(2, '0')}`
   }
 
+  const deleteTranscription = async () => {
+    if (!transcription || isDeleting) return
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch('/api/transcriptions/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcriptionIds: [transcription.id] })
+      })
+
+      if (response.ok) {
+        toast.success('Transcription deleted')
+        router.push('/dashboard')
+      } else {
+        toast.error('Failed to delete transcription')
+      }
+    } catch (error) {
+      console.error('Error deleting transcription:', error)
+      toast.error('Failed to delete transcription')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const isStuck =
+    transcription?.status === 'processing' &&
+    isTranscriptionStuck(transcription.fileSize, transcription.createdAt)
+
   if (loading) {
     return <LoadingScreen />
   }
@@ -247,6 +281,45 @@ export default function TranscriptionDetailPage() {
               </div>
             </SpotlightCard>
           </div>
+
+          {isStuck && (
+            <div className="mb-8">
+              <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 p-2 rounded-full bg-orange-500/20">
+                    <AlertTriangle className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-orange-400 font-semibold mb-1">
+                      Processing Delay Detected
+                    </h3>
+                    <p className="text-gray-300 text-sm mb-3">
+                      This transcription has been processing for{' '}
+                      <span className="text-orange-400 font-medium">
+                        {getElapsedTime(transcription.createdAt)}
+                      </span>
+                      , which is longer than expected. This might be due to a
+                      server issue on our end. You can wait a bit longer or
+                      delete this transcription and try again.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={deleteTranscription}
+                      disabled={isDeleting}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 text-orange-400 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isDeleting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                      {isDeleting ? 'Deleting...' : 'Delete Transcription'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
