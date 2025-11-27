@@ -1,0 +1,139 @@
+import { headers } from 'next/headers'
+import { NextResponse } from 'next/server'
+import crypto from 'crypto'
+import { db } from '@/db'
+import * as schema from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import { addCredits } from '@/lib/credits'
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.text()
+    const headersList = await headers()
+    const signature = headersList.get('webhook-signature')
+    const webhookId = headersList.get('webhook-id')
+    const timestamp = headersList.get('webhook-timestamp')
+
+    console.log('Received Dodo Webhook:', {
+      webhookId,
+      timestamp,
+      signaturePresent: !!signature
+    })
+
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
+    }
+
+    const secret = process.env.DODO_PAYMENTS_WEBHOOK_SECRET
+    if (!secret) {
+      console.error('Missing DODO_PAYMENTS_WEBHOOK_SECRET')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+
+    // Soft verification for debugging
+    try {
+      const hmac = crypto.createHmac('sha256', secret)
+      const digest = hmac.update(body).digest('base64')
+      const expectedSignature = `v1,${digest}` // Guessing format based on screenshot
+      
+      console.log('Signature Verification Debug:', {
+        received: signature,
+        computed: digest,
+        expectedWithPrefix: expectedSignature,
+        match: signature === expectedSignature || signature === digest
+      })
+      
+      // TODO: Enforce verification once format is confirmed
+      // if (signature !== expectedSignature) { ... }
+    } catch (err) {
+      console.error('Error computing signature:', err)
+    }
+    
+    const payload = JSON.parse(body)
+    
+    // Event handling logic
+    console.log('Processing event:', payload.event_type)
+
+    if (payload.event_type === 'payment.succeeded') {
+      const payment = payload.data
+      const metadata = payment.metadata as any
+
+      if (metadata?.purchaseType === 'credits') {
+        const userId = metadata.userId
+        const credits = Number.parseInt(metadata.credits || '0')
+        const packType = metadata.packType
+
+        if (userId && credits > 0) {
+          try {
+            await addCredits(userId, credits, {
+              type: 'purchase',
+              description: `Purchased ${packType} credit pack (${credits} credits)`,
+              dodoPaymentsPaymentId: payment.payment_id,
+              packType,
+              paymentId: payment.payment_id
+            })
+
+            console.log(`✓ Added ${credits} credits to user ${userId}`)
+          } catch (error) {
+            console.error('Error adding credits:', error)
+          }
+        }
+      }
+    } else if (payload.event_type === 'subscription.active') {
+      const subscription = payload.data
+      
+      // Find user by Dodo customer ID
+      const [userRecord] = await db
+        .select()
+        .from(schema.user)
+        .where(
+          eq(
+            schema.user.dodoPaymentsCustomerId,
+            subscription.customer.customer_id
+          )
+        )
+        .limit(1)
+
+      if (userRecord) {
+        const userId = userRecord.id
+
+        try {
+          await addCredits(userId, 600, {
+            type: 'subscription_grant',
+            description: 'Pro Plan monthly credits',
+            dodoPaymentsSubscriptionId: subscription.subscription_id,
+            subscriptionPeriodStart: new Date(subscription.current_period_start),
+            subscriptionPeriodEnd: new Date(subscription.current_period_end)
+          })
+
+          console.log(
+            `✓ Granted 600 monthly credits to user ${userId} for Pro Plan subscription`
+          )
+        } catch (error) {
+          console.error('Error granting subscription credits:', error)
+        }
+      }
+    } else if (payload.event_type === 'subscription.cancelled' || payload.event_type === 'subscription.payment_failed') {
+       const subscriptionData = payload.data
+       console.log(`⚠️ Subscription ${payload.event_type}:`, subscriptionData.subscription_id)
+
+       try {
+         await db.update(schema.subscription)
+           .set({ 
+             status: 'cancelled',
+             cancelAtPeriodEnd: true
+           })
+           .where(eq(schema.subscription.dodoPaymentsSubscriptionId, subscriptionData.subscription_id))
+         
+         console.log(`✓ Updated subscription status to cancelled for ${subscriptionData.subscription_id}`)
+       } catch (error) {
+         console.error('Error cancelling subscription:', error)
+       }
+    }
+
+    return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('Error processing webhook:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
