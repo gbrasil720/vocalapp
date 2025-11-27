@@ -51,12 +51,21 @@ export async function POST(req: Request) {
     
     const payload = JSON.parse(body)
     
+    const eventType = payload.type || payload.event_type // Fallback just in case
+    
     // Event handling logic
-    console.log('Processing event:', payload.event_type)
+    console.log('Processing event:', eventType)
+    console.log('Full Webhook Payload:', JSON.stringify(payload, null, 2))
 
-    if (payload.event_type === 'payment.succeeded') {
+    if (eventType === 'payment.succeeded') {
       const payment = payload.data
       const metadata = payment.metadata as any
+      
+      console.log('Payment Data:', {
+        paymentId: payment.payment_id,
+        metadata,
+        amount: payment.total_amount
+      })
 
       if (metadata?.purchaseType === 'credits') {
         const userId = metadata.userId
@@ -79,24 +88,31 @@ export async function POST(req: Request) {
           }
         }
       }
-    } else if (payload.event_type === 'subscription.active') {
+    } else if (eventType === 'subscription.active') {
       const subscription = payload.data
+      const metadata = subscription.metadata as any
       
-      // Find user by Dodo customer ID
-      const [userRecord] = await db
-        .select()
-        .from(schema.user)
-        .where(
-          eq(
-            schema.user.dodoPaymentsCustomerId,
-            subscription.customer.customer_id
-          )
-        )
-        .limit(1)
+      // Try to find user by metadata.userId first (more reliable)
+      let userId = metadata?.userId
+      
+      if (!userId) {
+         console.log('⚠️ No userId in metadata, falling back to customer_id')
+         // Find user by Dodo customer ID
+         const [userRecord] = await db
+           .select()
+           .from(schema.user)
+           .where(
+             eq(
+               schema.user.dodoPaymentsCustomerId,
+               subscription.customer.customer_id
+             )
+           )
+           .limit(1)
+           
+         userId = userRecord?.id
+      }
 
-      if (userRecord) {
-        const userId = userRecord.id
-
+      if (userId) {
         try {
           await addCredits(userId, 600, {
             type: 'subscription_grant',
@@ -112,10 +128,12 @@ export async function POST(req: Request) {
         } catch (error) {
           console.error('Error granting subscription credits:', error)
         }
+      } else {
+        console.error('❌ Could not find user for subscription:', subscription.subscription_id)
       }
-    } else if (payload.event_type === 'subscription.cancelled' || payload.event_type === 'subscription.payment_failed') {
+    } else if (eventType === 'subscription.cancelled' || eventType === 'subscription.payment_failed') {
        const subscriptionData = payload.data
-       console.log(`⚠️ Subscription ${payload.event_type}:`, subscriptionData.subscription_id)
+       console.log(`⚠️ Subscription ${eventType}:`, subscriptionData.subscription_id)
 
        try {
          await db.update(schema.subscription)
