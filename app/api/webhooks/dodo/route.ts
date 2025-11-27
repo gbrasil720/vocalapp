@@ -114,6 +114,7 @@ export async function POST(req: Request) {
 
       if (userId) {
         try {
+          // Grant credits
           await addCredits(userId, 600, {
             type: 'subscription_grant',
             description: 'Pro Plan monthly credits',
@@ -125,8 +126,43 @@ export async function POST(req: Request) {
           console.log(
             `✓ Granted 600 monthly credits to user ${userId} for Pro Plan subscription`
           )
+
+          // Update Subscription Table
+          // Check if subscription exists
+          const [existingSubscription] = await db
+            .select()
+            .from(schema.subscription)
+            .where(eq(schema.subscription.dodoPaymentsSubscriptionId, subscription.subscription_id))
+            .limit(1)
+
+          if (existingSubscription) {
+             await db.update(schema.subscription)
+               .set({
+                 status: 'active',
+                 periodStart: new Date(subscription.current_period_start),
+                 periodEnd: new Date(subscription.current_period_end),
+                 cancelAtPeriodEnd: false
+               })
+               .where(eq(schema.subscription.id, existingSubscription.id))
+             console.log(`✓ Updated existing subscription ${existingSubscription.id}`)
+          } else {
+             // Create new subscription
+             await db.insert(schema.subscription).values({
+               id: crypto.randomUUID(),
+               plan: 'frequency-plan', 
+               referenceId: userId, // better-auth usually uses referenceId for userId
+               dodoPaymentsSubscriptionId: subscription.subscription_id,
+               status: 'active',
+               periodStart: new Date(subscription.current_period_start),
+               periodEnd: new Date(subscription.current_period_end),
+               cancelAtPeriodEnd: false,
+               seats: 1
+             })
+             console.log(`✓ Created new subscription record for user ${userId}`)
+          }
+
         } catch (error) {
-          console.error('Error granting subscription credits:', error)
+          console.error('Error processing subscription active:', error)
         }
       } else {
         console.error('❌ Could not find user for subscription:', subscription.subscription_id)
