@@ -145,7 +145,7 @@ export default function BillingSuccessPage() {
 
           {status === 'error' && (
               <a
-                href="mailto:support@vocalapp.com"
+                href="mailto:support@vocalapp.io"
                 className="block w-full py-3 px-6 mb-3 bg-white/10 text-white font-semibold rounded-full hover:bg-white/20 transition-colors"
               >
                 Contact Support
