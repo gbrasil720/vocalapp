@@ -15,9 +15,11 @@ import {
 } from './language-tracking'
 
 // Inicializa o cliente da Groq
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
-})
+const getGroqClient = () => {
+  return new Groq({
+    apiKey: process.env.GROQ_API_KEY || 'dummy_key_for_build'
+  })
+}
 
 export async function processTranscription(transcriptionId: string) {
   let fileUrl: string | null = null
@@ -106,7 +108,7 @@ export async function processTranscription(transcriptionId: string) {
     // --- CORREÇÃO AQUI ---
     // Usamos 'as any' aqui porque o SDK da Groq ainda não tipa corretamente
     // o retorno do 'verbose_json' automaticamente no TypeScript.
-    const transcriptionResult = (await groq.audio.transcriptions.create({
+    const transcriptionResult = (await getGroqClient().audio.transcriptions.create({
       file: file,
       model: 'whisper-large-v3-turbo',
       language: normalizedLanguage,

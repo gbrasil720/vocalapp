@@ -8,6 +8,13 @@
       "when": 1732550000000,
       "tag": "0000_initial_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764203083792,
+      "tag": "0001_pretty_daimon_hellstrom",
+      "breakpoints": true
     }
   ]
 }

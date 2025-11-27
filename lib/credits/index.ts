@@ -23,6 +23,8 @@ export async function addCredits(
     type: 'purchase' | 'refund' | 'subscription_grant'
     description?: string
     stripePaymentIntentId?: string
+    dodoPaymentsPaymentId?: string
+    dodoPaymentsSubscriptionId?: string
     [key: string]: unknown
   }
 ): Promise<void> {
@@ -42,6 +44,7 @@ export async function addCredits(
     type,
     description,
     stripePaymentIntentId: metadata?.stripePaymentIntentId,
+    dodoPaymentsPaymentId: metadata?.dodoPaymentsPaymentId,
     metadata: metadata as Record<string, unknown>
   })
 }

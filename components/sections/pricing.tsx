@@ -5,8 +5,8 @@
 import { StarIcon, Tick02Icon, ZapIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
-import type { CreditPackType } from '@/lib/billing/credit-products'
-import { purchaseCredits } from '@/lib/billing/purchase-credits'
+import { authClient } from '@/lib/auth-client'
+import { getCreditPack, type CreditPackType } from '@/lib/billing/credit-products'
 import ElectricBorder from '../ElectricBorder'
 import { PricingCard } from '../pricing-card'
 
@@ -15,9 +15,52 @@ interface PricingProps {
 }
 
 export function Pricing({ waitlistMode = false }: PricingProps = {}) {
+  const { data: session } = authClient.useSession()
+
   const handleCreditPurchase = async (packType: CreditPackType) => {
+    if (!session?.user?.id) {
+        window.location.href = '/auth/sign-in'
+        return
+    }
+
     try {
-      await purchaseCredits(packType)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_credit_pack', packType)
+      }
+
+      const slugMap: Record<CreditPackType, string> = {
+        basic: 'echo-credits',
+        popular: 'reverb-credits',
+        premium: 'amplify-credits'
+      }
+
+      const pack = getCreditPack(packType)
+
+      const { data, error } = await authClient.dodopayments.checkout({
+        slug: slugMap[packType],
+        billing: {
+            city: 'New York',
+            country: 'US',
+            state: 'NY',
+            street: '123 Main St',
+            zipcode: '10001'
+        },
+        customer: {},
+        metadata: {
+            purchaseType: 'credits',
+            userId: session.user.id,
+            credits: pack.credits.toString(),
+            packType
+        }
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data?.url) {
+        window.location.href = data.url
+      }
     } catch (error) {
       console.error('Error purchasing credits:', error)
       toast.error('Failed to start checkout. Please try again.')

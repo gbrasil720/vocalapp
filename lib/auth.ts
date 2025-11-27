@@ -1,4 +1,5 @@
-import { stripe } from '@better-auth/stripe'
+import { dodopayments, checkout, portal, webhooks } from '@dodopayments/better-auth'
+import DodoPayments from 'dodopayments'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
@@ -7,10 +8,10 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
 import { isBetaUserByEmail } from './beta-access'
-import { stripeClient } from './billing/stripe-client'
 import { addCredits } from './credits'
 import { sendMagicLinkEmail } from './email/magic-link'
 import { isEmailApproved } from './waitlist'
+import { dodoPayments } from './billing/dodo-payments'
 
 export const auth = betterAuth({
   appName: 'VocalApp',
@@ -151,55 +152,79 @@ export const auth = betterAuth({
         await sendMagicLinkEmail({ email, token, url })
       }
     }),
-    stripe({
-      stripeClient,
-      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET as string,
+    dodopayments({
+      client: dodoPayments,
       createCustomerOnSignUp: true,
-      onEvent: async (event) => {
-        console.log('stripe event', event)
+      use: [
+        checkout({
+          products: [
+            {
+              productId: process.env.DODO_FREQUENCY_PRICE_ID as string,
+              slug: 'frequency-plan'
+            },
+            {
+              productId: process.env.DODO_ECHO_PRICE_ID as string,
+              slug: 'echo-credits'
+            },
+            {
+              productId: process.env.DODO_REVERB_PRICE_ID as string,
+              slug: 'reverb-credits'
+            },
+            {
+              productId: process.env.DODO_AMPLIFY_PRICE_ID as string,
+              slug: 'amplify-credits'
+            }
+          ].map(p => {
+             if (!p.productId) console.warn(`⚠️ Missing productId for slug: ${p.slug}`)
+             return p
+          }),
+          successUrl: '/dashboard/billing/success',
+          authenticatedUsersOnly: true
+        }),
+        portal(),
+        webhooks({
+          webhookKey: process.env.DODO_PAYMENTS_WEBHOOK_SECRET || 'PLACEHOLDER',
+          onPayload: async (payload: any) => {
+            console.log('DodoPayments webhook:', payload.event_type)
 
-        if (event.type === 'checkout.session.completed') {
-          const session = event.data.object
-          const metadata = session.metadata
+            if (payload.event_type === 'payment.succeeded') {
+              const payment = payload.data
+              const metadata = payment.metadata as any
 
-          if (metadata?.purchaseType === 'credits') {
-            const userId = metadata.userId
-            const credits = Number.parseInt(metadata.credits || '0')
-            const packType = metadata.packType
+              if (metadata?.purchaseType === 'credits') {
+                const userId = metadata.userId
+                const credits = Number.parseInt(metadata.credits || '0')
+                const packType = metadata.packType
 
-            if (userId && credits > 0) {
-              try {
-                await addCredits(userId, credits, {
-                  type: 'purchase',
-                  description: `Purchased ${packType} credit pack (${credits} credits)`,
-                  stripePaymentIntentId: session.payment_intent as string,
-                  packType,
-                  sessionId: session.id
-                })
+                if (userId && credits > 0) {
+                  try {
+                    await addCredits(userId, credits, {
+                      type: 'purchase',
+                      description: `Purchased ${packType} credit pack (${credits} credits)`,
+                      dodoPaymentsPaymentId: payment.payment_id,
+                      packType,
+                      paymentId: payment.payment_id
+                    })
 
-                console.log(`✓ Added ${credits} credits to user ${userId}`)
-              } catch (error) {
-                console.error('Error adding credits:', error)
+                    console.log(`✓ Added ${credits} credits to user ${userId}`)
+                  } catch (error) {
+                    console.error('Error adding credits:', error)
+                  }
+                }
               }
             }
-          }
-        }
 
-        if (
-          event.type === 'customer.subscription.created' ||
-          event.type === 'customer.subscription.updated'
-        ) {
-          const subscription = event.data.object
-
-          if (subscription.status === 'active') {
-            try {
+            if (payload.event_type === 'subscription.active') {
+              const subscription = payload.data
+              
+              // Find user by Dodo customer ID
               const [userRecord] = await db
                 .select()
                 .from(schema.user)
                 .where(
                   eq(
-                    schema.user.stripeCustomerId,
-                    subscription.customer as string
+                    schema.user.dodoPaymentsCustomerId,
+                    subscription.customer.customer_id
                   )
                 )
                 .limit(1)
@@ -207,38 +232,44 @@ export const auth = betterAuth({
               if (userRecord) {
                 const userId = userRecord.id
 
-                await addCredits(userId, 600, {
-                  type: 'subscription_grant',
-                  description: 'Pro Plan monthly credits',
-                  stripeSubscriptionId: subscription.id,
-                  subscriptionPeriodStart: (subscription as any)
-                    .current_period_start,
-                  subscriptionPeriodEnd: (subscription as any)
-                    .current_period_end
-                })
+                try {
+                  await addCredits(userId, 600, {
+                    type: 'subscription_grant',
+                    description: 'Pro Plan monthly credits',
+                    dodoPaymentsSubscriptionId: subscription.subscription_id,
+                    subscriptionPeriodStart: new Date(subscription.current_period_start),
+                    subscriptionPeriodEnd: new Date(subscription.current_period_end)
+                  })
 
-                console.log(
-                  `✓ Granted 600 monthly credits to user ${userId} for Pro Plan subscription`
-                )
+                  console.log(
+                    `✓ Granted 600 monthly credits to user ${userId} for Pro Plan subscription`
+                  )
+                } catch (error) {
+                  console.error('Error granting subscription credits:', error)
+                }
               }
-            } catch (error) {
-              console.error('Error granting subscription credits:', error)
+            }
+
+            if (payload.event_type === 'subscription.cancelled' || payload.event_type === 'subscription.payment_failed') {
+               const subscriptionData = payload.data
+               console.log(`⚠️ Subscription ${payload.event_type}:`, subscriptionData.subscription_id)
+
+               try {
+                 await db.update(schema.subscription)
+                   .set({ 
+                     status: 'cancelled',
+                     cancelAtPeriodEnd: true
+                   })
+                   .where(eq(schema.subscription.dodoPaymentsSubscriptionId, subscriptionData.subscription_id))
+                 
+                 console.log(`✓ Updated subscription status to cancelled for ${subscriptionData.subscription_id}`)
+               } catch (error) {
+                 console.error('Error cancelling subscription:', error)
+               }
             }
           }
-        }
-      },
-      subscription: {
-        enabled: true,
-        plans: [
-          {
-            name: 'Pro Plan',
-            priceId: 'price_1SKSwiLei6ZP9igfAKHMocXM',
-            limits: {
-              credits: 600
-            }
-          }
-        ]
-      }
+        })
+      ]
     })
   ]
 })

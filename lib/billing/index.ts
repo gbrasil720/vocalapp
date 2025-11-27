@@ -1,14 +1,11 @@
 import { authClient } from '../auth-client'
 
-export const upgrateToPro = async () => {
+export const upgradeToPro = async () => {
   try {
-    await authClient.subscription.upgrade({
-      plan: 'Pro Plan',
-      annual: false,
-      seats: 1,
-      successUrl: '/success?checkout_id={CHECKOUT_ID}',
-      cancelUrl: '/cancel',
-      disableRedirect: true
+    await authClient.dodopayments.checkout({
+      productId: 'pro-plan',
+      quantity: 1,
+      returnUrl: '/dashboard/billing?success=true'
     })
   } catch (e) {
     console.error('Error upgrading to pro', e)
