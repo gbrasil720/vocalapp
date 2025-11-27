@@ -19,6 +19,11 @@ export const config = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Explicitly skip API routes to prevent any redirects
+  if (pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
   const session = await auth.api.getSession({
     headers: request.headers
   })
