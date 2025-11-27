@@ -35,7 +35,9 @@ export async function GET() {
       .select()
       .from(subscription)
       .where(eq(subscription.referenceId, userId))
-      .limit(1)
+      
+    const activeSubscription = subscriptionData.find(sub => sub.status === 'active')
+    const currentSubscription = activeSubscription || subscriptionData[0]
 
     const usageStats = await db
       .select({
@@ -53,12 +55,12 @@ export async function GET() {
     const languagesUsed = await getUserLanguageCount(userId)
 
     const hasSubscription =
-      subscriptionData.length > 0 && subscriptionData[0].status === 'active'
-    const planName = hasSubscription ? subscriptionData[0].plan : 'Free Plan'
+      !!currentSubscription && currentSubscription.status === 'active'
+    const planName = hasSubscription ? currentSubscription.plan : 'Free Plan'
     const planCredits = hasSubscription ? 600 : 30
     const nextBillingDate =
-      hasSubscription && subscriptionData[0].periodEnd
-        ? new Date(subscriptionData[0].periodEnd).toLocaleDateString('en-US', {
+      hasSubscription && currentSubscription.periodEnd
+        ? new Date(currentSubscription.periodEnd).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'

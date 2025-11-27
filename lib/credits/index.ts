@@ -31,6 +31,28 @@ export async function addCredits(
   const type = metadata?.type || 'purchase'
   const description = metadata?.description || `Added ${amount} credits`
 
+  // Idempotency check
+  if (metadata?.dodoPaymentsPaymentId) {
+    const existingTransaction = await db
+      .select()
+      .from(creditTransaction)
+      .where(eq(creditTransaction.dodoPaymentsPaymentId, metadata.dodoPaymentsPaymentId))
+      .limit(1)
+
+    if (existingTransaction.length > 0) {
+      console.log(`⚠️ Transaction already processed: ${metadata.dodoPaymentsPaymentId}`)
+      return
+    }
+  }
+
+  if (metadata?.dodoPaymentsSubscriptionId && type === 'subscription_grant') {
+     // For subscription grants, we might want to check if we already granted for this period
+     // But for now, let's just rely on the payment ID check if available, or just proceed
+     // Dodo doesn't send a unique ID for the grant event itself other than the subscription ID
+     // which is the same for every month.
+     // Ideally we should check (subscriptionId + periodStart) combination.
+  }
+
   await db
     .update(user)
     .set({

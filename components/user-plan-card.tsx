@@ -2,6 +2,7 @@ import { Crown03Icon, SparklesIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { authClient } from '@/lib/auth-client'
 import SpotlightCard from './SpotlightCard'
 
 interface UserStats {
@@ -47,6 +48,7 @@ export function UserPlanCard({ stats }: { stats: UserStats }) {
 
               <span className="text-sm font-semibold text-primary">
                 {stats.plan.name
+                  .replace('-plan', '')
                   .split(' ')
                   .map(
                     (word) =>
@@ -88,7 +90,7 @@ export function UserPlanCard({ stats }: { stats: UserStats }) {
                 <p className="text-sm font-semibold text-white">
                   {stats.plan.nextBillingDate}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">$10.00/month</p>
+                <p className="text-xs text-gray-500 mt-1">$12.00/month</p>
               </div>
             ) : (
               <div className="bg-white/5 rounded-2xl p-4 mb-4">
@@ -105,21 +107,14 @@ export function UserPlanCard({ stats }: { stats: UserStats }) {
               type="button"
               onClick={async () => {
                 try {
-                  const response = await fetch('/api/billing/portal', {
-                    method: 'POST'
-                  })
-                  if (response.ok) {
-                    const { url } = await response.json()
-                    window.location.href = url
-                  } else {
-                    const errorData = await response.json()
-                    if (errorData.error?.includes('configuration')) {
-                      toast.error(
-                        'Billing portal not configured yet. Please use the billing page.'
-                      )
-                    } else {
-                      toast.error('Failed to open billing portal')
-                    }
+                  const { data, error } = await authClient.dodopayments.customer.portal()
+                  
+                  if (error) {
+                    throw error
+                  }
+
+                  if (data?.url) {
+                    window.location.href = data.url
                   }
                 } catch (error) {
                   console.error('Error opening portal:', error)

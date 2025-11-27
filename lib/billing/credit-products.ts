@@ -13,7 +13,7 @@ export interface CreditPack {
 export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
   basic: {
     type: 'basic',
-    name: 'Basic',
+    name: 'Echo',
     price: 5,
     credits: 120,
     priceId:
@@ -23,7 +23,7 @@ export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
   },
   popular: {
     type: 'popular',
-    name: 'Popular',
+    name: 'Reverb',
     price: 15,
     credits: 450,
     priceId:
@@ -33,7 +33,7 @@ export const CREDIT_PACKS: Record<CreditPackType, CreditPack> = {
   },
   premium: {
     type: 'premium',
-    name: 'Premium',
+    name: 'Amplify',
     price: 40,
     credits: 1500,
     priceId:

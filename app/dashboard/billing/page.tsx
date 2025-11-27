@@ -460,6 +460,7 @@ export default function BillingPage() {
                             <div>
                               <h3 className="text-2xl font-bold text-white">
                                 {subscriptionData.subscription.plan
+                                  .replace('-plan', '')
                                   .split(' ')
                                   .map(
                                     (word) =>
@@ -542,7 +543,7 @@ export default function BillingPage() {
                                   Amount
                                 </p>
                                 <p className="text-2xl font-bold text-white">
-                                  $10.00
+                                  $12.00
                                   <span className="text-sm text-gray-400 ml-2">
                                     /month
                                   </span>
@@ -637,6 +638,7 @@ export default function BillingPage() {
                           <div>
                             <h3 className="text-2xl font-bold text-white">
                               {subscriptionData.subscription.plan
+                                .replace('-plan', '')
                                 .split(' ')
                                 .map(
                                   (word) =>
@@ -832,109 +834,207 @@ export default function BillingPage() {
               <h2 className="text-xl font-bold text-white mb-4">
                 Buy Credit Packs
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Echo Pack */}
-                <SpotlightCard className="bg-[#03b3c3]/5 backdrop-blur-xl border border-[#03b3c3]/20 hover:border-[#03b3c3]/50 transition-all duration-300 group">
-                  <div className="p-6 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#03b3c3] to-transparent opacity-50" />
-                    
-                    <div className="mb-6 relative">
-                      <div className="w-20 h-20 mx-auto bg-[#03b3c3]/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <HugeiconsIcon icon={Coins01Icon} size={40} className="text-[#03b3c3]" />
-                      </div>
-                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#03b3c3]/20 px-3 py-1 rounded-full border border-[#03b3c3]/30">
-                        <span className="text-xs font-bold text-[#03b3c3] uppercase tracking-wider">Echo</span>
-                      </div>
-                    </div>
-
-                    <div className="mb-2">
-                      <span className="text-4xl font-bold text-white">120</span>
-                      <span className="text-sm text-gray-400 ml-1">credits</span>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <span className="text-2xl font-semibold text-[#03b3c3]">$5</span>
-                    </div>
-
-                    <button
-                      onClick={() => handleCreditPurchase('basic')}
-                      className="w-full py-3 rounded-xl border border-[#03b3c3]/50 text-[#03b3c3] font-semibold hover:bg-[#03b3c3] hover:text-white transition-all duration-300"
-                    >
-                      Purchase
-                    </button>
-                  </div>
-                </SpotlightCard>
-
-                {/* Reverb Pack */}
-                <div className="relative transform md:-translate-y-4">
-                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#d856bf]/20 tracking-wide">
-                      BEST VALUE
-                    </span>
-                  </div>
-                  <SpotlightCard className="bg-[#d856bf]/10 backdrop-blur-xl border border-[#d856bf]/50 hover:border-[#d856bf] transition-all duration-300 group h-full">
-                    <div className="p-8 text-center relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d856bf] to-transparent" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                {/* Echo Pack - The Starter */}
+                <div className="relative group mt-4">
+                  <div className="absolute inset-0 bg-[#03b3c3]/20 blur-xl rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative bg-[#0a0a0a] border border-white/5 rounded-3xl p-1 overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+                    <div className="bg-[#03b3c3]/5 rounded-[20px] p-6 h-full flex flex-col relative overflow-hidden">
+                      {/* Background Elements */}
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#03b3c3]/10 blur-3xl rounded-full -mr-10 -mt-10" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#03b3c3]/5 blur-2xl rounded-full -ml-5 -mb-5" />
                       
-                      <div className="mb-6 relative">
-                        <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_30px_rgba(216,86,191,0.2)]">
-                          <HugeiconsIcon icon={Coins01Icon} size={48} className="text-[#d856bf]" />
+                      <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="p-3 bg-[#03b3c3]/10 rounded-xl border border-[#03b3c3]/20 text-[#03b3c3]">
+                            <HugeiconsIcon icon={Coins01Icon} size={24} />
+                          </div>
+                          <span className="text-xs font-bold tracking-widest text-[#03b3c3] uppercase bg-[#03b3c3]/10 px-3 py-1 rounded-full border border-[#03b3c3]/20">
+                            Echo
+                          </span>
                         </div>
-                        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#d856bf]/20 px-3 py-1 rounded-full border border-[#d856bf]/30">
-                          <span className="text-xs font-bold text-[#d856bf] uppercase tracking-wider">Reverb</span>
+
+                        <div className="mb-8">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-bold text-white">120</span>
+                            <span className="text-sm font-medium text-gray-400">credits</span>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2">Perfect for trying out the platform and quick tasks.</p>
+                        </div>
+
+                        <div className="mt-auto">
+                          <div className="flex items-center justify-between mb-6">
+                            <span className="text-2xl font-bold text-white">$5</span>
+                            <span className="text-xs text-gray-500">One-time payment</span>
+                          </div>
+                          
+                          <button
+                            onClick={() => handleCreditPurchase('basic')}
+                            className="w-full py-3.5 rounded-xl border border-[#03b3c3]/30 text-[#03b3c3] font-bold hover:bg-[#03b3c3] hover:text-white hover:shadow-[0_0_20px_rgba(3,179,195,0.4)] transition-all duration-300"
+                          >
+                            Get Echo
+                          </button>
                         </div>
                       </div>
-
-                      <div className="mb-2">
-                        <span className="text-5xl font-bold text-white">450</span>
-                        <span className="text-sm text-gray-300 ml-1">credits</span>
-                      </div>
-                      
-                      <div className="mb-8">
-                        <span className="text-3xl font-bold text-[#d856bf]">$15</span>
-                      </div>
-
-                      <button
-                        onClick={() => handleCreditPurchase('popular')}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold shadow-lg shadow-[#d856bf]/25 hover:scale-[1.02] transition-transform duration-300"
-                      >
-                        Purchase
-                      </button>
                     </div>
-                  </SpotlightCard>
+                  </div>
                 </div>
 
-                {/* Amplify Pack */}
-                <SpotlightCard className="bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 hover:border-[#c247ac]/50 transition-all duration-300 group">
-                  <div className="p-6 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c247ac] to-transparent opacity-50" />
-                    
-                    <div className="mb-6 relative">
-                      <div className="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-white/10">
-                        <HugeiconsIcon icon={Coins01Icon} size={40} className="text-[#c247ac]" />
-                      </div>
-                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#c247ac]/20 px-3 py-1 rounded-full border border-[#c247ac]/30">
-                        <span className="text-xs font-bold text-[#c247ac] uppercase tracking-wider">Amplify</span>
-                      </div>
-                    </div>
-
-                    <div className="mb-2">
-                      <span className="text-4xl font-bold text-white">1,500</span>
-                      <span className="text-sm text-gray-400 ml-1">credits</span>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <span className="text-2xl font-semibold text-[#c247ac]">$40</span>
-                    </div>
-
-                    <button
-                      onClick={() => handleCreditPurchase('premium')}
-                      className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold hover:bg-[#c247ac] hover:border-[#c247ac] transition-all duration-300"
-                    >
-                      Purchase
-                    </button>
+                {/* Reverb Pack - The Star */}
+                <div className="relative z-10">
+                  <div className="absolute -top-6 left-0 right-0 flex justify-center z-20">
+                    <span className="bg-[#d856bf] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(216,86,191,0.5)] tracking-wide uppercase">
+                      Most Popular
+                    </span>
                   </div>
-                </SpotlightCard>
+                  {/* Desktop Version - Electric Border */}
+                  <div className="hidden md:block h-full">
+                    <ElectricBorder
+                      color="#d856bf"
+                      speed={2}
+                      chaos={0.3}
+                      thickness={2}
+                      className="rounded-3xl shadow-2xl shadow-[#d856bf]/20 h-full"
+                    >
+                      <div className="bg-[#0f0f0f] rounded-3xl p-1 h-full">
+                        <div className="bg-gradient-to-b from-[#d856bf]/10 to-transparent rounded-[20px] p-8 h-full flex flex-col relative overflow-hidden">
+                          {/* Shine Effect */}
+                          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30 pointer-events-none" />
+                          
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-8">
+                              <div className="p-4 bg-[#d856bf] rounded-2xl shadow-lg shadow-[#d856bf]/30 text-white">
+                                <HugeiconsIcon icon={ZapIcon} size={28} />
+                              </div>
+                              <span className="text-sm font-bold tracking-widest text-[#d856bf] uppercase bg-[#d856bf]/10 px-4 py-1.5 rounded-full border border-[#d856bf]/20">
+                                Reverb
+                              </span>
+                            </div>
+
+                            <div className="mb-10">
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-5xl font-black text-white tracking-tight">450</span>
+                                <span className="text-base font-medium text-gray-300">credits</span>
+                              </div>
+                              <p className="text-gray-400 mt-3 leading-relaxed">The sweet spot. Enough power for serious creators.</p>
+                            </div>
+
+                            <div className="mt-auto">
+                              <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-6">
+                                <div>
+                                  <span className="text-4xl font-bold text-white">$15</span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="block text-xs text-[#d856bf] font-semibold mb-1">SAVE 20%</span>
+                                  <span className="text-xs text-gray-500">vs Echo pack</span>
+                                </div>
+                              </div>
+                              
+                              <button
+                                onClick={() => handleCreditPurchase('popular')}
+                                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold text-lg shadow-[0_0_30px_rgba(216,86,191,0.4)] hover:shadow-[0_0_50px_rgba(216,86,191,0.6)] hover:scale-[1.02] transition-all duration-300"
+                              >
+                                Get Reverb
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ElectricBorder>
+                  </div>
+
+                  {/* Mobile Version - Static Border */}
+                  <div className="md:hidden h-full relative rounded-3xl p-[2px] bg-gradient-to-b from-[#d856bf] to-[#c247ac] shadow-[0_0_40px_-10px_rgba(216,86,191,0.5)]">
+                    <div className="bg-[#0f0f0f] rounded-[22px] p-1 h-full">
+                      <div className="bg-gradient-to-b from-[#d856bf]/10 to-transparent rounded-[20px] p-8 h-full flex flex-col relative overflow-hidden">
+                        {/* Shine Effect */}
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30 pointer-events-none" />
+                        
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-8">
+                            <div className="p-4 bg-[#d856bf] rounded-2xl shadow-lg shadow-[#d856bf]/30 text-white">
+                              <HugeiconsIcon icon={ZapIcon} size={28} />
+                            </div>
+                            <span className="text-sm font-bold tracking-widest text-[#d856bf] uppercase bg-[#d856bf]/10 px-4 py-1.5 rounded-full border border-[#d856bf]/20">
+                              Reverb
+                            </span>
+                          </div>
+
+                          <div className="mb-10">
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-5xl font-black text-white tracking-tight">450</span>
+                              <span className="text-base font-medium text-gray-300">credits</span>
+                            </div>
+                            <p className="text-gray-400 mt-3 leading-relaxed">The sweet spot. Enough power for serious creators.</p>
+                          </div>
+
+                          <div className="mt-auto">
+                            <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-6">
+                              <div>
+                                <span className="text-4xl font-bold text-white">$15</span>
+                              </div>
+                              <div className="text-right">
+                                <span className="block text-xs text-[#d856bf] font-semibold mb-1">SAVE 20%</span>
+                                <span className="text-xs text-gray-500">vs Echo pack</span>
+                              </div>
+                            </div>
+                            
+                            <button
+                              onClick={() => handleCreditPurchase('popular')}
+                              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold text-lg shadow-[0_0_30px_rgba(216,86,191,0.4)] hover:shadow-[0_0_50px_rgba(216,86,191,0.6)] hover:scale-[1.02] transition-all duration-300"
+                            >
+                              Get Reverb
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Amplify Pack - The Pro */}
+                <div className="relative group mt-4">
+                  <div className="absolute inset-0 bg-[#c247ac]/20 blur-xl rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative bg-[#0a0a0a] border border-white/5 rounded-3xl p-1 overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+                    <div className="bg-[#c247ac]/5 rounded-[20px] p-6 h-full flex flex-col relative overflow-hidden">
+                      {/* Background Elements */}
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-[#c247ac]/10 blur-3xl rounded-full -mr-10 -mt-10" />
+                      
+                      <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="p-3 bg-[#c247ac]/10 rounded-xl border border-[#c247ac]/20 text-[#c247ac]">
+                            <HugeiconsIcon icon={Crown03Icon} size={24} />
+                          </div>
+                          <span className="text-xs font-bold tracking-widest text-[#c247ac] uppercase bg-[#c247ac]/10 px-3 py-1 rounded-full border border-[#c247ac]/20">
+                            Amplify
+                          </span>
+                        </div>
+
+                        <div className="mb-8">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-bold text-white">1,500</span>
+                            <span className="text-sm font-medium text-gray-400">credits</span>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2">Maximum volume. For high-frequency production.</p>
+                        </div>
+
+                        <div className="mt-auto">
+                          <div className="flex items-center justify-between mb-6">
+                            <span className="text-2xl font-bold text-white">$40</span>
+                            <span className="text-xs text-[#c247ac] font-semibold border border-[#c247ac]/30 px-2 py-0.5 rounded">BEST RATE</span>
+                          </div>
+                          
+                          <button
+                            onClick={() => handleCreditPurchase('premium')}
+                            className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-[#c247ac] hover:border-[#c247ac] hover:shadow-[0_0_20px_rgba(194,71,172,0.4)] transition-all duration-300"
+                          >
+                            Get Amplify
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -943,76 +1043,101 @@ export default function BillingPage() {
             <h2 className="text-xl font-bold text-white mb-4">
               Transaction History
             </h2>
-            <div className="space-y-3">
+            <div className="relative pl-8 space-y-8 before:absolute before:inset-0 before:left-3.5 before:top-2 before:w-[2px] before:bg-gradient-to-b before:from-white/20 before:via-white/5 before:to-transparent before:h-full">
               {loading ? (
-                <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                  <div className="text-center py-8">
-                    <p className="text-gray-400">Loading transactions...</p>
-                  </div>
-                </SpotlightCard>
+                <div className="text-center py-12 pl-4">
+                  <div className="w-6 h-6 border-2 border-white/10 border-t-white rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">Loading timeline...</p>
+                </div>
               ) : transactions.length === 0 ? (
-                <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                  <div className="text-center py-8">
-                    <p className="text-gray-400">No transactions yet</p>
+                <div className="relative pl-4">
+                  <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-gray-600 ring-4 ring-[#0a0a0a]" />
+                  <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm">
+                    <p className="text-gray-400 text-center">No transactions recorded yet.</p>
                   </div>
-                </SpotlightCard>
+                </div>
               ) : (
-                transactions.map((transaction) => {
+                transactions.map((transaction, index) => {
                   const isPositive = transaction.amount > 0
-                  const typeColor =
-                    {
-                      purchase: 'text-green-400',
-                      usage: 'text-orange-400',
-                      refund: 'text-blue-400',
-                      subscription_grant: 'text-purple-400'
-                    }[transaction.type] || 'text-gray-400'
+                  
+                  let Icon = Coins01Icon
+                  let colorClass = 'text-[#03b3c3]'
+                  let bgClass = 'bg-[#03b3c3]'
+                  let shadowClass = 'shadow-[0_0_20px_rgba(3,179,195,0.3)]'
+                  let borderClass = 'border-[#03b3c3]/30'
+
+                  if (transaction.type === 'subscription_grant') {
+                    Icon = Crown03Icon
+                    colorClass = 'text-[#d856bf]'
+                    bgClass = 'bg-[#d856bf]'
+                    shadowClass = 'shadow-[0_0_20px_rgba(216,86,191,0.3)]'
+                    borderClass = 'border-[#d856bf]/30'
+                  } else if (transaction.type === 'usage') {
+                    Icon = ZapIcon
+                    colorClass = 'text-orange-400'
+                    bgClass = 'bg-orange-400'
+                    shadowClass = 'shadow-[0_0_20px_rgba(251,146,60,0.3)]'
+                    borderClass = 'border-orange-400/30'
+                  } else if (transaction.type === 'refund') {
+                    Icon = RefreshIcon
+                    colorClass = 'text-blue-400'
+                    bgClass = 'bg-blue-400'
+                    shadowClass = 'shadow-[0_0_20px_rgba(96,165,250,0.3)]'
+                    borderClass = 'border-blue-400/30'
+                  }
 
                   return (
-                    <SpotlightCard
-                      key={transaction.id}
-                      className="bg-transparent backdrop-blur-xl"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="p-2 rounded-xl bg-white/5">
-                            {isPositive ? (
-                              <HugeiconsIcon
-                                icon={ZapIcon}
-                                size={18}
-                                className="text-[#03b3c3]"
-                              />
-                            ) : (
-                              <HugeiconsIcon
-                                icon={Dollar01Icon}
-                                size={18}
-                                className="text-[#d856bf]"
-                              />
-                            )}
+                    <div key={transaction.id} className="relative group">
+                      {/* Timeline Node */}
+                      <div className={`absolute -left-[23px] top-6 w-4 h-4 rounded-full ${bgClass} ring-4 ring-[#0a0a0a] ${shadowClass} transition-all duration-300 group-hover:scale-125`} />
+                      
+                      {/* Glass Card */}
+                      <div className={`relative bg-[#0a0a0a]/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 sm:p-6 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group-hover:translate-x-1`}>
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className={`p-2.5 sm:p-3 rounded-xl bg-white/5 border ${borderClass} ${colorClass} shrink-0`}>
+                              <HugeiconsIcon icon={Icon} size={20} className="w-5 h-5 sm:w-6 sm:h-6" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-white text-base sm:text-lg mb-1 leading-tight">
+                                {(transaction.description || 'Transaction')
+                                  .replace('Frequency Plan', 'Frequency')
+                                  .replace('Pro Plan', 'Frequency')
+                                  .replace(' - DEV MODE', '')
+                                  .replace('Basic', 'Echo')
+                                  .replace('Popular', 'Reverb')
+                                  .replace('Premium', 'Amplify')
+                                  .replace('basic', 'Echo')
+                                  .replace('popular', 'Reverb')
+                                  .replace('premium', 'Amplify')}
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500">
+                                <span className="capitalize text-gray-400">{transaction.type.replace('_', ' ')}</span>
+                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-gray-700" />
+                                <span className="w-full sm:w-auto">
+                                  {new Date(transaction.createdAt).toLocaleString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric'
+                                  })}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold text-white">
-                              {transaction.description || 'Transaction'}
-                            </p>
-                            <p className={`text-sm ${typeColor} capitalize`}>
-                              {transaction.type.replace('_', ' ')}
-                            </p>
+                          
+                          <div className="flex items-center justify-between sm:block sm:text-right pl-[52px] sm:pl-0 mt-1 sm:mt-0">
+                            <div className="sm:hidden text-xs text-gray-500 font-medium uppercase tracking-wider">Amount</div>
+                            <div>
+                              <div className={`text-lg sm:text-xl font-bold ${isPositive ? 'text-green-400' : 'text-orange-400'}`}>
+                                {isPositive ? '+' : ''}{transaction.amount.toLocaleString()}
+                              </div>
+                              <div className="hidden sm:block text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Credits</div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className={`font-semibold ${isPositive ? 'text-green-400' : 'text-orange-400'}`}
-                          >
-                            {isPositive ? '+' : ''}
-                            {transaction.amount} credits
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(
-                              transaction.createdAt
-                            ).toLocaleDateString()}
-                          </p>
                         </div>
                       </div>
-                    </SpotlightCard>
+                    </div>
                   )
                 })
               )}

@@ -8,13 +8,13 @@ import {
 import { addCredits } from '@/lib/credits'
 
 export async function POST(req: Request) {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'This endpoint is only available in development' },
-      { status: 403 }
-    )
-  }
+  // Disable this endpoint to prevent duplicate credits with webhooks
+  return NextResponse.json(
+    { error: 'This endpoint is disabled' },
+    { status: 403 }
+  )
 
+  /*
   try {
     const session = await auth.api.getSession({
       headers: await headers()
@@ -60,6 +60,7 @@ export async function POST(req: Request) {
       { status: 500 }
     )
   }
+  */
 }
 
 async function getUserNewBalance(userId: string): Promise<number> {

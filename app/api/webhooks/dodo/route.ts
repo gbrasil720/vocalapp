@@ -76,7 +76,9 @@ export async function POST(req: Request) {
           try {
             await addCredits(userId, credits, {
               type: 'purchase',
-              description: `Purchased ${packType} credit pack (${credits} credits)`,
+              description: `Purchased ${
+                { basic: 'Echo', popular: 'Reverb', premium: 'Amplify' }[packType as 'basic' | 'popular' | 'premium'] || packType
+              } credit pack (${credits} credits)`,
               dodoPaymentsPaymentId: payment.payment_id,
               packType,
               paymentId: payment.payment_id
@@ -121,7 +123,7 @@ export async function POST(req: Request) {
           // Grant credits
           await addCredits(userId, 600, {
             type: 'subscription_grant',
-            description: 'Pro Plan monthly credits',
+            description: 'Frequency monthly credits',
             dodoPaymentsSubscriptionId: subscription.subscription_id,
             subscriptionPeriodStart: periodStart,
             subscriptionPeriodEnd: periodEnd
