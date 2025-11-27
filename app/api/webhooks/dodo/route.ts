@@ -114,13 +114,17 @@ export async function POST(req: Request) {
 
       if (userId) {
         try {
+          // Use correct date fields from Dodo payload
+          const periodStart = subscription.previous_billing_date ? new Date(subscription.previous_billing_date) : new Date()
+          const periodEnd = subscription.next_billing_date ? new Date(subscription.next_billing_date) : new Date()
+
           // Grant credits
           await addCredits(userId, 600, {
             type: 'subscription_grant',
             description: 'Pro Plan monthly credits',
             dodoPaymentsSubscriptionId: subscription.subscription_id,
-            subscriptionPeriodStart: new Date(subscription.current_period_start),
-            subscriptionPeriodEnd: new Date(subscription.current_period_end)
+            subscriptionPeriodStart: periodStart,
+            subscriptionPeriodEnd: periodEnd
           })
 
           console.log(
@@ -139,8 +143,8 @@ export async function POST(req: Request) {
              await db.update(schema.subscription)
                .set({
                  status: 'active',
-                 periodStart: new Date(subscription.current_period_start),
-                 periodEnd: new Date(subscription.current_period_end),
+                 periodStart: periodStart,
+                 periodEnd: periodEnd,
                  cancelAtPeriodEnd: false
                })
                .where(eq(schema.subscription.id, existingSubscription.id))
@@ -153,8 +157,8 @@ export async function POST(req: Request) {
                referenceId: userId, // better-auth usually uses referenceId for userId
                dodoPaymentsSubscriptionId: subscription.subscription_id,
                status: 'active',
-               periodStart: new Date(subscription.current_period_start),
-               periodEnd: new Date(subscription.current_period_end),
+               periodStart: periodStart,
+               periodEnd: periodEnd,
                cancelAtPeriodEnd: false,
                seats: 1
              })
