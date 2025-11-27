@@ -3,6 +3,7 @@
 import {
   ArrowLeft02Icon,
   Calendar02Icon,
+  Coins01Icon,
   Crown03Icon,
   Dollar01Icon,
   RefreshIcon,
@@ -20,7 +21,7 @@ import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
 import type { CreditPackType } from '@/lib/billing/credit-products'
-import { purchaseCredits } from '@/lib/billing/purchase-credits'
+import { getCreditPack } from '@/lib/billing/credit-products'
 
 interface Transaction {
   id: string
@@ -102,62 +103,55 @@ export default function BillingPage() {
 
   useEffect(() => {
     fetchData()
-
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('success') === 'true') {
-      const pendingPack = sessionStorage.getItem('pending_credit_pack')
-
-      if (pendingPack) {
-        sessionStorage.removeItem('pending_credit_pack')
-
-        const grantCreditsInDevMode = async () => {
-          try {
-            const response = await fetch('/api/credits/dev-grant', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                packType: pendingPack,
-                sessionId: params.get('session_id')
-              })
-            })
-
-            if (response.ok) {
-              const data = await response.json()
-              toast.success(
-                `Payment successful! Added ${data.credits} credits.`
-              )
-              setTimeout(() => fetchData(), 500)
-            } else {
-              toast.success(
-                'Payment successful! Credits will be added shortly.'
-              )
-              setTimeout(() => fetchData(), 1000)
-            }
-          } catch (error) {
-            console.error('Error granting credits:', error)
-            toast.success('Payment successful! Credits will be added shortly.')
-            setTimeout(() => fetchData(), 1000)
-          }
-        }
-
-        grantCreditsInDevMode()
-      } else {
-        toast.success('Payment successful! Your credits have been added.')
-        setTimeout(() => fetchData(), 1000)
-      }
-
-      window.history.replaceState({}, '', '/dashboard/billing')
-    } else if (params.get('canceled') === 'true') {
-      toast.info('Payment was canceled. No charges were made.')
-      window.history.replaceState({}, '', '/dashboard/billing')
-      sessionStorage.removeItem('pending_credit_pack')
-    }
   }, [fetchData])
 
   const handleCreditPurchase = async (packType: CreditPackType) => {
+    if (!session?.user?.id) {
+      toast.error('You must be logged in to purchase credits')
+      return
+    }
+
     try {
       const toastId = toast.loading('Opening checkout...')
-      await purchaseCredits(packType)
+      
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_credit_pack', packType)
+      }
+
+      const slugMap: Record<CreditPackType, string> = {
+        basic: 'echo-credits',
+        popular: 'reverb-credits',
+        premium: 'amplify-credits'
+      }
+
+      const pack = getCreditPack(packType)
+
+      const { data, error } = await authClient.dodopayments.checkout({
+        slug: slugMap[packType],
+        billing: {
+            city: 'New York',
+            country: 'US',
+            state: 'NY',
+            street: '123 Main St',
+            zipcode: '10001'
+        },
+        customer: {},
+        metadata: {
+            purchaseType: 'credits',
+            userId: session.user.id,
+            credits: pack.credits.toString(),
+            packType
+        }
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data?.url) {
+        window.location.href = data.url
+      }
+      
       toast.dismiss(toastId)
     } catch (error) {
       console.error('Error purchasing credits:', error)
@@ -173,8 +167,52 @@ export default function BillingPage() {
           'Credit packs are not configured yet. Please contact support.'
         )
       } else {
-        toast.error('Failed to start checkout. Please try again.')
+        toast.error(`Failed to start checkout: ${errorMessage}`)
       }
+    }
+  }
+
+  const handleUpgradeToPro = async () => {
+    if (!session?.user?.id) {
+      toast.error('You must be logged in to upgrade')
+      return
+    }
+
+    try {
+      const toastId = toast.loading('Opening checkout...')
+      
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_subscription', 'true')
+      }
+
+      const { data, error } = await authClient.dodopayments.checkout({
+        slug: 'frequency-plan',
+        billing: {
+            city: 'New York',
+            country: 'US',
+            state: 'NY',
+            street: '123 Main St',
+            zipcode: '10001'
+        },
+        customer: {},
+        metadata: {
+            purchaseType: 'subscription',
+            userId: session.user.id
+        }
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data?.url) {
+        window.location.href = data.url
+      }
+
+      toast.dismiss(toastId)
+    } catch (error) {
+      console.error('Error upgrading to pro:', error)
+      toast.error('Failed to start checkout. Please try again.')
     }
   }
 
@@ -195,9 +233,14 @@ export default function BillingPage() {
     }
   }
 
+  const { data: session } = authClient.useSession()
+  const isAdmin = session?.user?.role === 'admin'
+
   const hasSubscription = subscriptionData?.hasSubscription ?? false
   const planCredits = hasSubscription ? 600 : 30
   const creditsUsed = Math.max(0, planCredits - Math.min(credits, planCredits))
+
+  const showContent = !IS_BETA_MODE || isAdmin
 
   return (
     <>
@@ -247,7 +290,7 @@ export default function BillingPage() {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <BetaPaymentNotice />
-          {!IS_BETA_MODE &&
+          {showContent &&
             (loading ? (
               <div className="mb-8">
                 <h2 className="text-xl font-bold text-white mb-4">
@@ -773,100 +816,122 @@ export default function BillingPage() {
                     <p className="text-gray-400 mb-6">
                       You're on the free plan with {credits} credits
                     </p>
-                    <Link
-                      href="/#pricing"
+                    <button
+                      onClick={handleUpgradeToPro}
                       className="inline-flex px-6 py-3 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
                     >
                       Upgrade to Pro
-                    </Link>
+                    </button>
                   </div>
                 </SpotlightCard>
               </div>
             ))}
 
-          {!IS_BETA_MODE && (
+          {showContent && (
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4">
                 Buy Credit Packs
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                  <div className="text-center">
-                    <p className="text-sm text-[#03b3c3] font-semibold mb-2">
-                      Basic
-                    </p>
-                    <div className="flex items-baseline justify-center mb-2">
-                      <span className="text-3xl font-bold text-white">$5</span>
+                {/* Echo Pack */}
+                <SpotlightCard className="bg-[#03b3c3]/5 backdrop-blur-xl border border-[#03b3c3]/20 hover:border-[#03b3c3]/50 transition-all duration-300 group">
+                  <div className="p-6 text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#03b3c3] to-transparent opacity-50" />
+                    
+                    <div className="mb-6 relative">
+                      <div className="w-20 h-20 mx-auto bg-[#03b3c3]/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <HugeiconsIcon icon={Coins01Icon} size={40} className="text-[#03b3c3]" />
+                      </div>
+                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#03b3c3]/20 px-3 py-1 rounded-full border border-[#03b3c3]/30">
+                        <span className="text-xs font-bold text-[#03b3c3] uppercase tracking-wider">Echo</span>
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                      120
+
+                    <div className="mb-2">
+                      <span className="text-4xl font-bold text-white">120</span>
+                      <span className="text-sm text-gray-400 ml-1">credits</span>
                     </div>
-                    <p className="text-xs text-gray-400 mb-4">
-                      credits (2 hours)
-                    </p>
+                    
+                    <div className="mb-6">
+                      <span className="text-2xl font-semibold text-[#03b3c3]">$5</span>
+                    </div>
+
                     <button
-                      type="button"
                       onClick={() => handleCreditPurchase('basic')}
-                      className="w-full py-2 px-4 bg-gradient-to-r from-[#03b3c3] to-[#0e5ea5] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                      className="w-full py-3 rounded-xl border border-[#03b3c3]/50 text-[#03b3c3] font-semibold hover:bg-[#03b3c3] hover:text-white transition-all duration-300"
                     >
-                      Buy Now
+                      Purchase
                     </button>
                   </div>
                 </SpotlightCard>
 
-                <div className="relative">
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-lg">
-                      Best Value
+                {/* Reverb Pack */}
+                <div className="relative transform md:-translate-y-4">
+                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-[#d856bf]/20 tracking-wide">
+                      BEST VALUE
                     </span>
                   </div>
-                  <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform border-2 border-[#d856bf]/50">
-                    <div className="text-center">
-                      <p className="text-sm text-[#03b3c3] font-semibold mb-2 mt-2">
-                        Popular
-                      </p>
-                      <div className="flex items-baseline justify-center mb-2">
-                        <span className="text-3xl font-bold text-white">
-                          $15
-                        </span>
+                  <SpotlightCard className="bg-[#d856bf]/10 backdrop-blur-xl border border-[#d856bf]/50 hover:border-[#d856bf] transition-all duration-300 group h-full">
+                    <div className="p-8 text-center relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d856bf] to-transparent" />
+                      
+                      <div className="mb-6 relative">
+                        <div className="w-24 h-24 mx-auto bg-gradient-to-br from-[#d856bf]/20 to-[#c247ac]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_30px_rgba(216,86,191,0.2)]">
+                          <HugeiconsIcon icon={Coins01Icon} size={48} className="text-[#d856bf]" />
+                        </div>
+                        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#d856bf]/20 px-3 py-1 rounded-full border border-[#d856bf]/30">
+                          <span className="text-xs font-bold text-[#d856bf] uppercase tracking-wider">Reverb</span>
+                        </div>
                       </div>
-                      <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                        450
+
+                      <div className="mb-2">
+                        <span className="text-5xl font-bold text-white">450</span>
+                        <span className="text-sm text-gray-300 ml-1">credits</span>
                       </div>
-                      <p className="text-xs text-gray-400 mb-4">
-                        credits (7.5 hours)
-                      </p>
+                      
+                      <div className="mb-8">
+                        <span className="text-3xl font-bold text-[#d856bf]">$15</span>
+                      </div>
+
                       <button
-                        type="button"
                         onClick={() => handleCreditPurchase('popular')}
-                        className="w-full py-2 px-4 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                        className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold shadow-lg shadow-[#d856bf]/25 hover:scale-[1.02] transition-transform duration-300"
                       >
-                        Buy Now
+                        Purchase
                       </button>
                     </div>
                   </SpotlightCard>
                 </div>
 
-                <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                  <div className="text-center">
-                    <p className="text-sm text-[#03b3c3] font-semibold mb-2">
-                      Premium
-                    </p>
-                    <div className="flex items-baseline justify-center mb-2">
-                      <span className="text-3xl font-bold text-white">$40</span>
+                {/* Amplify Pack */}
+                <SpotlightCard className="bg-[#1a1a1a]/80 backdrop-blur-xl border border-white/10 hover:border-[#c247ac]/50 transition-all duration-300 group">
+                  <div className="p-6 text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c247ac] to-transparent opacity-50" />
+                    
+                    <div className="mb-6 relative">
+                      <div className="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-white/10">
+                        <HugeiconsIcon icon={Coins01Icon} size={40} className="text-[#c247ac]" />
+                      </div>
+                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-[#c247ac]/20 px-3 py-1 rounded-full border border-[#c247ac]/30">
+                        <span className="text-xs font-bold text-[#c247ac] uppercase tracking-wider">Amplify</span>
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-[#d856bf] mb-3">
-                      1,500
+
+                    <div className="mb-2">
+                      <span className="text-4xl font-bold text-white">1,500</span>
+                      <span className="text-sm text-gray-400 ml-1">credits</span>
                     </div>
-                    <p className="text-xs text-gray-400 mb-4">
-                      credits (25 hours)
-                    </p>
+                    
+                    <div className="mb-6">
+                      <span className="text-2xl font-semibold text-[#c247ac]">$40</span>
+                    </div>
+
                     <button
-                      type="button"
                       onClick={() => handleCreditPurchase('premium')}
-                      className="w-full py-2 px-4 bg-gradient-to-r from-[#c247ac] to-[#d856bf] rounded-full text-white font-semibold hover:scale-105 transition-transform"
+                      className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold hover:bg-[#c247ac] hover:border-[#c247ac] transition-all duration-300"
                     >
-                      Buy Now
+                      Purchase
                     </button>
                   </div>
                 </SpotlightCard>
@@ -958,15 +1023,13 @@ export default function BillingPage() {
                 <p className="text-sm text-gray-400 mb-2">
                   Need to view invoices or manage your payment method?
                 </p>
-                <a
-                  href="https://billing.stripe.com/p/login/test_xxxx"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={handleManageSubscription}
                   className="inline-flex items-center gap-2 text-[#03b3c3] hover:text-[#d856bf] transition-colors text-sm font-semibold"
                 >
-                  Open Stripe Customer Portal
+                  Open Customer Portal
                   <ChevronRight className="w-4 h-4" />
-                </a>
+                </button>
               </div>
             )}
           </div>

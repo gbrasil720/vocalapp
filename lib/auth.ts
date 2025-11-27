@@ -11,6 +11,7 @@ import { isBetaUserByEmail } from './beta-access'
 import { addCredits } from './credits'
 import { sendMagicLinkEmail } from './email/magic-link'
 import { isEmailApproved } from './waitlist'
+import { dodoPayments } from './billing/dodo-payments'
 
 export const auth = betterAuth({
   appName: 'VocalApp',
@@ -152,32 +153,32 @@ export const auth = betterAuth({
       }
     }),
     dodopayments({
-      client: new DodoPayments({
-        bearerToken: process.env.DODO_PAYMENTS_API_KEY || 'PLACEHOLDER',
-        environment: 'test_mode'
-      }),
+      client: dodoPayments,
       createCustomerOnSignUp: true,
       use: [
         checkout({
           products: [
             {
-              productId: 'pdt_ClccB9prbGGQAmihFDSgq', // User needs to fill this
+              productId: process.env.DODO_FREQUENCY_PRICE_ID as string,
               slug: 'frequency-plan'
             },
             {
-              productId: 'pdt_C4RGv9YYpvPaPyCO9PI6A', // User needs to fill this
+              productId: process.env.DODO_ECHO_PRICE_ID as string,
               slug: 'echo-credits'
             },
             {
-              productId: 'pdt_Q7C6wnRcKS5jO8aensGdT', // User needs to fill this
+              productId: process.env.DODO_REVERB_PRICE_ID as string,
               slug: 'reverb-credits'
             },
             {
-              productId: 'pdt_bEZWN6iWMqjM6h6tFSW4n', // User needs to fill this
+              productId: process.env.DODO_AMPLIFY_PRICE_ID as string,
               slug: 'amplify-credits'
             }
-          ],
-          successUrl: '/dashboard/billing?success=true',
+          ].map(p => {
+             if (!p.productId) console.warn(`⚠️ Missing productId for slug: ${p.slug}`)
+             return p
+          }),
+          successUrl: '/dashboard/billing/success',
           authenticatedUsersOnly: true
         }),
         portal(),
@@ -247,6 +248,24 @@ export const auth = betterAuth({
                   console.error('Error granting subscription credits:', error)
                 }
               }
+            }
+
+            if (payload.event_type === 'subscription.cancelled' || payload.event_type === 'subscription.payment_failed') {
+               const subscriptionData = payload.data
+               console.log(`⚠️ Subscription ${payload.event_type}:`, subscriptionData.subscription_id)
+
+               try {
+                 await db.update(schema.subscription)
+                   .set({ 
+                     status: 'cancelled',
+                     cancelAtPeriodEnd: true
+                   })
+                   .where(eq(schema.subscription.dodoPaymentsSubscriptionId, subscriptionData.subscription_id))
+                 
+                 console.log(`✓ Updated subscription status to cancelled for ${subscriptionData.subscription_id}`)
+               } catch (error) {
+                 console.error('Error cancelling subscription:', error)
+               }
             }
           }
         })

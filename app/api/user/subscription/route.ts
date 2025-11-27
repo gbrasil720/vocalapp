@@ -5,6 +5,8 @@ import { db } from '@/db'
 import { subscription } from '@/db/schema'
 import { auth } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await auth.api.getSession({
@@ -17,24 +19,41 @@ export async function GET() {
 
     const userId = session.user.id
 
+    console.log(`🔍 Checking subscription for user ${userId}`)
+    
     const subscriptionData = await db
       .select()
       .from(subscription)
       .where(eq(subscription.referenceId, userId))
-      .limit(1)
+
+    console.log(`Found ${subscriptionData.length} subscriptions`)
 
     if (subscriptionData.length === 0) {
+      console.log('No subscriptions found')
       return NextResponse.json({
         hasSubscription: false,
         subscription: null
       })
     }
 
-    const sub = subscriptionData[0]
+    // Prioritize Dodo Payments subscription
+    const dodoSub = subscriptionData.find(
+      sub => sub.status === 'active' && !!sub.dodoPaymentsSubscriptionId
+    )
+    
+    if (dodoSub) console.log('Found active Dodo subscription:', dodoSub.id)
+    else console.log('No active Dodo subscription found')
+
+    // Fallback to any active subscription (or just the first one if none active)
+    const sub = dodoSub || subscriptionData[0]
+    
     const isActive = sub.status === 'active'
+    const isDodo = !!sub.dodoPaymentsSubscriptionId
+    
+    console.log(`Selected sub: ${sub.id}, isActive: ${isActive}, isDodo: ${isDodo}`)
 
     return NextResponse.json({
-      hasSubscription: isActive,
+      hasSubscription: isActive && isDodo,
       subscription: {
         id: sub.id,
         plan: sub.plan,

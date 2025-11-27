@@ -36,10 +36,36 @@ export function PricingCard({
     </li>
   ))
 
+  const { data: session } = authClient.useSession()
+
   const handleUpgradeToPro = async () => {
+    if (!session?.user?.id) {
+      // If not logged in, the plugin might handle it or we can redirect to login
+      // For now, let's assume the user needs to be logged in.
+      // We can redirect to login page or show a toast.
+      window.location.href = '/auth/sign-in'
+      return
+    }
+
     try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_subscription', 'true')
+      }
+
       const { data, error } = await authClient.dodopayments.checkout({
-        slug: 'pro-plan',
+        slug: 'frequency-plan',
+        billing: {
+          city: 'New York',
+          country: 'US',
+          state: 'NY',
+          street: '123 Main St',
+          zipcode: '10001'
+        },
+        customer: {},
+        metadata: {
+          purchaseType: 'subscription',
+          userId: session.user.id
+        }
       })
       
       if (error) {
