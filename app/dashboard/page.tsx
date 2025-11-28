@@ -10,6 +10,11 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle
+} from '@/components/ui/alert'
+import {
   AudioLines,
   BarChart3,
   ChevronRight,
@@ -22,7 +27,9 @@ import {
   Newspaper,
   Settings,
   Sparkles,
+  TriangleAlert,
   Upload,
+  X,
   Zap
 } from 'lucide-react'
 import Link from 'next/link'
@@ -45,6 +52,8 @@ import { authClient } from '@/lib/auth-client'
 interface UserStats {
   credits: number
   isBetaUser: boolean
+  hasPassword?: boolean
+  signupMethod?: 'google' | 'magic-link' | 'email'
   plan: {
     name: string
     isActive: boolean
@@ -76,6 +85,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
+  const [showPasswordAlert, setShowPasswordAlert] = useState(true)
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -168,6 +178,37 @@ export default function DashboardPage() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {stats.hasPassword === false && showPasswordAlert && (
+            <div className="mb-8">
+              <Alert variant="destructive" className="bg-red-900/10 border-red-900/20 text-red-200 pr-12">
+                <TriangleAlert className="h-4 w-4" />
+                <AlertTitle>No Password Set</AlertTitle>
+                <AlertDescription>
+                  <p>
+                    We detected that{' '}
+                    {stats.signupMethod === 'google'
+                      ? 'you signed up via Google. '
+                      : stats.signupMethod === 'magic-link'
+                      ? 'you signed up via Magic Link. '
+                      : 'you currently don\'t have a password set. '}
+                    We strongly recommend setting a password in your{' '}
+                    <Link href="/dashboard/settings" className="font-medium underline underline-offset-4 hover:text-red-100">
+                      settings
+                    </Link>{' '}
+                    to enable email/password authentication.
+                  </p>
+                </AlertDescription>
+                <button
+                  onClick={() => setShowPasswordAlert(false)}
+                  className="absolute right-4 top-4 p-1 rounded-md hover:bg-red-900/20 text-red-200 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </button>
+              </Alert>
+            </div>
+          )}
+
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
               <h1 className="font-['Satoshi'] text-4xl md:text-5xl font-bold text-primary">
