@@ -140,6 +140,7 @@ export const transcription = pgTable('transcription', {
   })
     .notNull()
     .default('processing'),
+  isPublic: boolean('is_public').default(false).notNull(),
   text: text('text'),
   creditsUsed: integer('credits_used'),
   errorMessage: text('error_message'),

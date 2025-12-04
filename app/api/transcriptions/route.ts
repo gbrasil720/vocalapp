@@ -26,7 +26,8 @@ export async function GET() {
         status: transcription.status,
         creditsUsed: transcription.creditsUsed,
         createdAt: transcription.createdAt,
-        completedAt: transcription.completedAt
+        completedAt: transcription.completedAt,
+        isPublic: transcription.isPublic
       })
       .from(transcription)
       .where(eq(transcription.userId, session.user.id))

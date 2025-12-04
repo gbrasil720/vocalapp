@@ -78,6 +78,7 @@ interface Transcription {
   creditsUsed: number | null
   createdAt: string
   completedAt: string | null
+  isPublic: boolean
 }
 
 export default function DashboardPage() {
