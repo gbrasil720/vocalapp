@@ -1,8 +1,8 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, isNotNull, sql } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
-import { creditTransaction, subscription, user } from '@/db/schema'
+import { account, creditTransaction, subscription, user } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { getUserLanguageCount } from '@/lib/transcription/language-tracking'
 
@@ -30,6 +30,15 @@ export async function GET() {
     if (userData.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
+
+    const userAccounts = await db
+      .select()
+      .from(account)
+      .where(eq(account.userId, userId))
+
+    const hasPassword = userAccounts.some(acc => acc.password !== null)
+    const isGoogle = userAccounts.some(acc => acc.providerId === 'google')
+    const isMagicLink = !hasPassword && !isGoogle // Assuming if no password and not google, it's magic link (or other passwordless)
 
     const subscriptionData = await db
       .select()
@@ -71,6 +80,8 @@ export async function GET() {
       {
         credits: userData[0].credits,
         isBetaUser: userData[0].isBetaUser,
+        hasPassword,
+        signupMethod: isGoogle ? 'google' : isMagicLink ? 'magic-link' : 'email',
         plan: {
           name: planName,
           isActive: hasSubscription,
@@ -98,3 +109,4 @@ export async function GET() {
     )
   }
 }
+
