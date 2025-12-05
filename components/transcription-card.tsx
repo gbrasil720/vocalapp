@@ -1,8 +1,15 @@
 import {
+  Alert02Icon,
+  CancelCircleIcon,
+  CheckmarkCircle02Icon,
   Clock01Icon,
   Download01Icon,
   File02Icon,
-  GlobeIcon
+  Globe02Icon,
+  GlobeIcon,
+  Loading03Icon,
+  LockKeyIcon,
+  ViewOffIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { AlertTriangle } from 'lucide-react'
@@ -23,6 +30,7 @@ interface TranscriptionProps {
   creditsUsed: number | null
   createdAt: string
   completedAt: string | null
+  isPublic: boolean
 }
 
 export function TranscriptionCard({
@@ -100,9 +108,23 @@ export function TranscriptionCard({
             </div>
           </div>
           <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-1">
+            <span
+              className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-full whitespace-nowrap ${
+                transcription.isPublic
+                  ? 'bg-blue-400/20 text-blue-400'
+                  : 'bg-gray-400/20 text-gray-400'
+              }`}
+            >
+              <HugeiconsIcon
+                icon={transcription.isPublic ? Globe02Icon : LockKeyIcon}
+                size={12}
+              />
+              {transcription.isPublic ? 'Public' : 'Private'}
+            </span>
             {transcription.status === 'completed' ? (
               <>
-                <span className="px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
+                  <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} />
                   Completed
                 </span>
                 <button
@@ -121,16 +143,18 @@ export function TranscriptionCard({
                 </button>
               </>
             ) : transcription.status === 'failed' ? (
-              <span className="px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
+                <HugeiconsIcon icon={CancelCircleIcon} size={12} />
                 Failed
               </span>
             ) : isStuck ? (
               <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-400/20 text-orange-400 text-xs rounded-full whitespace-nowrap">
-                <AlertTriangle className="w-3 h-3" />
+                <HugeiconsIcon icon={Alert02Icon} size={12} />
                 Delayed
               </span>
             ) : (
-              <span className="px-2 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
+                <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" />
                 Processing...
               </span>
             )}

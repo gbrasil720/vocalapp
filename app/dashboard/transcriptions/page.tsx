@@ -10,8 +10,21 @@ import {
   Globe,
   Loader2,
   Search,
-  Trash2
+  Trash2,
+  AlertTriangle
 } from 'lucide-react'
+import {
+  Alert02Icon,
+  CancelCircleIcon,
+  CheckmarkCircle02Icon,
+  Clock01Icon,
+  File02Icon,
+  Globe02Icon,
+  GlobeIcon,
+  Loading03Icon,
+  LockKeyIcon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -34,6 +47,7 @@ interface Transcription {
   creditsUsed: number | null
   createdAt: string
   completedAt: string | null
+  isPublic: boolean
 }
 
 type StatusFilter = 'all' | 'completed' | 'processing' | 'failed'
@@ -546,7 +560,7 @@ export default function TranscriptionsPage() {
                       >
                         <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
                           <div className="p-2 sm:p-3 rounded-xl bg-white/5 flex-shrink-0">
-                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#03b3c3]" />
+                            <HugeiconsIcon icon={File02Icon} size={20} color="#03b3c3" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-white mb-1 sm:mb-1 truncate text-sm sm:text-base">
@@ -554,13 +568,13 @@ export default function TranscriptionsPage() {
                             </h3>
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
                               <span className="flex items-center gap-1 flex-shrink-0">
-                                <Clock className="w-3 h-3" />
+                                <HugeiconsIcon icon={Clock01Icon} size={14} color="#03b3c3" />
                                 <span className="whitespace-nowrap">
                                   {formatDuration(transcription.duration)}
                                 </span>
                               </span>
                               <span className="flex items-center gap-1 flex-shrink-0">
-                                <Globe className="w-3 h-3" />
+                                <HugeiconsIcon icon={GlobeIcon} size={14} color="#03b3c3" />
                                 <span className="whitespace-nowrap">
                                   {getLanguageName(transcription.language)}
                                 </span>
@@ -573,18 +587,32 @@ export default function TranscriptionsPage() {
                         </div>
 
                         <div className="flex items-center justify-end sm:justify-start gap-2 sm:gap-3 flex-shrink-0">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 text-xs rounded-full whitespace-nowrap ${
+                              transcription.isPublic
+                                ? 'bg-blue-400/20 text-blue-400'
+                                : 'bg-gray-400/20 text-gray-400'
+                            }`}
+                          >
+                            <HugeiconsIcon
+                              icon={transcription.isPublic ? Globe02Icon : LockKeyIcon}
+                              size={12}
+                            />
+                            {transcription.isPublic ? 'Public' : 'Private'}
+                          </span>
                           {transcription.status === 'completed' ? (
-                            <span className="px-2 sm:px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full flex items-center gap-1 whitespace-nowrap">
-                              <Check className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
+                              <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} />
                               Completed
                             </span>
                           ) : transcription.status === 'failed' ? (
-                            <span className="px-2 sm:px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
+                              <HugeiconsIcon icon={CancelCircleIcon} size={12} />
                               Failed
                             </span>
                           ) : (
-                            <span className="px-2 sm:px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse flex items-center gap-1 whitespace-nowrap">
-                              <Loader2 className="w-3 h-3 animate-spin" />
+                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
+                              <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" />
                               Processing
                             </span>
                           )}

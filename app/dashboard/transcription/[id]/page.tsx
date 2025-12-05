@@ -11,7 +11,9 @@ import {
   FileText,
   Globe,
   Loader2,
-  Trash2
+  Trash2,
+  Share2,
+  Lock
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -39,6 +41,7 @@ interface TranscriptionData {
   creditsUsed: number | null
   errorMessage: string | null
   metadata: unknown
+  isPublic: boolean
   createdAt: Date
   completedAt: Date | null
 }
@@ -162,6 +165,40 @@ export default function TranscriptionDetailPage() {
     const minutes = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${minutes}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const togglePublic = async () => {
+    if (!transcription) return
+
+    try {
+      const newIsPublic = !transcription.isPublic
+      const response = await fetch(`/api/transcriptions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic: newIsPublic })
+      })
+
+      if (response.ok) {
+        setTranscription({ ...transcription, isPublic: newIsPublic })
+        toast.success(newIsPublic ? 'Transcription is now public' : 'Transcription is now private')
+      } else {
+        toast.error('Failed to update privacy settings')
+      }
+    } catch (error) {
+      console.error('Error updating privacy:', error)
+      toast.error('Failed to update privacy settings')
+    }
+  }
+
+  const copyPublicLink = async () => {
+    if (!transcription) return
+    const url = `${window.location.origin}/share/${transcription.id}`
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.success('Public link copied!')
+    } catch {
+      toast.error('Failed to copy link')
+    }
   }
 
   const deleteTranscription = async () => {
@@ -320,6 +357,74 @@ export default function TranscriptionDetailPage() {
               </div>
             </div>
           )}
+
+          <div className="mb-8">
+            <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-white/10 rounded-3xl p-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#03b3c3]/10 to-[#d856bf]/10 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none" />
+              
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`p-2 rounded-lg ${transcription.isPublic ? 'bg-green-500/20' : 'bg-neutral-800'}`}>
+                      {transcription.isPublic ? (
+                        <Globe className="w-5 h-5 text-green-400" />
+                      ) : (
+                        <Lock className="w-5 h-5 text-gray-400" />
+                      )}
+                    </div>
+                    <h3 className="text-xl font-bold text-white">
+                      {transcription.isPublic ? 'Public Access' : 'Private Access'}
+                    </h3>
+                  </div>
+                  <p className="text-gray-400 text-sm max-w-xl">
+                    {transcription.isPublic 
+                      ? 'This transcription is currently visible to anyone with the link. You can share it freely.'
+                      : 'Only you can see this transcription. Enable public access to share it with others.'}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  {transcription.isPublic && (
+                    <div className="flex items-center gap-2 bg-black/30 rounded-xl p-1.5 border border-white/5 w-full sm:w-auto">
+                      <code className="text-xs text-gray-400 px-2 truncate max-w-[200px]">
+                        {`${typeof window !== 'undefined' ? window.location.origin : ''}/share/${transcription.id}`}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={copyPublicLink}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
+                        title="Copy Link"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <button
+                    type="button"
+                    onClick={togglePublic}
+                    className={`w-full sm:w-auto px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                      transcription.isPublic
+                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
+                        : 'bg-white text-black hover:bg-gray-200 shadow-lg shadow-white/10'
+                    }`}
+                  >
+                    {transcription.isPublic ? (
+                      <>
+                        <Lock className="w-4 h-4" />
+                        Make Private
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4" />
+                        Make Public
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <SpotlightCard className="bg-transparent backdrop-blur-xl">
