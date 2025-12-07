@@ -33,13 +33,13 @@ export async function GET(request: Request) {
     })
   } catch (error: any) {
     console.error('Error fetching billing details:', error)
-    
+
     // Check for 404 or specific Dodo error codes if available
     if (error?.status === 404 || error?.code === 'resource_missing') {
-        return NextResponse.json(
-            { error: 'Payment or subscription not found' },
-            { status: 404 }
-        )
+      return NextResponse.json(
+        { error: 'Payment or subscription not found' },
+        { status: 404 }
+      )
     }
 
     return NextResponse.json(

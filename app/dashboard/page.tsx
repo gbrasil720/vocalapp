@@ -10,11 +10,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle
-} from '@/components/ui/alert'
-import {
   AudioLines,
   BarChart3,
   ChevronRight,
@@ -45,9 +40,11 @@ import { LazyHyperspeed } from '@/components/lazy-hyperspeed'
 import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { TranscriptionCard } from '@/components/transcription-card'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { UserNav } from '@/components/user-nav'
 import { UserPlanCard } from '@/components/user-plan-card'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 
 interface UserStats {
   credits: number
@@ -83,6 +80,7 @@ interface Transcription {
 
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession()
+  const { hyperspeedEnabled } = useHyperspeed()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
@@ -139,7 +137,7 @@ export default function DashboardPage() {
     return null
   }
 
-  const recentTranscriptions = transcriptions.slice(0, 10)
+  const recentTranscriptions = transcriptions.slice(0, 6)
   const sessionBetaUser =
     session.user && 'isBetaUser' in session.user
       ? Boolean((session.user as { isBetaUser?: unknown }).isBetaUser)
@@ -148,9 +146,11 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <LazyHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <LazyHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -181,7 +181,10 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {stats.hasPassword === false && showPasswordAlert && (
             <div className="mb-8">
-              <Alert variant="destructive" className="bg-red-900/10 border-red-900/20 text-red-200 pr-12">
+              <Alert
+                variant="destructive"
+                className="bg-red-900/10 border-red-900/20 text-red-200 pr-12"
+              >
                 <TriangleAlert className="h-4 w-4" />
                 <AlertTitle>No Password Set</AlertTitle>
                 <AlertDescription>
@@ -190,10 +193,13 @@ export default function DashboardPage() {
                     {stats.signupMethod === 'google'
                       ? 'you signed up via Google. '
                       : stats.signupMethod === 'magic-link'
-                      ? 'you signed up via Magic Link. '
-                      : 'you currently don\'t have a password set. '}
+                        ? 'you signed up via Magic Link. '
+                        : "you currently don't have a password set. "}
                     We strongly recommend setting a password in your{' '}
-                    <Link href="/dashboard/settings" className="font-medium underline underline-offset-4 hover:text-red-100">
+                    <Link
+                      href="/dashboard/settings"
+                      className="font-medium underline underline-offset-4 hover:text-red-100"
+                    >
                       settings
                     </Link>{' '}
                     to enable email/password authentication.
@@ -207,6 +213,17 @@ export default function DashboardPage() {
                   <span className="sr-only">Close</span>
                 </button>
               </Alert>
+            </div>
+          )}
+
+          {hyperspeedEnabled && (
+            <div className="mb-6 flex items-center justify-center">
+              <p className="text-xs text-gray-500">
+                <span className="opacity-70">💡 Tip:</span> You can disable the background effect in{' '}
+                <Link href="/dashboard/settings" className="text-gray-400 hover:text-white underline underline-offset-2">
+                  Settings → Appearance
+                </Link>
+              </p>
             </div>
           )}
 
@@ -224,109 +241,109 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <SpotlightCard
-              className="bg-transparent backdrop-blur-xl"
-              spotlightColor="rgba(3, 179, 195, 0.3)"
-            >
-              <div className="flex items-start justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {/* Credits Left */}
+            <div className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Credits Left</p>
-                  <h3 className="text-3xl font-bold text-white mb-2">
+                  <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-1">
+                    Credits Left
+                  </p>
+                  <h3 className="text-2xl font-bold text-white">
                     {stats.credits}
                   </h3>
-                  <p className="text-xs text-gray-500">
-                    {stats.plan.isActive
-                      ? `of ${stats.plan.totalCredits} monthly`
-                      : 'Free tier'}
-                  </p>
                 </div>
-                <div className="p-2 rounded-xl bg-[#03b3c3]/20">
-                  <HugeiconsIcon icon={ZapIcon} size={22} color="#03b3c3" />
+                <div className="p-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                  <HugeiconsIcon icon={ZapIcon} size={18} className="text-cyan-400" />
                 </div>
               </div>
-              <div className="mt-4 w-full bg-white/5 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-[#03b3c3] to-[#d856bf] h-2 rounded-full"
-                  style={{
-                    width: `${Math.min((stats.credits / stats.plan.totalCredits) * 100, 100)}%`
-                  }}
-                />
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">
+                    {stats.plan.isActive ? `of ${stats.plan.totalCredits} monthly` : 'Free tier'}
+                  </span>
+                  <span className="text-gray-400">
+                    {Math.round((stats.credits / stats.plan.totalCredits) * 100)}%
+                  </span>
+                </div>
+                <div className="w-full bg-zinc-800 rounded-full h-1.5">
+                  <div
+                    className="bg-gradient-to-r from-cyan-400 to-[#d856bf] h-1.5 rounded-full transition-all"
+                    style={{
+                      width: `${Math.min((stats.credits / stats.plan.totalCredits) * 100, 100)}%`
+                    }}
+                  />
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard
-              className="bg-transparent backdrop-blur-xl"
-              spotlightColor="rgba(200, 71, 172, 0.3)"
-            >
-              <div className="flex items-start justify-between">
+            {/* Minutes Used */}
+            <div className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Minutes Used</p>
-                  <h3 className="text-3xl font-bold text-white mb-2">
+                  <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-1">
+                    Minutes Used
+                  </p>
+                  <h3 className="text-2xl font-bold text-white">
                     {stats.usage.minutesUsed}
                   </h3>
-                  <p className="text-xs text-gray-500">total</p>
                 </div>
-                <div className="p-2 rounded-xl bg-[#c247ac]/20">
-                  <HugeiconsIcon icon={Clock01Icon} size={22} color="#c247ac" />
+                <div className="p-2.5 rounded-lg bg-[#c247ac]/10 border border-[#c247ac]/20">
+                  <HugeiconsIcon icon={Clock01Icon} size={18} className="text-[#c247ac]" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center gap-1 text-gray-400">
-                <HugeiconsIcon icon={File02Icon} size={16} />
+              <div className="flex items-center gap-1.5 text-gray-500">
+                <HugeiconsIcon icon={File02Icon} size={14} />
                 <span className="text-xs">
-                  {stats.usage.transcriptionsCount} transcription
-                  {stats.usage.transcriptionsCount !== 1 ? 's' : ''}
+                  {stats.usage.transcriptionsCount} transcription{stats.usage.transcriptionsCount !== 1 ? 's' : ''} total
                 </span>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard
-              className="bg-transparent backdrop-blur-xl"
-              spotlightColor="rgba(216, 86, 191, 0.3)"
-            >
-              <div className="flex items-start justify-between">
+            {/* Transcriptions */}
+            <div className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Transcriptions</p>
-                  <h3 className="text-3xl font-bold text-white mb-2">
+                  <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-1">
+                    Transcriptions
+                  </p>
+                  <h3 className="text-2xl font-bold text-white">
                     {stats.usage.transcriptionsCount}
                   </h3>
-                  <p className="text-xs text-gray-500">completed</p>
                 </div>
-                <div className="p-2 rounded-xl bg-[#d856bf]/20">
-                  <HugeiconsIcon icon={File02Icon} size={22} color="#d856bf" />
+                <div className="p-2.5 rounded-lg bg-[#d856bf]/10 border border-[#d856bf]/20">
+                  <HugeiconsIcon icon={File02Icon} size={18} className="text-[#d856bf]" />
                 </div>
               </div>
-              <div className="mt-4 flex items-center gap-1 text-gray-400">
-                <Clock className="w-3 h-3" />
+              <div className="flex items-center gap-1.5 text-gray-500">
+                <HugeiconsIcon icon={Clock01Icon} size={14} />
                 <span className="text-xs">
-                  {stats.usage.minutesUsed} minute
-                  {stats.usage.minutesUsed !== 1 ? 's' : ''} total
+                  {stats.usage.minutesUsed} minute{stats.usage.minutesUsed !== 1 ? 's' : ''} processed
                 </span>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard
-              className="bg-transparent backdrop-blur-xl"
-              spotlightColor="rgba(3, 179, 195, 0.3)"
-            >
-              <div className="flex items-start justify-between">
+            {/* Languages */}
+            <div className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Languages</p>
-                  <h3 className="text-3xl font-bold text-white mb-2">
+                  <p className="text-gray-500 text-xs uppercase tracking-wider font-medium mb-1">
+                    Languages
+                  </p>
+                  <h3 className="text-2xl font-bold text-white">
                     {stats.usage.languagesUsed}
                   </h3>
-                  <p className="text-xs text-gray-500">available</p>
                 </div>
-                <div className="p-2 rounded-xl bg-[#03b3c3]/20">
-                  <HugeiconsIcon icon={GlobeIcon} size={22} color="#03b3c3" />
+                <div className="p-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                  <HugeiconsIcon icon={GlobeIcon} size={18} className="text-cyan-400" />
                 </div>
               </div>
-              <div className="mt-4 text-xs text-gray-400">
+              <div className="text-xs text-gray-500">
                 {stats.plan.isActive
-                  ? `50+ languages supported`
-                  : '10 languages supported'}
+                  ? '50+ languages supported'
+                  : '10 languages available'}
               </div>
-            </SpotlightCard>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -453,9 +470,9 @@ export default function DashboardPage() {
               </h2>
               <Link
                 href="/dashboard/transcriptions"
-                className="text-[#03b3c3] hover:text-[#d856bf] transition-colors text-sm flex items-center gap-1"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-zinc-700 hover:border-zinc-600 text-gray-300 hover:text-white rounded-lg transition-all text-sm font-medium"
               >
-                View All
+                View All Transcriptions
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -482,49 +499,50 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link href="/dashboard/analytics">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="p-4 rounded-full bg-[#03b3c3]/20 inline-block mb-4">
-                    <BarChart3 className="w-6 h-6 text-[#03b3c3]" />
-                  </div>
-                  <h3 className="font-semibold text-white mb-2">
-                    View Analytics
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    Track your usage and performance metrics
-                  </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/dashboard/analytics"
+              className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all"
+            >
+              <div className="text-center">
+                <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20 inline-flex mb-4 group-hover:border-cyan-500/40 transition-all">
+                  <BarChart3 className="w-5 h-5 text-cyan-400" />
                 </div>
-              </SpotlightCard>
+                <h3 className="font-semibold text-white mb-2">View Analytics</h3>
+                <p className="text-xs text-gray-500">
+                  Track your usage and performance metrics
+                </p>
+              </div>
             </Link>
 
-            <Link href="/dashboard/billing">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="p-4 rounded-full bg-[#c247ac]/20 inline-block mb-4">
-                    <Zap className="w-6 h-6 text-[#c247ac]" />
-                  </div>
-                  <h3 className="font-semibold text-white mb-2">Buy Credits</h3>
-                  <p className="text-sm text-gray-400">
-                    Top up your account with credit packs
-                  </p>
+            <Link
+              href="/dashboard/billing"
+              className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all"
+            >
+              <div className="text-center">
+                <div className="p-3 rounded-lg bg-[#c247ac]/10 border border-[#c247ac]/20 inline-flex mb-4 group-hover:border-[#c247ac]/40 transition-all">
+                  <Zap className="w-5 h-5 text-[#c247ac]" />
                 </div>
-              </SpotlightCard>
+                <h3 className="font-semibold text-white mb-2">Buy Credits</h3>
+                <p className="text-xs text-gray-500">
+                  Top up your account with credit packs
+                </p>
+              </div>
             </Link>
 
-            <Link href="/dashboard/settings">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-105 transition-transform">
-                <div className="text-center">
-                  <div className="p-4 rounded-full bg-[#d856bf]/20 inline-block mb-4">
-                    <Settings className="w-6 h-6 text-[#d856bf]" />
-                  </div>
-                  <h3 className="font-semibold text-white mb-2">Settings</h3>
-                  <p className="text-sm text-gray-400">
-                    Customize your preferences and settings
-                  </p>
+            <Link
+              href="/dashboard/settings"
+              className="group bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-all"
+            >
+              <div className="text-center">
+                <div className="p-3 rounded-lg bg-[#d856bf]/10 border border-[#d856bf]/20 inline-flex mb-4 group-hover:border-[#d856bf]/40 transition-all">
+                  <Settings className="w-5 h-5 text-[#d856bf]" />
                 </div>
-              </SpotlightCard>
+                <h3 className="font-semibold text-white mb-2">Settings</h3>
+                <p className="text-xs text-gray-500">
+                  Customize your preferences and settings
+                </p>
+              </div>
             </Link>
           </div>
 

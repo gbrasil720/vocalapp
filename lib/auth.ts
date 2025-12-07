@@ -1,17 +1,28 @@
-import { dodopayments, checkout, portal, webhooks } from '@dodopayments/better-auth'
-import DodoPayments from 'dodopayments'
+import {
+  checkout,
+  dodopayments,
+  portal,
+  webhooks
+} from '@dodopayments/better-auth'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
-import { admin, lastLoginMethod, magicLink, openAPI, twoFactor } from 'better-auth/plugins'
+import {
+  admin,
+  lastLoginMethod,
+  magicLink,
+  openAPI,
+  twoFactor
+} from 'better-auth/plugins'
+import DodoPayments from 'dodopayments'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
 import { isBetaUserByEmail } from './beta-access'
+import { dodoPayments } from './billing/dodo-payments'
 import { addCredits } from './credits'
 import { sendMagicLinkEmail } from './email/magic-link'
 import { isEmailApproved } from './waitlist'
-import { dodoPayments } from './billing/dodo-payments'
 
 export const auth = betterAuth({
   appName: 'VocalApp',
@@ -174,14 +185,14 @@ export const auth = betterAuth({
               productId: process.env.DODO_AMPLIFY_PRICE_ID as string,
               slug: 'amplify-credits'
             }
-          ].map(p => {
-             if (!p.productId) console.warn(`⚠️ Missing productId for slug: ${p.slug}`)
-             return p
+          ].map((p) => {
+            if (!p.productId)
+              console.warn(`⚠️ Missing productId for slug: ${p.slug}`)
+            return p
           }),
           successUrl: '/dashboard/billing/success',
           authenticatedUsersOnly: true
         }),
-        portal(),
         portal()
       ]
     })

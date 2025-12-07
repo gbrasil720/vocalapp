@@ -38,19 +38,20 @@ export async function GET() {
     const { backupCodes: encryptedBackupCodes } = twoFactorRecord[0]
 
     // Check if backup codes exist (they're encrypted, so we can't show them)
-    const hasBackupCodes = !!encryptedBackupCodes && encryptedBackupCodes.length > 0
+    const hasBackupCodes =
+      !!encryptedBackupCodes && encryptedBackupCodes.length > 0
 
     // We cannot decrypt existing backup codes - user must generate new ones to view them
-    return NextResponse.json({ 
+    return NextResponse.json({
       hasBackupCodes,
-      message: hasBackupCodes 
+      message: hasBackupCodes
         ? 'Backup codes exist but cannot be viewed. Generate new codes to see them.'
         : 'No backup codes found. Please generate backup codes.',
       needsRegeneration: true
     })
   } catch (error) {
     console.error('Error checking backup codes:', error)
-    
+
     return NextResponse.json(
       { error: 'Failed to check backup codes status.' },
       { status: 500 }

@@ -140,9 +140,11 @@ export default function SharedTranscriptionPage() {
               Transcription Unavailable
             </h1>
             <p className="text-gray-400 mb-8 leading-relaxed">
-              We couldn't find the transcription you're looking for. It might have been deleted, made private by the owner, or the link is incorrect.
+              We couldn't find the transcription you're looking for. It might
+              have been deleted, made private by the owner, or the link is
+              incorrect.
             </p>
-            
+
             <div className="space-y-3">
               <Link
                 href="/"
@@ -166,7 +168,7 @@ export default function SharedTranscriptionPage() {
                 </Link>
               )}
             </div>
-            
+
             <div className="mt-8 pt-6 border-t border-white/5">
               <p className="text-xs text-gray-500">
                 If you believe this is an error, please contact support.
@@ -177,8 +179,6 @@ export default function SharedTranscriptionPage() {
       </div>
     )
   }
-
-
 
   return (
     <>
@@ -195,7 +195,11 @@ export default function SharedTranscriptionPage() {
                   href="/"
                   className="flex items-center gap-2 flex-shrink-0"
                 >
-                  <HugeiconsIcon icon={AudioWave01Icon} color="#03b3c3" size={22} />
+                  <HugeiconsIcon
+                    icon={AudioWave01Icon}
+                    color="#03b3c3"
+                    size={22}
+                  />
                   <p className="font-['Satoshi'] font-medium text-lg sm:text-xl text-white">
                     vocalapp
                   </p>
@@ -206,11 +210,17 @@ export default function SharedTranscriptionPage() {
                     {transcription.fileName}
                   </h1>
                   <p className="text-xs text-gray-400">
-                    Shared by <span className="capitalize">{transcription.user?.name || transcription.user?.email || 'Unknown'}</span> via VocalApp
+                    Shared by{' '}
+                    <span className="capitalize">
+                      {transcription.user?.name ||
+                        transcription.user?.email ||
+                        'Unknown'}
+                    </span>{' '}
+                    via VocalApp
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 {transcription.status === 'completed' && (
                   <button
@@ -231,7 +241,7 @@ export default function SharedTranscriptionPage() {
                   </Link>
                 )}
                 {session && (
-                   <Link
+                  <Link
                     href="/dashboard"
                     className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white font-medium transition-colors"
                   >
@@ -256,7 +266,9 @@ export default function SharedTranscriptionPage() {
                       Viewing as Guest
                     </h3>
                     <p className="text-gray-300 text-sm mb-3">
-                      You are viewing a public transcription. Create a free account to transcribe your own audio files, save them, and share with others!
+                      You are viewing a public transcription. Create a free
+                      account to transcribe your own audio files, save them, and
+                      share with others!
                     </p>
                     <Link
                       href="/sign-up"
@@ -345,7 +357,9 @@ export default function SharedTranscriptionPage() {
                 <div>
                   <p className="text-gray-400">Language</p>
                   <p className="text-white font-medium">
-                    {transcription.language ? getLanguageName(transcription.language) : 'Auto-detected'}
+                    {transcription.language
+                      ? getLanguageName(transcription.language)
+                      : 'Auto-detected'}
                   </p>
                 </div>
                 <div>
@@ -418,7 +432,7 @@ export default function SharedTranscriptionPage() {
             ) : (
               <ExpiredAudioMessage
                 createdAt={transcription.createdAt}
-                isPro={false} 
+                isPro={false}
               />
             )}
           </div>

@@ -1,39 +1,45 @@
 'use client'
 
 import {
-  AudioLines,
-  Check,
-  ChevronDown,
-  Clock,
-  Download,
-  FileText,
-  Globe,
-  Loader2,
-  Search,
-  Trash2,
-  AlertTriangle
-} from 'lucide-react'
-import {
-  Alert02Icon,
+  ArrowDown01Icon,
+  ArrowLeft01Icon,
+  ArrowUp01Icon,
   CancelCircleIcon,
   CheckmarkCircle02Icon,
   Clock01Icon,
+  Delete02Icon,
+  Download01Icon,
   File02Icon,
+  FilterIcon,
   Globe02Icon,
   GlobeIcon,
   Loading03Icon,
-  LockKeyIcon
+  LockKeyIcon,
+  Search01Icon,
+  AudioWave01Icon,
+  Time02Icon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { CommandInput } from '@/components/command-input'
 import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
-import SpotlightCard from '@/components/SpotlightCard'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 import { getLanguageName } from '@/lib/utils'
 
 interface Transcription {
@@ -51,10 +57,12 @@ interface Transcription {
 }
 
 type StatusFilter = 'all' | 'completed' | 'processing' | 'failed'
+type VisibilityFilter = 'all' | 'public' | 'private'
 type SortOption = 'recent' | 'oldest' | 'duration'
 
 export default function TranscriptionsPage() {
   const { data: session, isPending } = authClient.useSession()
+  const { hyperspeedEnabled } = useHyperspeed()
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [filteredTranscriptions, setFilteredTranscriptions] = useState<
     Transcription[]
@@ -67,6 +75,8 @@ export default function TranscriptionsPage() {
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [visibilityFilter, setVisibilityFilter] =
+    useState<VisibilityFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOption, setSortOption] = useState<SortOption>('recent')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -108,10 +118,19 @@ export default function TranscriptionsPage() {
   useEffect(() => {
     let filtered = [...transcriptions]
 
+    // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter((t) => t.status === statusFilter)
     }
 
+    // Visibility filter
+    if (visibilityFilter !== 'all') {
+      filtered = filtered.filter((t) =>
+        visibilityFilter === 'public' ? t.isPublic : !t.isPublic
+      )
+    }
+
+    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((t) =>
@@ -119,6 +138,7 @@ export default function TranscriptionsPage() {
       )
     }
 
+    // Sort
     filtered.sort((a, b) => {
       switch (sortOption) {
         case 'recent':
@@ -140,7 +160,7 @@ export default function TranscriptionsPage() {
     setDisplayedTranscriptions(filtered.slice(0, ITEMS_PER_PAGE))
     setPage(1)
     setHasMore(filtered.length > ITEMS_PER_PAGE)
-  }, [transcriptions, statusFilter, searchQuery, sortOption])
+  }, [transcriptions, statusFilter, visibilityFilter, searchQuery, sortOption])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -313,9 +333,11 @@ export default function TranscriptionsPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         {/* Header */}
@@ -323,9 +345,9 @@ export default function TranscriptionsPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
-                <AudioLines
+                <HugeiconsIcon
+                  icon={AudioWave01Icon}
                   size={24}
-                  strokeWidth={1.5}
                   className="text-[#03b3c3]"
                 />
                 <span className="font-['Satoshi'] font-medium text-xl">
@@ -334,30 +356,10 @@ export default function TranscriptionsPage() {
               </Link>
 
               <div className="flex items-center gap-4">
-                <Link
-                  href="/dashboard"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/dashboard/billing"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Billing
-                </Link>
-                <Link
-                  href="/dashboard/analytics"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Analytics
-                </Link>
-                <Link
-                  href="/dashboard/feedback"
-                  className="hidden md:block text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  Feedback
-                </Link>
+                <div className="hidden md:block">
+                  <CommandInput />
+                </div>
+
                 <UserNav />
               </div>
             </div>
@@ -367,166 +369,243 @@ export default function TranscriptionsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Page Title */}
           <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] bg-clip-text text-transparent mb-2">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors mb-4"
+            >
+              <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+              Back to Dashboard
+            </Link>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
               All Transcriptions
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-500">
               Manage and export your transcriptions
             </p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">
+                  <p className="text-gray-500 text-sm mb-1">
                     Total Transcriptions
                   </p>
-                  <h3 className="text-3xl font-bold text-white">
+                  <h3 className="text-2xl font-bold text-white">
                     {transcriptions.length}
                   </h3>
                 </div>
-                <FileText className="w-8 h-8 text-[#03b3c3]" />
+                <div className="p-2.5 rounded-lg bg-cyan-500/10">
+                  <HugeiconsIcon
+                    icon={File02Icon}
+                    size={20}
+                    className="text-cyan-400"
+                  />
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Total Minutes</p>
-                  <h3 className="text-3xl font-bold text-white">
+                  <p className="text-gray-500 text-sm mb-1">Total Minutes</p>
+                  <h3 className="text-2xl font-bold text-white">
                     {Math.round(totalMinutes)}
                   </h3>
                 </div>
-                <Clock className="w-8 h-8 text-[#c247ac]" />
+                <div className="p-2.5 rounded-lg bg-cyan-500/10">
+                  <HugeiconsIcon
+                    icon={Time02Icon}
+                    size={20}
+                    className="text-cyan-400"
+                  />
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Credits Used</p>
-                  <h3 className="text-3xl font-bold text-white">
+                  <p className="text-gray-500 text-sm mb-1">Credits Used</p>
+                  <h3 className="text-2xl font-bold text-white">
                     {totalCreditsUsed}
                   </h3>
                 </div>
-                <Globe className="w-8 h-8 text-[#d856bf]" />
+                <div className="p-2.5 rounded-lg bg-[#d856bf]/10">
+                  <HugeiconsIcon
+                    icon={GlobeIcon}
+                    size={20}
+                    className="text-[#d856bf]"
+                  />
+                </div>
               </div>
-            </SpotlightCard>
+            </div>
           </div>
 
           {/* Filter and Action Bar */}
-          <SpotlightCard className="bg-transparent backdrop-blur-xl mb-6 !p-4 sm:!p-6">
-            <div className="space-y-3 sm:space-y-4">
-              {/* Status Filter Tabs */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {(
-                  ['all', 'completed', 'processing', 'failed'] as StatusFilter[]
-                ).map((filter) => (
-                  <button
-                    key={filter}
-                    type="button"
-                    onClick={() => setStatusFilter(filter)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                      statusFilter === filter
-                        ? 'bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                    }`}
-                  >
-                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Search and Sort */}
-              <div className="flex flex-col md:flex-row gap-4">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 sm:p-5 mb-6">
+            <div className="space-y-4">
+              {/* Filters Row */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                {/* Search */}
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
+                  <HugeiconsIcon
+                    icon={Search01Icon}
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  />
+                  <Input
                     type="text"
                     placeholder="Search by filename..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 transition-all"
+                    className="pl-10 bg-zinc-800 border-zinc-700 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                   />
                 </div>
 
-                <div className="relative">
-                  <select
-                    value={sortOption}
-                    onChange={(e) =>
-                      setSortOption(e.target.value as SortOption)
-                    }
-                    className="appearance-none pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 transition-all cursor-pointer"
-                  >
-                    <option value="recent">Recent First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="duration">By Duration</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                </div>
+                {/* Status Filter */}
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) =>
+                    setStatusFilter(value as StatusFilter)
+                  }
+                >
+                  <SelectTrigger className="w-full lg:w-[160px] bg-zinc-800 border-zinc-700">
+                    <div className="flex items-center gap-2">
+                      <HugeiconsIcon
+                        icon={FilterIcon}
+                        size={14}
+                        className="text-gray-500"
+                      />
+                      <SelectValue placeholder="Status" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Visibility Filter */}
+                <Select
+                  value={visibilityFilter}
+                  onValueChange={(value) =>
+                    setVisibilityFilter(value as VisibilityFilter)
+                  }
+                >
+                  <SelectTrigger className="w-full lg:w-[160px] bg-zinc-800 border-zinc-700">
+                    <div className="flex items-center gap-2">
+                      <HugeiconsIcon
+                        icon={Globe02Icon}
+                        size={14}
+                        className="text-gray-500"
+                      />
+                      <SelectValue placeholder="Visibility" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Visibility</SelectItem>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Sort */}
+                <Select
+                  value={sortOption}
+                  onValueChange={(value) =>
+                    setSortOption(value as SortOption)
+                  }
+                >
+                  <SelectTrigger className="w-full lg:w-[160px] bg-zinc-800 border-zinc-700">
+                    <div className="flex items-center gap-2">
+                      <HugeiconsIcon
+                        icon={
+                          sortOption === 'oldest'
+                            ? ArrowUp01Icon
+                            : ArrowDown01Icon
+                        }
+                        size={14}
+                        className="text-gray-500"
+                      />
+                      <SelectValue placeholder="Sort" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Recent First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    <SelectItem value="duration">By Duration</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Bulk Actions */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-4 border-t border-white/10">
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={
-                        selectedIds.size > 0 &&
-                        selectedIds.size === displayedTranscriptions.length
-                      }
-                      onChange={toggleSelectAll}
-                      className="w-5 h-5 rounded border-2 border-white/20 bg-white/5 checked:bg-gradient-to-r checked:from-[#d856bf] checked:to-[#c247ac] focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-400">
-                      Select All ({selectedIds.size} selected)
-                    </span>
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-4 border-t border-zinc-700">
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id="select-all"
+                    checked={
+                      selectedIds.size > 0 &&
+                      selectedIds.size === displayedTranscriptions.length
+                    }
+                    onCheckedChange={toggleSelectAll}
+                  />
+                  <label
+                    htmlFor="select-all"
+                    className="text-sm text-gray-400 cursor-pointer"
+                  >
+                    Select All ({selectedIds.size} selected)
                   </label>
                 </div>
 
                 <div className="flex items-center gap-3 flex-wrap">
                   {selectedIds.size > 0 && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={handleBulkDelete}
                       disabled={isDeleting}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full text-sm font-semibold transition-all disabled:opacity-50"
+                      className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30"
                     >
-                      {isDeleting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
+                      <HugeiconsIcon
+                        icon={isDeleting ? Loading03Icon : Delete02Icon}
+                        size={16}
+                        className={isDeleting ? 'animate-spin' : ''}
+                      />
                       Delete Selected
-                    </button>
+                    </Button>
                   )}
 
-                  <button
-                    type="button"
+                  <Button
+                    size="sm"
                     onClick={handleExportAll}
                     disabled={isExporting || transcriptions.length === 0}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] hover:scale-105 text-white rounded-full text-sm font-semibold transition-all disabled:opacity-50 disabled:hover:scale-100"
+                    className="bg-[#d856bf] hover:bg-[#c247ac] text-white"
                   >
-                    {isExporting ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Download className="w-4 h-4" />
-                    )}
+                    <HugeiconsIcon
+                      icon={isExporting ? Loading03Icon : Download01Icon}
+                      size={16}
+                      className={isExporting ? 'animate-spin' : ''}
+                    />
                     Export All
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
-          </SpotlightCard>
+          </div>
 
           {/* Transcriptions List */}
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3">
             {displayedTranscriptions.length === 0 ? (
               <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <HugeiconsIcon
+                  icon={File02Icon}
+                  size={48}
+                  className="text-gray-600 mx-auto mb-4"
+                />
                 <p className="text-gray-400 text-lg mb-2">
                   {transcriptions.length === 0
                     ? 'No transcriptions yet'
@@ -541,85 +620,109 @@ export default function TranscriptionsPage() {
             ) : (
               <>
                 {displayedTranscriptions.map((transcription) => (
-                  <SpotlightCard
+                  <div
                     key={transcription.id}
-                    className="bg-transparent backdrop-blur-xl hover:scale-[1.01] transition-transform !p-4 sm:!p-6"
+                    className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={selectedIds.has(transcription.id)}
-                        onChange={() => toggleSelection(transcription.id)}
+                        onCheckedChange={() =>
+                          toggleSelection(transcription.id)
+                        }
                         onClick={(e) => e.stopPropagation()}
-                        className="w-5 h-5 rounded border-2 border-white/20 bg-white/5 checked:bg-gradient-to-r checked:from-[#d856bf] checked:to-[#c247ac] focus:outline-none focus:ring-2 focus:ring-[#d856bf]/50 cursor-pointer flex-shrink-0 self-start sm:self-center"
+                        className="flex-shrink-0 self-start sm:self-center"
                       />
 
                       <Link
                         href={`/dashboard/transcription/${transcription.id}`}
                         className="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0"
                       >
-                        <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                          <div className="p-2 sm:p-3 rounded-xl bg-white/5 flex-shrink-0">
-                            <HugeiconsIcon icon={File02Icon} size={20} color="#03b3c3" />
+                        <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+                          <div className="p-2 rounded-lg bg-cyan-500/10 flex-shrink-0">
+                            <HugeiconsIcon
+                              icon={File02Icon}
+                              size={18}
+                              className="text-cyan-400"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-white mb-1 sm:mb-1 truncate text-sm sm:text-base">
+                            <h3 className="font-medium text-white mb-1 truncate text-sm">
                               {transcription.fileName}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                               <span className="flex items-center gap-1 flex-shrink-0">
-                                <HugeiconsIcon icon={Clock01Icon} size={14} color="#03b3c3" />
+                                <HugeiconsIcon
+                                  icon={Clock01Icon}
+                                  size={12}
+                                  className="text-gray-500"
+                                />
                                 <span className="whitespace-nowrap">
                                   {formatDuration(transcription.duration)}
                                 </span>
                               </span>
                               <span className="flex items-center gap-1 flex-shrink-0">
-                                <HugeiconsIcon icon={GlobeIcon} size={14} color="#03b3c3" />
+                                <HugeiconsIcon
+                                  icon={GlobeIcon}
+                                  size={12}
+                                  className="text-gray-500"
+                                />
                                 <span className="whitespace-nowrap">
                                   {getLanguageName(transcription.language)}
                                 </span>
                               </span>
-                              <span className="whitespace-nowrap">
+                              <span className="whitespace-nowrap text-gray-600">
                                 {formatRelativeTime(transcription.createdAt)}
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end sm:justify-start gap-2 sm:gap-3 flex-shrink-0">
+                        <div className="flex items-center justify-end sm:justify-start gap-2 flex-shrink-0">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 text-xs rounded-full whitespace-nowrap ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md whitespace-nowrap ${
                               transcription.isPublic
-                                ? 'bg-blue-400/20 text-blue-400'
-                                : 'bg-gray-400/20 text-gray-400'
+                                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                : 'bg-zinc-800 text-gray-400 border border-zinc-700'
                             }`}
                           >
                             <HugeiconsIcon
-                              icon={transcription.isPublic ? Globe02Icon : LockKeyIcon}
+                              icon={
+                                transcription.isPublic
+                                  ? Globe02Icon
+                                  : LockKeyIcon
+                              }
                               size={12}
                             />
                             {transcription.isPublic ? 'Public' : 'Private'}
                           </span>
                           {transcription.status === 'completed' ? (
-                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
-                              <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} />
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 text-xs rounded-md whitespace-nowrap">
+                              <HugeiconsIcon
+                                icon={CheckmarkCircle02Icon}
+                                size={12}
+                              />
                               Completed
                             </span>
                           ) : transcription.status === 'failed' ? (
-                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 text-red-400 border border-red-500/20 text-xs rounded-md whitespace-nowrap">
                               <HugeiconsIcon icon={CancelCircleIcon} size={12} />
                               Failed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
-                              <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" />
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#d856bf]/10 text-[#d856bf] border border-[#d856bf]/20 text-xs rounded-md animate-pulse whitespace-nowrap">
+                              <HugeiconsIcon
+                                icon={Loading03Icon}
+                                size={12}
+                                className="animate-spin"
+                              />
                               Processing
                             </span>
                           )}
                         </div>
                       </Link>
                     </div>
-                  </SpotlightCard>
+                  </div>
                 ))}
 
                 {/* Infinite Scroll Trigger */}
@@ -628,7 +731,11 @@ export default function TranscriptionsPage() {
                     ref={observerTarget}
                     className="flex items-center justify-center py-8"
                   >
-                    <Loader2 className="w-6 h-6 animate-spin text-[#d856bf]" />
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      size={24}
+                      className="animate-spin text-[#d856bf]"
+                    />
                   </div>
                 )}
 

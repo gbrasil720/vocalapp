@@ -20,6 +20,7 @@ import ElectricBorder from '@/components/ElectricBorder'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 import type { CreditPackType } from '@/lib/billing/credit-products'
 import { getCreditPack } from '@/lib/billing/credit-products'
 
@@ -51,6 +52,7 @@ interface SubscriptionData {
 const IS_BETA_MODE = true
 
 export default function BillingPage() {
+  const { hyperspeedEnabled } = useHyperspeed()
   const [credits, setCredits] = useState<number>(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [subscriptionData, setSubscriptionData] =
@@ -113,7 +115,7 @@ export default function BillingPage() {
 
     try {
       const toastId = toast.loading('Opening checkout...')
-      
+
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('pending_credit_pack', packType)
       }
@@ -129,18 +131,18 @@ export default function BillingPage() {
       const { data, error } = await authClient.dodopayments.checkout({
         slug: slugMap[packType],
         billing: {
-            city: 'New York',
-            country: 'US',
-            state: 'NY',
-            street: '123 Main St',
-            zipcode: '10001'
+          city: 'New York',
+          country: 'US',
+          state: 'NY',
+          street: '123 Main St',
+          zipcode: '10001'
         },
         customer: {},
         metadata: {
-            purchaseType: 'credits',
-            userId: session.user.id,
-            credits: pack.credits.toString(),
-            packType
+          purchaseType: 'credits',
+          userId: session.user.id,
+          credits: pack.credits.toString(),
+          packType
         }
       })
 
@@ -151,7 +153,7 @@ export default function BillingPage() {
       if (data?.url) {
         window.location.href = data.url
       }
-      
+
       toast.dismiss(toastId)
     } catch (error) {
       console.error('Error purchasing credits:', error)
@@ -180,7 +182,7 @@ export default function BillingPage() {
 
     try {
       const toastId = toast.loading('Opening checkout...')
-      
+
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('pending_subscription', 'true')
       }
@@ -188,16 +190,16 @@ export default function BillingPage() {
       const { data, error } = await authClient.dodopayments.checkout({
         slug: 'frequency-plan',
         billing: {
-            city: 'New York',
-            country: 'US',
-            state: 'NY',
-            street: '123 Main St',
-            zipcode: '10001'
+          city: 'New York',
+          country: 'US',
+          state: 'NY',
+          street: '123 Main St',
+          zipcode: '10001'
         },
         customer: {},
         metadata: {
-            purchaseType: 'subscription',
-            userId: session.user.id
+          purchaseType: 'subscription',
+          userId: session.user.id
         }
       })
 
@@ -244,9 +246,11 @@ export default function BillingPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -843,7 +847,7 @@ export default function BillingPage() {
                       {/* Background Elements */}
                       <div className="absolute top-0 right-0 w-32 h-32 bg-[#03b3c3]/10 blur-3xl rounded-full -mr-10 -mt-10" />
                       <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#03b3c3]/5 blur-2xl rounded-full -ml-5 -mb-5" />
-                      
+
                       <div className="relative z-10 flex flex-col h-full">
                         <div className="flex items-center justify-between mb-6">
                           <div className="p-3 bg-[#03b3c3]/10 rounded-xl border border-[#03b3c3]/20 text-[#03b3c3]">
@@ -856,18 +860,28 @@ export default function BillingPage() {
 
                         <div className="mb-8">
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-bold text-white">120</span>
-                            <span className="text-sm font-medium text-gray-400">credits</span>
+                            <span className="text-4xl font-bold text-white">
+                              120
+                            </span>
+                            <span className="text-sm font-medium text-gray-400">
+                              credits
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-500 mt-2">Perfect for trying out the platform and quick tasks.</p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Perfect for trying out the platform and quick tasks.
+                          </p>
                         </div>
 
                         <div className="mt-auto">
                           <div className="flex items-center justify-between mb-6">
-                            <span className="text-2xl font-bold text-white">$5</span>
-                            <span className="text-xs text-gray-500">One-time payment</span>
+                            <span className="text-2xl font-bold text-white">
+                              $5
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              One-time payment
+                            </span>
                           </div>
-                          
+
                           <button
                             onClick={() => handleCreditPurchase('basic')}
                             className="w-full py-3.5 rounded-xl border border-[#03b3c3]/30 text-[#03b3c3] font-bold hover:bg-[#03b3c3] hover:text-white hover:shadow-[0_0_20px_rgba(3,179,195,0.4)] transition-all duration-300"
@@ -900,7 +914,7 @@ export default function BillingPage() {
                         <div className="bg-gradient-to-b from-[#d856bf]/10 to-transparent rounded-[20px] p-8 h-full flex flex-col relative overflow-hidden">
                           {/* Shine Effect */}
                           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30 pointer-events-none" />
-                          
+
                           <div className="relative z-10">
                             <div className="flex items-center justify-between mb-8">
                               <div className="p-4 bg-[#d856bf] rounded-2xl shadow-lg shadow-[#d856bf]/30 text-white">
@@ -913,23 +927,36 @@ export default function BillingPage() {
 
                             <div className="mb-10">
                               <div className="flex items-baseline gap-1">
-                                <span className="text-5xl font-black text-white tracking-tight">450</span>
-                                <span className="text-base font-medium text-gray-300">credits</span>
+                                <span className="text-5xl font-black text-white tracking-tight">
+                                  450
+                                </span>
+                                <span className="text-base font-medium text-gray-300">
+                                  credits
+                                </span>
                               </div>
-                              <p className="text-gray-400 mt-3 leading-relaxed">The sweet spot. Enough power for serious creators.</p>
+                              <p className="text-gray-400 mt-3 leading-relaxed">
+                                The sweet spot. Enough power for serious
+                                creators.
+                              </p>
                             </div>
 
                             <div className="mt-auto">
                               <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-6">
                                 <div>
-                                  <span className="text-4xl font-bold text-white">$15</span>
+                                  <span className="text-4xl font-bold text-white">
+                                    $15
+                                  </span>
                                 </div>
                                 <div className="text-right">
-                                  <span className="block text-xs text-[#d856bf] font-semibold mb-1">SAVE 20%</span>
-                                  <span className="text-xs text-gray-500">vs Echo pack</span>
+                                  <span className="block text-xs text-[#d856bf] font-semibold mb-1">
+                                    SAVE 20%
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    vs Echo pack
+                                  </span>
                                 </div>
                               </div>
-                              
+
                               <button
                                 onClick={() => handleCreditPurchase('popular')}
                                 className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold text-lg shadow-[0_0_30px_rgba(216,86,191,0.4)] hover:shadow-[0_0_50px_rgba(216,86,191,0.6)] hover:scale-[1.02] transition-all duration-300"
@@ -949,7 +976,7 @@ export default function BillingPage() {
                       <div className="bg-gradient-to-b from-[#d856bf]/10 to-transparent rounded-[20px] p-8 h-full flex flex-col relative overflow-hidden">
                         {/* Shine Effect */}
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-30 pointer-events-none" />
-                        
+
                         <div className="relative z-10">
                           <div className="flex items-center justify-between mb-8">
                             <div className="p-4 bg-[#d856bf] rounded-2xl shadow-lg shadow-[#d856bf]/30 text-white">
@@ -962,23 +989,35 @@ export default function BillingPage() {
 
                           <div className="mb-10">
                             <div className="flex items-baseline gap-1">
-                              <span className="text-5xl font-black text-white tracking-tight">450</span>
-                              <span className="text-base font-medium text-gray-300">credits</span>
+                              <span className="text-5xl font-black text-white tracking-tight">
+                                450
+                              </span>
+                              <span className="text-base font-medium text-gray-300">
+                                credits
+                              </span>
                             </div>
-                            <p className="text-gray-400 mt-3 leading-relaxed">The sweet spot. Enough power for serious creators.</p>
+                            <p className="text-gray-400 mt-3 leading-relaxed">
+                              The sweet spot. Enough power for serious creators.
+                            </p>
                           </div>
 
                           <div className="mt-auto">
                             <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-6">
                               <div>
-                                <span className="text-4xl font-bold text-white">$15</span>
+                                <span className="text-4xl font-bold text-white">
+                                  $15
+                                </span>
                               </div>
                               <div className="text-right">
-                                <span className="block text-xs text-[#d856bf] font-semibold mb-1">SAVE 20%</span>
-                                <span className="text-xs text-gray-500">vs Echo pack</span>
+                                <span className="block text-xs text-[#d856bf] font-semibold mb-1">
+                                  SAVE 20%
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  vs Echo pack
+                                </span>
                               </div>
                             </div>
-                            
+
                             <button
                               onClick={() => handleCreditPurchase('popular')}
                               className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d856bf] to-[#c247ac] text-white font-bold text-lg shadow-[0_0_30px_rgba(216,86,191,0.4)] hover:shadow-[0_0_50px_rgba(216,86,191,0.6)] hover:scale-[1.02] transition-all duration-300"
@@ -999,7 +1038,7 @@ export default function BillingPage() {
                     <div className="bg-[#c247ac]/5 rounded-[20px] p-6 h-full flex flex-col relative overflow-hidden">
                       {/* Background Elements */}
                       <div className="absolute top-0 right-0 w-40 h-40 bg-[#c247ac]/10 blur-3xl rounded-full -mr-10 -mt-10" />
-                      
+
                       <div className="relative z-10 flex flex-col h-full">
                         <div className="flex items-center justify-between mb-6">
                           <div className="p-3 bg-[#c247ac]/10 rounded-xl border border-[#c247ac]/20 text-[#c247ac]">
@@ -1012,18 +1051,28 @@ export default function BillingPage() {
 
                         <div className="mb-8">
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-bold text-white">1,500</span>
-                            <span className="text-sm font-medium text-gray-400">credits</span>
+                            <span className="text-4xl font-bold text-white">
+                              1,500
+                            </span>
+                            <span className="text-sm font-medium text-gray-400">
+                              credits
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-500 mt-2">Maximum volume. For high-frequency production.</p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Maximum volume. For high-frequency production.
+                          </p>
                         </div>
 
                         <div className="mt-auto">
                           <div className="flex items-center justify-between mb-6">
-                            <span className="text-2xl font-bold text-white">$40</span>
-                            <span className="text-xs text-[#c247ac] font-semibold border border-[#c247ac]/30 px-2 py-0.5 rounded">BEST RATE</span>
+                            <span className="text-2xl font-bold text-white">
+                              $40
+                            </span>
+                            <span className="text-xs text-[#c247ac] font-semibold border border-[#c247ac]/30 px-2 py-0.5 rounded">
+                              BEST RATE
+                            </span>
                           </div>
-                          
+
                           <button
                             onClick={() => handleCreditPurchase('premium')}
                             className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-[#c247ac] hover:border-[#c247ac] hover:shadow-[0_0_20px_rgba(194,71,172,0.4)] transition-all duration-300"
@@ -1053,13 +1102,15 @@ export default function BillingPage() {
                 <div className="relative pl-4">
                   <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-gray-600 ring-4 ring-[#0a0a0a]" />
                   <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm">
-                    <p className="text-gray-400 text-center">No transactions recorded yet.</p>
+                    <p className="text-gray-400 text-center">
+                      No transactions recorded yet.
+                    </p>
                   </div>
                 </div>
               ) : (
                 transactions.map((transaction, index) => {
                   const isPositive = transaction.amount > 0
-                  
+
                   let Icon = Coins01Icon
                   let colorClass = 'text-[#03b3c3]'
                   let bgClass = 'bg-[#03b3c3]'
@@ -1089,14 +1140,24 @@ export default function BillingPage() {
                   return (
                     <div key={transaction.id} className="relative group">
                       {/* Timeline Node */}
-                      <div className={`absolute -left-[23px] top-6 w-4 h-4 rounded-full ${bgClass} ring-4 ring-[#0a0a0a] ${shadowClass} transition-all duration-300 group-hover:scale-125`} />
-                      
+                      <div
+                        className={`absolute -left-[23px] top-6 w-4 h-4 rounded-full ${bgClass} ring-4 ring-[#0a0a0a] ${shadowClass} transition-all duration-300 group-hover:scale-125`}
+                      />
+
                       {/* Glass Card */}
-                      <div className={`relative bg-[#0a0a0a]/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 sm:p-6 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group-hover:translate-x-1`}>
+                      <div
+                        className={`relative bg-[#0a0a0a]/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 sm:p-6 hover:bg-white/[0.02] hover:border-white/10 transition-all duration-300 group-hover:translate-x-1`}
+                      >
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                           <div className="flex items-start gap-3 sm:gap-4">
-                            <div className={`p-2.5 sm:p-3 rounded-xl bg-white/5 border ${borderClass} ${colorClass} shrink-0`}>
-                              <HugeiconsIcon icon={Icon} size={20} className="w-5 h-5 sm:w-6 sm:h-6" />
+                            <div
+                              className={`p-2.5 sm:p-3 rounded-xl bg-white/5 border ${borderClass} ${colorClass} shrink-0`}
+                            >
+                              <HugeiconsIcon
+                                icon={Icon}
+                                size={20}
+                                className="w-5 h-5 sm:w-6 sm:h-6"
+                              />
                             </div>
                             <div>
                               <h4 className="font-bold text-white text-base sm:text-lg mb-1 leading-tight">
@@ -1112,10 +1173,14 @@ export default function BillingPage() {
                                   .replace('premium', 'Amplify')}
                               </h4>
                               <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500">
-                                <span className="capitalize text-gray-400">{transaction.type.replace('_', ' ')}</span>
+                                <span className="capitalize text-gray-400">
+                                  {transaction.type.replace('_', ' ')}
+                                </span>
                                 <span className="hidden sm:inline w-1 h-1 rounded-full bg-gray-700" />
                                 <span className="w-full sm:w-auto">
-                                  {new Date(transaction.createdAt).toLocaleString(undefined, {
+                                  {new Date(
+                                    transaction.createdAt
+                                  ).toLocaleString(undefined, {
                                     month: 'short',
                                     day: 'numeric',
                                     hour: 'numeric',
@@ -1125,14 +1190,21 @@ export default function BillingPage() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center justify-between sm:block sm:text-right pl-[52px] sm:pl-0 mt-1 sm:mt-0">
-                            <div className="sm:hidden text-xs text-gray-500 font-medium uppercase tracking-wider">Amount</div>
+                            <div className="sm:hidden text-xs text-gray-500 font-medium uppercase tracking-wider">
+                              Amount
+                            </div>
                             <div>
-                              <div className={`text-lg sm:text-xl font-bold ${isPositive ? 'text-green-400' : 'text-orange-400'}`}>
-                                {isPositive ? '+' : ''}{transaction.amount.toLocaleString()}
+                              <div
+                                className={`text-lg sm:text-xl font-bold ${isPositive ? 'text-green-400' : 'text-orange-400'}`}
+                              >
+                                {isPositive ? '+' : ''}
+                                {transaction.amount.toLocaleString()}
                               </div>
-                              <div className="hidden sm:block text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">Credits</div>
+                              <div className="hidden sm:block text-xs text-gray-500 font-medium uppercase tracking-wider mt-1">
+                                Credits
+                              </div>
                             </div>
                           </div>
                         </div>

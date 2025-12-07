@@ -1,42 +1,29 @@
-PRD: VocalApp Pre-Launch Features
-Date: December 6, 2025 Status: Ready for Development Priority: High (Blocker for Launch)
+2. Feature: Interactive Transcript (Click-to-Jump)
+2.1 Problem Statement
+Navigating long audio files using only a timeline slider is imprecise. Users find it difficult to verify specific text segments against the audio or to replay a specific sentence they are reading.
 
-1. Feature: Export Suite (Client-Side)
-1.1 Problem Statement
-Users currently have no way to extract the transcribed text from the platform for use in external workflows (e.g., video editing, content writing, archiving). This limits the product's value to a "read-only" experience.
+2.2 User Story
+As a user reviewing a transcript, I want to click on any sentence in the text to instantly hear the audio corresponding to that specific moment, so I can verify accuracy or listen to context without scrubbing the timeline.
 
-1.2 User Story
-As a content creator (YouTuber/Podcaster), I want to download my transcription in specific formats (SRT for video, TXT for blogs) so that I can immediately use the output in my production software without manual formatting.
+2.3 Functional Requirements
+The text display must be synchronized with the HTML5 Audio Player.
 
-1.3 Functional Requirements
-The system must provide a "Download" action that generates files locally (Client-Side) based on the current transcription data.
+Granularity: The interactivity should be at the Segment level (phrases/sentences returned by Whisper), not the block level.
 
-Supported Formats:
+Action: Clicking a text segment must set the audio player's current time to the segment's start timestamp and ensure playback is active.
 
-SubRip (.srt): Must follow standard SRT formatting (Index, HH:MM:SS,ms, Text). Crucial: Milliseconds must be separated by a comma (,).
+2.4 UX/UI Design
+Visual Cues:
 
-WebVTT (.vtt): Must follow W3C standards (WEBVTT header, HH:MM:SS.ms). Crucial: Milliseconds must be separated by a period (.).
+The text must not look like a static wall of text.
 
-Plain Text (.txt): Pure text content with line breaks preserved, stripped of timestamps and metadata.
+Hover State: When the mouse hovers over a segment, the background of that specific segment should highlight (e.g., bg-primary/10) and the text color should brighten slightly.
 
-JSON (.json): The raw data object containing segments, language, and duration.
+Cursor: The cursor must change to a pointer (hand icon).
 
-File Naming: The downloaded file must automatically adopt the name of the transcription project.
+Active State (Optional/Nice to have): The segment currently being spoken should be highlighted automatically as audio plays (requires a timeupdate listener).
 
-Example: If project is "Podcast #1", file is Podcast #1.srt.
+2.5 Technical Implementation Notes
+Data Structure: The rendering component must map over transcription.segments instead of rendering transcription.text.
 
-Fallback: If name is empty, use transcript-[date].srt.
-
-1.4 UX/UI Design
-Placement: Add an "Export" or "Download" button (icon: Download) in the transcription view header (top-right), adjacent to the status/date.
-
-Interaction: Clicking the button opens a small dropdown menu listing the 4 formats.
-
-Action: Clicking a format triggers the browser's native download prompt immediately.
-
-1.5 Technical Implementation Notes
-Logic: Implement a utility function generateExportBlob(data, format) in the frontend.
-
-No API Calls: Do not send a request to the server. Generate the Blob object in the browser using the existing segments array currently displayed on screen.
-
-Memory: Revoke the URL.createObjectURL after download to prevent memory leaks.
+Player Reference: Use a React useRef to access the <audio> element.

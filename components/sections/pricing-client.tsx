@@ -5,8 +5,8 @@
 import { Tick02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
-import type { CreditPackType } from '@/lib/billing/credit-products'
 import { authClient } from '@/lib/auth-client'
+import type { CreditPackType } from '@/lib/billing/credit-products'
 import { getCreditPack } from '@/lib/billing/credit-products'
 
 interface CreditPackProps {
@@ -32,8 +32,8 @@ export function CreditPack({
 
   const handlePurchase = async () => {
     if (!session?.user?.id) {
-        window.location.href = '/auth/sign-in'
-        return
+      window.location.href = '/auth/sign-in'
+      return
     }
 
     try {
@@ -52,18 +52,18 @@ export function CreditPack({
       const { data, error } = await authClient.dodopayments.checkout({
         slug: slugMap[packType],
         billing: {
-            city: 'New York',
-            country: 'US',
-            state: 'NY',
-            street: '123 Main St',
-            zipcode: '10001'
+          city: 'New York',
+          country: 'US',
+          state: 'NY',
+          street: '123 Main St',
+          zipcode: '10001'
         },
         customer: {},
         metadata: {
-            purchaseType: 'credits',
-            userId: session.user.id,
-            credits: pack.credits.toString(),
-            packType
+          purchaseType: 'credits',
+          userId: session.user.id,
+          credits: pack.credits.toString(),
+          packType
         }
       })
 

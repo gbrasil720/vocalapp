@@ -9,6 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 
 const footerLinks = {
   product: [
@@ -41,6 +42,8 @@ const socialLinks = [
 ]
 
 export function Footer() {
+  const { hyperspeedEnabled, setHyperspeedEnabled } = useHyperspeed()
+
   return (
     <footer className="relative z-10 border-t border-white/10 bg-transparent backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -160,12 +163,33 @@ export function Footer() {
             <p className="text-gray-400 text-sm">
               © 2025 vocalapp. All rights reserved.
             </p>
-            <p className="text-gray-400 text-sm">
-              Made with ❤️ for creators worldwide
-            </p>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setHyperspeedEnabled(!hyperspeedEnabled)}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                <span>Background Effect</span>
+                <div
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    hyperspeedEnabled ? 'bg-[#d856bf]' : 'bg-white/10'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      hyperspeedEnabled ? 'translate-x-5' : 'translate-x-1'
+                    }`}
+                  />
+                </div>
+              </button>
+              <p className="text-gray-400 text-sm">
+                Made with ❤️ for creators worldwide
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </footer>
   )
 }
+

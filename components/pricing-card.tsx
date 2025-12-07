@@ -67,7 +67,7 @@ export function PricingCard({
           userId: session.user.id
         }
       })
-      
+
       if (error) {
         throw error
       }

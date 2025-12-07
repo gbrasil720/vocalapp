@@ -1,9 +1,9 @@
+import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { subscription } from '@/db/schema'
 import { auth } from '@/lib/auth'
-import { eq } from 'drizzle-orm'
 import { addCredits } from '@/lib/credits'
 
 export async function POST(req: Request) {
@@ -45,7 +45,8 @@ export async function POST(req: Request) {
           plan: 'frequency-plan',
           periodStart: now,
           periodEnd: nextMonth,
-          dodoPaymentsSubscriptionId: 'sub_DEV_' + Math.random().toString(36).substring(7)
+          dodoPaymentsSubscriptionId:
+            'sub_DEV_' + Math.random().toString(36).substring(7)
         })
         .where(eq(subscription.id, existingSub[0].id))
     } else {
@@ -56,7 +57,8 @@ export async function POST(req: Request) {
         plan: 'frequency-plan',
         periodStart: now,
         periodEnd: nextMonth,
-        dodoPaymentsSubscriptionId: 'sub_DEV_' + Math.random().toString(36).substring(7)
+        dodoPaymentsSubscriptionId:
+          'sub_DEV_' + Math.random().toString(36).substring(7)
       })
     }
 

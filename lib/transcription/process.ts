@@ -108,13 +108,14 @@ export async function processTranscription(transcriptionId: string) {
     // --- CORREÇÃO AQUI ---
     // Usamos 'as any' aqui porque o SDK da Groq ainda não tipa corretamente
     // o retorno do 'verbose_json' automaticamente no TypeScript.
-    const transcriptionResult = (await getGroqClient().audio.transcriptions.create({
-      file: file,
-      model: 'whisper-large-v3-turbo',
-      language: normalizedLanguage,
-      response_format: 'verbose_json',
-      temperature: 0.0
-    })) as any
+    const transcriptionResult =
+      (await getGroqClient().audio.transcriptions.create({
+        file: file,
+        model: 'whisper-large-v3-turbo',
+        language: normalizedLanguage,
+        response_format: 'verbose_json',
+        temperature: 0.0
+      })) as any
     // ---------------------
 
     const creditsUsed = Math.ceil(record.duration / 60)
@@ -123,7 +124,7 @@ export async function processTranscription(transcriptionId: string) {
       ...metadata,
       // Agora o TypeScript não vai reclamar, pois tratamos como 'any'
       language: transcriptionResult.language || normalizedLanguage,
-      segments: transcriptionResult.segments?.slice(0, 10),
+      segments: transcriptionResult.segments,
       ...(languageLimitExceeded && {
         originalDetectedLanguage: detectedLanguage,
         transcribedLanguage: transcriptionLanguage

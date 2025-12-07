@@ -34,7 +34,7 @@ const requirements: PasswordRequirement[] = [
   },
   {
     label: 'Contains special character',
-    test: (password) => /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\/`~]/.test(password)
+    test: (password) => /[!@#$%^&*(),.?":{}|<>_\-+=[\]\\/`~]/.test(password)
   }
 ]
 
@@ -200,4 +200,3 @@ export function PasswordStrengthBar({
     />
   )
 }
-

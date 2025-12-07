@@ -3,21 +3,17 @@ import {
   CancelCircleIcon,
   CheckmarkCircle02Icon,
   Clock01Icon,
-  Download01Icon,
   File02Icon,
   Globe02Icon,
   GlobeIcon,
   Loading03Icon,
-  LockKeyIcon,
-  ViewOffIcon
+  LockKeyIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { isTranscriptionStuck } from '@/lib/transcription-utils'
 import { getLanguageName } from '@/lib/utils'
-import SpotlightCard from './SpotlightCard'
 
 interface TranscriptionProps {
   id: string
@@ -76,91 +72,96 @@ export function TranscriptionCard({
     <Link
       key={transcription.id}
       href={`/dashboard/transcription/${transcription.id}`}
-      className="block h-full w-full"
+      className="block h-full w-full group"
     >
-      <SpotlightCard className="bg-transparent backdrop-blur-xl cursor-pointer hover:scale-[1.02] transition-transform h-full w-full !p-4 sm:!p-6">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 h-full hover:border-zinc-700 transition-all group-hover:bg-zinc-900/70">
         <div className="flex flex-col gap-3 h-full">
+          {/* Header with icon and filename */}
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            <div className="p-2 rounded-xl bg-white/5 flex-shrink-0">
-              <HugeiconsIcon icon={File02Icon} size={18} color="#03b3c3" />
+            <div className="p-2 rounded-lg bg-cyan-500/10 flex-shrink-0">
+              <HugeiconsIcon
+                icon={File02Icon}
+                size={18}
+                className="text-cyan-400"
+              />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-white mb-2 truncate text-sm sm:text-base">
+              <h3 className="font-medium text-white mb-1.5 truncate text-sm group-hover:text-cyan-400 transition-colors">
                 {transcription.fileName}
               </h3>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                 <span className="flex items-center gap-1 flex-shrink-0">
-                  <HugeiconsIcon icon={Clock01Icon} size={14} color="#03b3c3" />
+                  <HugeiconsIcon
+                    icon={Clock01Icon}
+                    size={12}
+                    className="text-gray-500"
+                  />
                   <span className="whitespace-nowrap">
                     {formatDuration(transcription.duration)}
                   </span>
                 </span>
                 <span className="flex items-center gap-1 flex-shrink-0">
-                  <HugeiconsIcon icon={GlobeIcon} size={14} color="#03b3c3" />
+                  <HugeiconsIcon
+                    icon={GlobeIcon}
+                    size={12}
+                    className="text-gray-500"
+                  />
                   <span className="whitespace-nowrap">
                     {getLanguageName(transcription.language)}
                   </span>
                 </span>
-                <span className="whitespace-nowrap">
-                  {formatRelativeTime(transcription.createdAt)}
-                </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-end gap-2 flex-shrink-0 pt-1">
-            <span
-              className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-full whitespace-nowrap ${
-                transcription.isPublic
-                  ? 'bg-blue-400/20 text-blue-400'
-                  : 'bg-gray-400/20 text-gray-400'
-              }`}
-            >
-              <HugeiconsIcon
-                icon={transcription.isPublic ? Globe02Icon : LockKeyIcon}
-                size={12}
-              />
-              {transcription.isPublic ? 'Public' : 'Private'}
+
+          {/* Footer with badges and time */}
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-800">
+            <span className="text-xs text-gray-600">
+              {formatRelativeTime(transcription.createdAt)}
             </span>
-            {transcription.status === 'completed' ? (
-              <>
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-400/20 text-green-400 text-xs rounded-full whitespace-nowrap">
-                  <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} />
-                  Completed
+            <div className="flex items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-md whitespace-nowrap ${
+                  transcription.isPublic
+                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                    : 'bg-zinc-800 text-gray-400 border border-zinc-700'
+                }`}
+              >
+                <HugeiconsIcon
+                  icon={transcription.isPublic ? Globe02Icon : LockKeyIcon}
+                  size={10}
+                />
+                {transcription.isPublic ? 'Public' : 'Private'}
+              </span>
+              {transcription.status === 'completed' ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/10 text-green-400 border border-green-500/20 text-xs rounded-md whitespace-nowrap">
+                  <HugeiconsIcon icon={CheckmarkCircle02Icon} size={10} />
+                  Done
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="p-1.5 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
-                >
+              ) : transcription.status === 'failed' ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20 text-xs rounded-md whitespace-nowrap">
+                  <HugeiconsIcon icon={CancelCircleIcon} size={10} />
+                  Failed
+                </span>
+              ) : isStuck ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs rounded-md whitespace-nowrap">
+                  <HugeiconsIcon icon={Alert02Icon} size={10} />
+                  Delayed
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#d856bf]/10 text-[#d856bf] border border-[#d856bf]/20 text-xs rounded-md animate-pulse whitespace-nowrap">
                   <HugeiconsIcon
-                    icon={Download01Icon}
-                    size={14}
-                    color="#03b3c3"
+                    icon={Loading03Icon}
+                    size={10}
+                    className="animate-spin"
                   />
-                </button>
-              </>
-            ) : transcription.status === 'failed' ? (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-red-400/20 text-red-400 text-xs rounded-full whitespace-nowrap">
-                <HugeiconsIcon icon={CancelCircleIcon} size={12} />
-                Failed
-              </span>
-            ) : isStuck ? (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-orange-400/20 text-orange-400 text-xs rounded-full whitespace-nowrap">
-                <HugeiconsIcon icon={Alert02Icon} size={12} />
-                Delayed
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#d856bf]/20 text-[#d856bf] text-xs rounded-full animate-pulse whitespace-nowrap">
-                <HugeiconsIcon icon={Loading03Icon} size={12} className="animate-spin" />
-                Processing...
-              </span>
-            )}
+                  Processing
+                </span>
+              )}
+            </div>
           </div>
         </div>
-      </SpotlightCard>
+      </div>
     </Link>
   )
 }

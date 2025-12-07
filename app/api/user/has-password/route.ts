@@ -22,10 +22,7 @@ export async function GET() {
       .select()
       .from(account)
       .where(
-        and(
-          eq(account.userId, userId),
-          eq(account.providerId, 'credential')
-        )
+        and(eq(account.userId, userId), eq(account.providerId, 'credential'))
       )
       .limit(1)
 
@@ -41,4 +38,3 @@ export async function GET() {
     )
   }
 }
-
