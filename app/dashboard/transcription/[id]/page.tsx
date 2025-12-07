@@ -14,6 +14,25 @@ import {
   MusicNote04Icon,
   Share01Icon,
   Tick02Icon
+  AlertTriangle,
+  ArrowLeft,
+  Calendar,
+  Check,
+  Copy,
+  FileAudio,
+  FileText,
+  Globe,
+  Loader2,
+  Trash2,
+  Share2,
+  Lock
+} from 'lucide-react'
+import {
+  Download01Icon,
+  ArrowDown01Icon,
+  File02Icon,
+  SourceCodeIcon,
+  ClosedCaptionIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
@@ -32,8 +51,21 @@ import {
 import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import { authClient } from '@/lib/auth-client'
 import { useHyperspeed } from '@/lib/hyperspeed-context'
+import {
+  generateExportBlob,
+  downloadExport,
+  getExportFileName,
+  type ExportFormat
+} from '@/lib/export/generate-export'
 import { getElapsedTime, isTranscriptionStuck } from '@/lib/transcription-utils'
 import { getLanguageName } from '@/lib/utils'
 
@@ -151,19 +183,19 @@ export default function TranscriptionDetailPage() {
     }
   }
 
-  const downloadTranscription = () => {
-    if (transcription?.text) {
-      const blob = new Blob([transcription.text], { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${transcription.fileName.replace(/\.[^/.]+$/, '')}.txt`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      toast.success('Downloaded!')
-    }
+  const handleExport = (format: ExportFormat) => {
+    if (!transcription?.text) return
+
+    const blob = generateExportBlob(transcription.text, format, {
+      fileName: transcription.fileName,
+      duration: transcription.duration,
+      language: transcription.language
+    })
+
+    const exportFileName = getExportFileName(transcription.fileName, format)
+    downloadExport(blob, exportFileName)
+
+    toast.success(`Downloaded as ${format.toUpperCase()}!`)
   }
 
   const formatFileSize = (bytes: number) => {
@@ -285,14 +317,48 @@ export default function TranscriptionDetailPage() {
                 </p>
               </div>
               {transcription.status === 'completed' && (
-                <button
-                  type="button"
-                  onClick={downloadTranscription}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform flex-shrink-0"
-                >
-                  <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" />
-                  Download
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform flex-shrink-0 border-0">
+                      <HugeiconsIcon icon={Download01Icon} size={16} />
+                      Export
+                      <HugeiconsIcon icon={ArrowDown01Icon} size={14} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-48 bg-neutral-900/95 backdrop-blur-xl border-white/10"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => handleExport('srt')}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <HugeiconsIcon icon={ClosedCaptionIcon} size={18} color="#03b3c3" />
+                      SubRip (.srt)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleExport('vtt')}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <HugeiconsIcon icon={ClosedCaptionIcon} size={18} color="#03b3c3" />
+                      WebVTT (.vtt)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleExport('txt')}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <HugeiconsIcon icon={File02Icon} size={18} color="#d856bf" />
+                      Plain Text (.txt)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleExport('json')}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <HugeiconsIcon icon={SourceCodeIcon} size={18} color="#c247ac" />
+                      JSON (.json)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
