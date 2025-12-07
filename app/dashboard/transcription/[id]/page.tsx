@@ -13,7 +13,7 @@ import {
   LockPasswordIcon,
   MusicNote04Icon,
   Share01Icon,
-  Tick02Icon
+  Tick02Icon,
   AlertTriangle,
   ArrowLeft,
   Calendar,
