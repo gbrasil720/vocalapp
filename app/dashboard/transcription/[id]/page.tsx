@@ -1,12 +1,16 @@
 'use client'
 
 import {
+  Download01Icon,
+  ArrowDown01Icon,
+  File02Icon,
+  SourceCodeIcon,
+  ClosedCaptionIcon,
   AlertDiamondIcon,
   ArrowLeft01Icon,
   Calendar03Icon,
   Copy01Icon,
   Delete02Icon,
-  Download01Icon,
   FileEditIcon,
   Globe02Icon,
   Loading03Icon,
@@ -14,25 +18,6 @@ import {
   MusicNote04Icon,
   Share01Icon,
   Tick02Icon,
-  AlertTriangle,
-  ArrowLeft,
-  Calendar,
-  Check,
-  Copy,
-  FileAudio,
-  FileText,
-  Globe,
-  Loader2,
-  Trash2,
-  Share2,
-  Lock
-} from 'lucide-react'
-import {
-  Download01Icon,
-  ArrowDown01Icon,
-  File02Icon,
-  SourceCodeIcon,
-  ClosedCaptionIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
