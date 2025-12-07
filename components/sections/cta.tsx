@@ -3,15 +3,20 @@
 import { CheckmarkBadge01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 import { LazyHyperspeed } from '../lazy-hyperspeed'
 import { Button } from '../ui/button'
 
 export function CTA() {
+  const { hyperspeedEnabled } = useHyperspeed()
+
   return (
     <>
-      <div className="fixed inset-0 z-0">
-        <LazyHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="fixed inset-0 z-0">
+          <LazyHyperspeed />
+        </div>
+      )}
 
       <div className="relative w-screen h-[100vh] z-40 flex flex-col items-center justify-center text-center px-6 sm:px-6 lg:px-8 pointer-events-none">
         <div className="pointer-events-auto">
@@ -52,3 +57,4 @@ export function CTA() {
     </>
   )
 }
+

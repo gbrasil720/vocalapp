@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from 'react'
 import QRCode from 'react-qr-code'
 import { toast } from 'sonner'
 import SpotlightCard from '@/components/SpotlightCard'
+import { AnimatedOTPInput } from '@/components/ui/animated-otp-input'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -31,7 +32,6 @@ import {
   FieldLabel
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { AnimatedOTPInput } from '@/components/ui/animated-otp-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'

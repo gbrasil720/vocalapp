@@ -1,8 +1,15 @@
 'use client'
 
-import { AlertTriangle, LogOut, Monitor, Smartphone, Tablet } from 'lucide-react'
+import {
+  AlertTriangle,
+  LogOut,
+  Monitor,
+  Smartphone,
+  Tablet
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import SpotlightCard from '@/components/SpotlightCard'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,7 +21,6 @@ import {
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
-import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
 
 interface Session {
@@ -58,7 +64,12 @@ function parseUserAgent(userAgent: string | null): {
     os = 'Windows'
   } else if (ua.includes('android')) {
     os = 'Android'
-  } else if (ua.includes('mac') && !ua.includes('iphone') && !ua.includes('ipod') && !ua.includes('ipad')) {
+  } else if (
+    ua.includes('mac') &&
+    !ua.includes('iphone') &&
+    !ua.includes('ipod') &&
+    !ua.includes('ipad')
+  ) {
     os = 'macOS'
   } else if (ua.includes('linux')) {
     os = 'Linux'
@@ -86,11 +97,19 @@ function parseUserAgent(userAgent: string | null): {
     browser = 'Firefox'
   } else if (ua.includes('fxios')) {
     browser = 'Firefox' // Firefox on iOS
-  } else if (ua.includes('safari') && !ua.includes('chrome') && !ua.includes('crios')) {
+  } else if (
+    ua.includes('safari') &&
+    !ua.includes('chrome') &&
+    !ua.includes('crios')
+  ) {
     browser = 'Safari'
   } else if (ua.includes('edg')) {
     browser = 'Edge'
-  } else if (ua.includes('opera') || ua.includes('opr') || ua.includes('opios')) {
+  } else if (
+    ua.includes('opera') ||
+    ua.includes('opr') ||
+    ua.includes('opios')
+  ) {
     browser = 'Opera'
   }
 
@@ -152,11 +171,11 @@ export function ActiveSessionsSection() {
         throw new Error('Failed to fetch sessions')
       }
       const data = await response.json()
-      
+
       // Handle different possible response formats
       // Better Auth might return: { sessions: [...] } or { data: { sessions: [...] } } or just [...]
       let sessionsArray: Session[] = []
-      
+
       if (Array.isArray(data)) {
         sessionsArray = data
       } else if (data?.sessions && Array.isArray(data.sessions)) {
@@ -166,13 +185,13 @@ export function ActiveSessionsSection() {
       } else if (data?.data && Array.isArray(data.data)) {
         sessionsArray = data.data
       }
-      
+
       if (sessionsArray.length === 0) {
         console.warn('No sessions found in response:', data)
         setSessions([])
         return
       }
-      
+
       // Get current session token from cookies
       const cookies = document.cookie.split(';')
       const sessionCookie = cookies.find((c) =>
@@ -193,7 +212,7 @@ export function ActiveSessionsSection() {
           }
         }
       )
-      
+
       console.log('Parsed sessions:', parsedSessions)
       setSessions(parsedSessions)
     } catch (error) {
@@ -526,4 +545,3 @@ export function ActiveSessionsSection() {
     </>
   )
 }
-

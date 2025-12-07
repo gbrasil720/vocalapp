@@ -1,30 +1,39 @@
 'use client'
 
 import {
-  AlertTriangle,
-  ArrowLeft,
-  Calendar,
-  Check,
-  Copy,
-  Download,
-  FileAudio,
-  FileText,
-  Globe,
-  Loader2,
-  Trash2,
-  Share2,
-  Lock
-} from 'lucide-react'
+  AlertDiamondIcon,
+  ArrowLeft01Icon,
+  Calendar03Icon,
+  Copy01Icon,
+  Delete02Icon,
+  Download01Icon,
+  FileEditIcon,
+  Globe02Icon,
+  Loading03Icon,
+  LockPasswordIcon,
+  MusicNote04Icon,
+  Share01Icon,
+  Tick02Icon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { CustomAudioPlayer } from '@/components/custom-audio-player'
+import {
+  CustomAudioPlayer,
+  type CustomAudioPlayerHandle
+} from '@/components/custom-audio-player'
 import { ExpiredAudioMessage } from '@/components/expired-audio-message'
+import {
+  InteractiveTranscript,
+  type TranscriptSegment
+} from '@/components/interactive-transcript'
 import { LoadingScreen } from '@/components/loading-screen'
 import { MemoizedHyperspeed } from '@/components/memoized-hyperspeed'
 import SpotlightCard from '@/components/SpotlightCard'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 import { getElapsedTime, isTranscriptionStuck } from '@/lib/transcription-utils'
 import { getLanguageName } from '@/lib/utils'
 
@@ -51,6 +60,7 @@ export default function TranscriptionDetailPage() {
   const router = useRouter()
   const id = params.id as string
   const { data: session } = authClient.useSession()
+  const { hyperspeedEnabled } = useHyperspeed()
 
   const [transcription, setTranscription] = useState<TranscriptionData | null>(
     null
@@ -59,6 +69,8 @@ export default function TranscriptionDetailPage() {
   const [polling, setPolling] = useState(false)
   const [isPro, setIsPro] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [currentAudioTime, setCurrentAudioTime] = useState(0)
+  const audioPlayerRef = useRef<CustomAudioPlayerHandle>(null)
 
   useEffect(() => {
     const fetchTranscription = async () => {
@@ -180,7 +192,11 @@ export default function TranscriptionDetailPage() {
 
       if (response.ok) {
         setTranscription({ ...transcription, isPublic: newIsPublic })
-        toast.success(newIsPublic ? 'Transcription is now public' : 'Transcription is now private')
+        toast.success(
+          newIsPublic
+            ? 'Transcription is now public'
+            : 'Transcription is now private'
+        )
       } else {
         toast.error('Failed to update privacy settings')
       }
@@ -244,9 +260,11 @@ export default function TranscriptionDetailPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -256,7 +274,7 @@ export default function TranscriptionDetailPage() {
                 href="/dashboard"
                 className="p-2 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5" />
               </Link>
               <div className="flex-1 min-w-0">
                 <h1 className="text-2xl font-bold text-white truncate">
@@ -272,7 +290,7 @@ export default function TranscriptionDetailPage() {
                   onClick={downloadTranscription}
                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#d856bf] to-[#c247ac] rounded-full text-white font-semibold hover:scale-105 transition-transform flex-shrink-0"
                 >
-                  <Download className="w-4 h-4" />
+                  <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" />
                   Download
                 </button>
               )}
@@ -295,11 +313,20 @@ export default function TranscriptionDetailPage() {
                     }`}
                   >
                     {transcription.status === 'completed' ? (
-                      <Check className="w-6 h-6 text-green-400" />
+                      <HugeiconsIcon
+                        icon={Tick02Icon}
+                        className="w-6 h-6 text-green-400"
+                      />
                     ) : transcription.status === 'processing' ? (
-                      <Loader2 className="w-6 h-6 text-[#d856bf] animate-spin" />
+                      <HugeiconsIcon
+                        icon={Loading03Icon}
+                        className="w-6 h-6 text-[#d856bf] animate-spin"
+                      />
                     ) : (
-                      <FileText className="w-6 h-6 text-red-400" />
+                      <HugeiconsIcon
+                        icon={FileEditIcon}
+                        className="w-6 h-6 text-red-400"
+                      />
                     )}
                   </div>
                   <div>
@@ -324,7 +351,10 @@ export default function TranscriptionDetailPage() {
               <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 p-2 rounded-full bg-orange-500/20">
-                    <AlertTriangle className="w-5 h-5 text-orange-400" />
+                    <HugeiconsIcon
+                      icon={AlertDiamondIcon}
+                      className="w-5 h-5 text-orange-400"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-orange-400 font-semibold mb-1">
@@ -346,9 +376,15 @@ export default function TranscriptionDetailPage() {
                       className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 text-orange-400 text-sm font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isDeleting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <HugeiconsIcon
+                          icon={Loading03Icon}
+                          className="w-4 h-4 animate-spin"
+                        />
                       ) : (
-                        <Trash2 className="w-4 h-4" />
+                        <HugeiconsIcon
+                          icon={Delete02Icon}
+                          className="w-4 h-4"
+                        />
                       )}
                       {isDeleting ? 'Deleting...' : 'Delete Transcription'}
                     </button>
@@ -361,23 +397,33 @@ export default function TranscriptionDetailPage() {
           <div className="mb-8">
             <div className="bg-gradient-to-br from-neutral-900 to-neutral-950 border border-white/10 rounded-3xl p-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#03b3c3]/10 to-[#d856bf]/10 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none" />
-              
+
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`p-2 rounded-lg ${transcription.isPublic ? 'bg-green-500/20' : 'bg-neutral-800'}`}>
+                    <div
+                      className={`p-2 rounded-lg ${transcription.isPublic ? 'bg-green-500/20' : 'bg-neutral-800'}`}
+                    >
                       {transcription.isPublic ? (
-                        <Globe className="w-5 h-5 text-green-400" />
+                        <HugeiconsIcon
+                          icon={Globe02Icon}
+                          className="w-5 h-5 text-green-400"
+                        />
                       ) : (
-                        <Lock className="w-5 h-5 text-gray-400" />
+                        <HugeiconsIcon
+                          icon={LockPasswordIcon}
+                          className="w-5 h-5 text-gray-400"
+                        />
                       )}
                     </div>
                     <h3 className="text-xl font-bold text-white">
-                      {transcription.isPublic ? 'Public Access' : 'Private Access'}
+                      {transcription.isPublic
+                        ? 'Public Access'
+                        : 'Private Access'}
                     </h3>
                   </div>
                   <p className="text-gray-400 text-sm max-w-xl">
-                    {transcription.isPublic 
+                    {transcription.isPublic
                       ? 'This transcription is currently visible to anyone with the link. You can share it freely.'
                       : 'Only you can see this transcription. Enable public access to share it with others.'}
                   </p>
@@ -395,11 +441,11 @@ export default function TranscriptionDetailPage() {
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
                         title="Copy Link"
                       >
-                        <Copy className="w-4 h-4" />
+                        <HugeiconsIcon icon={Copy01Icon} className="w-4 h-4" />
                       </button>
                     </div>
                   )}
-                  
+
                   <button
                     type="button"
                     onClick={togglePublic}
@@ -411,12 +457,15 @@ export default function TranscriptionDetailPage() {
                   >
                     {transcription.isPublic ? (
                       <>
-                        <Lock className="w-4 h-4" />
+                        <HugeiconsIcon
+                          icon={LockPasswordIcon}
+                          className="w-4 h-4"
+                        />
                         Make Private
                       </>
                     ) : (
                       <>
-                        <Share2 className="w-4 h-4" />
+                        <HugeiconsIcon icon={Share01Icon} className="w-4 h-4" />
                         Make Public
                       </>
                     )}
@@ -426,77 +475,72 @@ export default function TranscriptionDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+          {/* Metadata Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center gap-3 mb-4">
-                <FileAudio className="w-5 h-5 text-[#03b3c3]" />
-                <h3 className="font-semibold text-white">File Details</h3>
+                <div className="p-2 rounded-lg bg-cyan-500/10">
+                  <HugeiconsIcon icon={MusicNote04Icon} className="w-5 h-5 text-cyan-400" />
+                </div>
+                <h3 className="font-medium text-white">File Details</h3>
               </div>
               <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-gray-400">Size</p>
-                  <p className="text-white font-medium">
-                    {formatFileSize(transcription.fileSize)}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Size</span>
+                  <span className="text-gray-200">{formatFileSize(transcription.fileSize)}</span>
                 </div>
-                <div>
-                  <p className="text-gray-400">Type</p>
-                  <p className="text-white font-medium">
-                    {transcription.mimeType}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Type</span>
+                  <span className="text-gray-200">{transcription.mimeType}</span>
                 </div>
-                <div>
-                  <p className="text-gray-400">Duration</p>
-                  <p className="text-white font-medium">
-                    {formatDuration(transcription.duration)}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Duration</span>
+                  <span className="text-gray-200">{formatDuration(transcription.duration)}</span>
                 </div>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center gap-3 mb-4">
-                <Globe className="w-5 h-5 text-[#c247ac]" />
-                <h3 className="font-semibold text-white">Transcription Info</h3>
+                <div className="p-2 rounded-lg bg-cyan-500/10">
+                  <HugeiconsIcon icon={Globe02Icon} className="w-5 h-5 text-cyan-400" />
+                </div>
+                <h3 className="font-medium text-white">Transcription Info</h3>
               </div>
               <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-gray-400">Language</p>
-                  <p className="text-white font-medium">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Language</span>
+                  <span className="text-gray-200">
                     {transcription.language ? getLanguageName(transcription.language) : 'Auto-detected'}
-                  </p>
+                  </span>
                 </div>
-                <div>
-                  <p className="text-gray-400">Credits Used</p>
-                  <p className="text-white font-medium">
-                    {transcription.creditsUsed || 'N/A'} credits
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Credits Used</span>
+                  <span className="text-gray-200">{transcription.creditsUsed || 'N/A'} credits</span>
                 </div>
               </div>
-            </SpotlightCard>
+            </div>
 
-            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
               <div className="flex items-center gap-3 mb-4">
-                <Calendar className="w-5 h-5 text-[#d856bf]" />
-                <h3 className="font-semibold text-white">Timeline</h3>
+                <div className="p-2 rounded-lg bg-cyan-500/10">
+                  <HugeiconsIcon icon={Calendar03Icon} className="w-5 h-5 text-cyan-400" />
+                </div>
+                <h3 className="font-medium text-white">Timeline</h3>
               </div>
               <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-gray-400">Created</p>
-                  <p className="text-white font-medium">
-                    {new Date(transcription.createdAt).toLocaleString()}
-                  </p>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Created</span>
+                  <span className="text-gray-200">{new Date(transcription.createdAt).toLocaleString()}</span>
                 </div>
                 {transcription.completedAt && (
-                  <div>
-                    <p className="text-gray-400">Completed</p>
-                    <p className="text-white font-medium">
-                      {new Date(transcription.completedAt).toLocaleString()}
-                    </p>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Completed</span>
+                    <span className="text-gray-200">{new Date(transcription.completedAt).toLocaleString()}</span>
                   </div>
                 )}
               </div>
-            </SpotlightCard>
+            </div>
           </div>
 
           {(() => {
@@ -561,19 +605,42 @@ export default function TranscriptionDetailPage() {
                 <button
                   type="button"
                   onClick={copyToClipboard}
-                  className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-full text-white hover:bg-white/5 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-lg text-white hover:bg-white/5 transition-all"
                 >
-                  <Copy className="w-4 h-4" />
+                  <HugeiconsIcon icon={Copy01Icon} className="w-4 h-4" />
                   Copy
                 </button>
               </div>
-              <SpotlightCard className="bg-transparent backdrop-blur-xl">
-                <div className="p-6">
-                  <div className="text-gray-300 leading-relaxed whitespace-pre-wrap break-words">
-                    {transcription.text}
-                  </div>
-                </div>
-              </SpotlightCard>
+              <div className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800">
+                {(() => {
+                  const metadata = transcription.metadata as Record<
+                    string,
+                    unknown
+                  > | null
+                  const segments = metadata?.segments as
+                    | TranscriptSegment[]
+                    | undefined
+
+                  if (segments && segments.length > 0) {
+                    return (
+                      <InteractiveTranscript
+                        segments={segments}
+                        currentTime={currentAudioTime}
+                        onSegmentClick={(startTime) => {
+                          audioPlayerRef.current?.seekToTime(startTime)
+                          audioPlayerRef.current?.play()
+                        }}
+                      />
+                    )
+                  }
+
+                  return (
+                    <div className="text-gray-200 text-lg leading-loose">
+                      {transcription.text}
+                    </div>
+                  )
+                })()}
+              </div>
             </div>
           )}
 
@@ -584,8 +651,10 @@ export default function TranscriptionDetailPage() {
             {transcription.fileUrl ? (
               <SpotlightCard className="bg-transparent backdrop-blur-xl">
                 <CustomAudioPlayer
+                  ref={audioPlayerRef}
                   src={transcription.fileUrl}
                   mimeType={transcription.mimeType}
+                  onTimeUpdate={setCurrentAudioTime}
                 />
               </SpotlightCard>
             ) : (

@@ -2,7 +2,15 @@
 
 import { FloppyDiskIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { AlertTriangle, ArrowLeft, Bell, Shield, Trash2, User } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Bell,
+  Paintbrush,
+  Shield,
+  Trash2,
+  User
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -22,14 +30,16 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import HoldButton from '@/components/ui/hold-button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
-import HoldButton from '@/components/ui/hold-button'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 
 export default function SettingsPage() {
   const { data: session } = authClient.useSession()
+  const { hyperspeedEnabled, setHyperspeedEnabled } = useHyperspeed()
   const router = useRouter()
   const [originalName, setOriginalName] = useState(session?.user.name || '')
   const [originalImage, setOriginalImage] = useState(session?.user.image || '')
@@ -237,7 +247,7 @@ export default function SettingsPage() {
     // For mobile (text confirmation), validate the input
     // For desktop (hold button), we skip this check as the hold action is the confirmation
     const isMobile = window.innerWidth < 768 // Simple check, but we'll rely on the UI state mostly
-    
+
     // If we're using the text input (which is visible on mobile), validate it
     // We can check if the deleteConfirmation state is being used
     if (deleteConfirmation !== '' && deleteConfirmation !== 'DELETE') {
@@ -256,7 +266,9 @@ export default function SettingsPage() {
       })
 
       if (result.error) {
-        throw new Error(result.error.message || 'Failed to initiate account deletion')
+        throw new Error(
+          result.error.message || 'Failed to initiate account deletion'
+        )
       }
 
       toast.success(
@@ -279,9 +291,11 @@ export default function SettingsPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <MemoizedHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <MemoizedHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">
@@ -440,6 +454,38 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
+            </SpotlightCard>
+          </div>
+
+          <div className="hidden md:block mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Paintbrush className="w-5 h-5 text-[#d856bf]" />
+              <h2 className="text-xl font-bold text-white">Appearance</h2>
+            </div>
+            <SpotlightCard className="bg-transparent backdrop-blur-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-white">
+                    Background Animation
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Enable the hyperspeed background effect on dashboard pages
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setHyperspeedEnabled(!hyperspeedEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    hyperspeedEnabled ? 'bg-[#d856bf]' : 'bg-white/10'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      hyperspeedEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
             </SpotlightCard>
           </div>
 
@@ -745,11 +791,11 @@ export default function SettingsPage() {
                 className="w-full bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500 focus:ring-[3px] focus:ring-red-500/20 transition-all duration-200 font-mono"
               />
             </div>
-            
+
             <div className="hidden md:block p-4 bg-red-500/5 border border-red-500/10 rounded-xl text-center">
-               <p className="text-sm text-gray-400 mb-2">
-                 Hold the button below for 2 seconds to confirm deletion.
-               </p>
+              <p className="text-sm text-gray-400 mb-2">
+                Hold the button below for 2 seconds to confirm deletion.
+              </p>
             </div>
           </div>
 
@@ -764,7 +810,7 @@ export default function SettingsPage() {
             >
               Cancel
             </Button>
-            
+
             {/* Mobile: Text Confirmation Button */}
             <div className="block md:hidden w-full sm:w-auto">
               <Button

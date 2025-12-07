@@ -36,16 +36,18 @@ export async function GET() {
       .from(account)
       .where(eq(account.userId, userId))
 
-    const hasPassword = userAccounts.some(acc => acc.password !== null)
-    const isGoogle = userAccounts.some(acc => acc.providerId === 'google')
+    const hasPassword = userAccounts.some((acc) => acc.password !== null)
+    const isGoogle = userAccounts.some((acc) => acc.providerId === 'google')
     const isMagicLink = !hasPassword && !isGoogle // Assuming if no password and not google, it's magic link (or other passwordless)
 
     const subscriptionData = await db
       .select()
       .from(subscription)
       .where(eq(subscription.referenceId, userId))
-      
-    const activeSubscription = subscriptionData.find(sub => sub.status === 'active')
+
+    const activeSubscription = subscriptionData.find(
+      (sub) => sub.status === 'active'
+    )
     const currentSubscription = activeSubscription || subscriptionData[0]
 
     const usageStats = await db
@@ -81,7 +83,11 @@ export async function GET() {
         credits: userData[0].credits,
         isBetaUser: userData[0].isBetaUser,
         hasPassword,
-        signupMethod: isGoogle ? 'google' : isMagicLink ? 'magic-link' : 'email',
+        signupMethod: isGoogle
+          ? 'google'
+          : isMagicLink
+            ? 'magic-link'
+            : 'email',
         plan: {
           name: planName,
           isActive: hasSubscription,
@@ -109,4 +115,3 @@ export async function GET() {
     )
   }
 }
-

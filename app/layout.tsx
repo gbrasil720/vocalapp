@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Providers } from '@/components/providers'
 import { StructuredData } from '@/components/structured-data'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -61,10 +62,12 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <SpeedInsights />
-          <Analytics />
-          <Toaster richColors />
+          <Providers>
+            {children}
+            <SpeedInsights />
+            <Analytics />
+            <Toaster richColors />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

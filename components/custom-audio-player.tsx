@@ -1,14 +1,48 @@
 'use client'
 
-import { Pause, Play, Volume2, VolumeX } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import {
+  PauseIcon,
+  PlayIcon,
+  VolumeHighIcon,
+  VolumeMute01Icon
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 
 interface CustomAudioPlayerProps {
   src: string
   mimeType: string
+  onTimeUpdate?: (currentTime: number) => void
 }
 
-export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
+export interface CustomAudioPlayerHandle {
+  seekToTime: (time: number) => void
+  play: () => void
+  pause: () => void
+  getCurrentTime: () => number
+}
+
+// Generate stable waveform bar properties once
+const generateWaveformBars = (count: number) => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    height: Math.floor(Math.random() * 24 + 8),
+    animDelay: (Math.random() * 0.8).toFixed(2),
+    animDuration: (Math.random() * 0.6 + 0.4).toFixed(2)
+  }))
+}
+
+export const CustomAudioPlayer = forwardRef<
+  CustomAudioPlayerHandle,
+  CustomAudioPlayerProps
+>(function CustomAudioPlayer({ src, mimeType, onTimeUpdate }, ref) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -17,6 +51,33 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
   const [isMuted, setIsMuted] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
 
+  // Memoize waveform bars to prevent glitchy re-renders
+  const waveformBars = useMemo(() => generateWaveformBars(24), [])
+
+  useImperativeHandle(ref, () => ({
+    seekToTime: (time: number) => {
+      const audio = audioRef.current
+      if (!audio) return
+      audio.currentTime = time
+      setCurrentTime(time)
+    },
+    play: () => {
+      const audio = audioRef.current
+      if (!audio) return
+      audio.play()
+      setIsPlaying(true)
+    },
+    pause: () => {
+      const audio = audioRef.current
+      if (!audio) return
+      audio.pause()
+      setIsPlaying(false)
+    },
+    getCurrentTime: () => {
+      return audioRef.current?.currentTime ?? 0
+    }
+  }))
+
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -24,6 +85,7 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
     const handleTimeUpdate = () => {
       if (!isDragging) {
         setCurrentTime(audio.currentTime)
+        onTimeUpdate?.(audio.currentTime)
       }
     }
 
@@ -35,16 +97,23 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
       setIsPlaying(false)
     }
 
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
 
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
       audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
     }
-  }, [isDragging])
+  }, [isDragging, onTimeUpdate])
 
   const togglePlay = () => {
     const audio = audioRef.current
@@ -55,7 +124,6 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
     } else {
       audio.play()
     }
-    setIsPlaying(!isPlaying)
   }
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -132,144 +200,161 @@ export function CustomAudioPlayer({ src, mimeType }: CustomAudioPlayerProps) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full">
       <audio ref={audioRef} src={src} preload="metadata">
         <source src={src} type={mimeType} />
         <track kind="captions" />
       </audio>
 
-      <div className="flex flex-col gap-6 min-w-0">
-        <div className="space-y-2">
-          <div
-            className="relative h-3 bg-white/10 rounded-full cursor-pointer group"
-            onClick={handleProgressClick}
-            onMouseDown={handleProgressMouseDown}
-            onMouseMove={handleProgressMouseMove}
-            onMouseUp={handleProgressMouseUp}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                const rect = e.currentTarget.getBoundingClientRect()
-                const syntheticEvent = {
-                  currentTarget: e.currentTarget,
-                  clientX: rect.left + (rect.width * currentTime) / duration
-                } as React.MouseEvent<HTMLDivElement>
-                handleProgressClick(syntheticEvent)
-              }
-            }}
-            role="slider"
-            aria-label="Audio progress"
-            aria-valuemin={0}
-            aria-valuemax={duration}
-            aria-valuenow={currentTime}
-            tabIndex={0}
-          >
-            <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#03b3c3] via-[#c247ac] to-[#d856bf] rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
+      {/* Main Player Container */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/10 p-5">
+        {/* Ambient Background Glow */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#d856bf]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#03b3c3]/20 rounded-full blur-3xl pointer-events-none" />
 
-            <div
-              className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ left: `calc(${progress}% - 10px)` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#03b3c3] to-[#d856bf] rounded-full blur-md opacity-50" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-sm text-gray-400">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6 min-w-0">
-          <button
-            type="button"
-            onClick={togglePlay}
-            className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] hover:scale-110 transition-transform shadow-lg relative group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#d856bf] via-[#c247ac] to-[#03b3c3] rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-            {isPlaying ? (
-              <Pause
-                className="w-6 h-6 text-white relative z-10"
-                fill="white"
-              />
-            ) : (
-              <Play
-                className="w-6 h-6 text-white relative z-10 ml-1"
-                fill="white"
-              />
-            )}
-          </button>
-
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-64 flex-shrink-0 min-w-0">
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="p-2 rounded-full hover:bg-white/5 transition-colors flex-shrink-0"
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
-              ) : (
-                <Volume2 className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
-              )}
-            </button>
-
-            <div className="relative flex-1 h-2 bg-white/10 rounded-full min-w-0">
-              <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#03b3c3] to-[#c247ac] rounded-full"
-                style={{ width: `${isMuted ? 0 : volume * 100}%` }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                aria-label="Volume"
-              />
-            </div>
-          </div>
-
-          <div className="hidden lg:block h-8 w-px bg-white/10 flex-shrink-0" />
-
-          <div className="hidden lg:flex items-center gap-1 flex-1 min-w-0 max-w-md">
-            {[...Array(20)].map((_, i) => {
-              const height = Math.floor(Math.random() * 20 + 10)
-              const animDuration = (Math.random() * 1 + 0.5).toFixed(2)
+        <div className="relative z-10 flex flex-col gap-5">
+          {/* Waveform Visualizer */}
+          <div className="flex items-center justify-center gap-[3px] h-12 px-2">
+            {waveformBars.map((bar) => {
+              const barProgress = (bar.id / waveformBars.length) * 100
+              const isPast = barProgress < progress
+              
               return (
                 <div
-                  key={`wave-${i}-${height}`}
-                  className={`w-1 rounded-full transition-all ${
-                    isPlaying && i < progress / 5
-                      ? 'bg-gradient-to-t from-[#03b3c3] to-[#d856bf]'
-                      : 'bg-white/20'
-                  }`}
+                  key={bar.id}
+                  className="w-1.5 rounded-full transition-all duration-300 ease-out"
                   style={{
-                    height: `${height}px`,
-                    animation: isPlaying
-                      ? `pulse ${animDuration}s ease-in-out infinite`
-                      : 'none'
+                    height: isPlaying ? `${bar.height}px` : '4px',
+                    background: isPast
+                      ? '#d856bf'
+                      : 'rgba(255, 255, 255, 0.15)',
+                    animationName: isPlaying ? 'waveform' : 'none',
+                    animationDuration: `${bar.animDuration}s`,
+                    animationDelay: `${bar.animDelay}s`,
+                    animationIterationCount: 'infinite',
+                    animationTimingFunction: 'ease-in-out',
+                    animationDirection: 'alternate'
                   }}
                 />
               )
             })}
           </div>
+
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <div
+              className="relative h-2 bg-white/10 rounded-full cursor-pointer group overflow-hidden"
+              onClick={handleProgressClick}
+              onMouseDown={handleProgressMouseDown}
+              onMouseMove={handleProgressMouseMove}
+              onMouseUp={handleProgressMouseUp}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const syntheticEvent = {
+                    currentTarget: e.currentTarget,
+                    clientX: rect.left + (rect.width * currentTime) / duration
+                  } as React.MouseEvent<HTMLDivElement>
+                  handleProgressClick(syntheticEvent)
+                }
+              }}
+              role="slider"
+              aria-label="Audio progress"
+              aria-valuemin={0}
+              aria-valuemax={duration}
+              aria-valuenow={currentTime}
+              tabIndex={0}
+            >
+              <div
+                className="absolute inset-y-0 left-0 bg-[#d856bf] rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+              
+              {/* Glow Effect */}
+              <div
+                className="absolute inset-y-0 left-0 bg-[#d856bf] rounded-full blur-sm opacity-40"
+                style={{ width: `${progress}%` }}
+              />
+
+              {/* Scrubber Handle */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg shadow-black/30 opacity-0 group-hover:opacity-100 transition-all duration-200 scale-75 group-hover:scale-100"
+                style={{ left: `calc(${progress}% - 8px)` }}
+              />
+            </div>
+
+            {/* Time Display */}
+            <div className="flex items-center justify-between text-xs font-medium">
+              <span className="text-white/70 tabular-nums">{formatTime(currentTime)}</span>
+              <span className="text-white/40 tabular-nums">{formatTime(duration)}</span>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-between gap-4">
+            {/* Volume Control */}
+            <div className="flex items-center gap-2 flex-1 max-w-[140px]">
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="p-2 rounded-xl hover:bg-white/10 transition-colors duration-200"
+              >
+                <HugeiconsIcon
+                  icon={isMuted || volume === 0 ? VolumeMute01Icon : VolumeHighIcon}
+                  className="w-5 h-5 text-white/60 hover:text-white transition-colors"
+                />
+              </button>
+
+              <div className="relative flex-1 h-1.5 bg-white/10 rounded-full group">
+                <div
+                  className="absolute inset-y-0 left-0 bg-white/50 rounded-full transition-all duration-150"
+                  style={{ width: `${isMuted ? 0 : volume * 100}%` }}
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  aria-label="Volume"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={togglePlay}
+              className="relative flex items-center justify-center w-16 h-16 rounded-full bg-[#d856bf] hover:bg-[#c247ac] hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg shadow-[#d856bf]/30 group"
+            >
+              {/* Inner glow */}
+              <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              
+              <HugeiconsIcon
+                icon={isPlaying ? PauseIcon : PlayIcon}
+                className={`w-7 h-7 text-white relative z-10 ${!isPlaying ? 'ml-1' : ''}`}
+                fill="white"
+              />
+            </button>
+
+            {/* Spacer for symmetry */}
+            <div className="flex-1 max-w-[140px]" />
+          </div>
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 0.5;
+        @keyframes waveform {
+          0% {
+            transform: scaleY(0.4);
           }
-          50% {
-            opacity: 1;
+          100% {
+            transform: scaleY(1);
           }
         }
       `}</style>
     </div>
   )
-}
+})
+

@@ -36,7 +36,8 @@ export async function POST() {
             type: 'subscription_grant',
             description: 'Pro Plan monthly credits (manual grant)',
             stripeSubscriptionId: sub.stripeSubscriptionId ?? undefined,
-            dodoPaymentsSubscriptionId: sub.dodoPaymentsSubscriptionId ?? undefined
+            dodoPaymentsSubscriptionId:
+              sub.dodoPaymentsSubscriptionId ?? undefined
           })
 
           results.push({

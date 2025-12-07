@@ -33,6 +33,7 @@ import { LoadingScreen } from '@/components/loading-screen'
 import SpotlightCard from '@/components/SpotlightCard'
 import { UserNav } from '@/components/user-nav'
 import { authClient } from '@/lib/auth-client'
+import { useHyperspeed } from '@/lib/hyperspeed-context'
 
 interface UserStats {
   credits: number
@@ -176,6 +177,7 @@ function getRecentFailures(transcriptions: Transcription[]) {
 
 export default function AnalyticsPage() {
   const { data: session, isPending } = authClient.useSession()
+  const { hyperspeedEnabled } = useHyperspeed()
   const [stats, setStats] = useState<UserStats | null>(null)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
   const [transactions, setTransactions] = useState<CreditTransaction[]>([])
@@ -295,9 +297,11 @@ export default function AnalyticsPage() {
 
   return (
     <>
-      <div className="hidden md:block fixed inset-0 z-0 opacity-40">
-        <LazyHyperspeed />
-      </div>
+      {hyperspeedEnabled && (
+        <div className="hidden md:block fixed inset-0 z-0 opacity-40">
+          <LazyHyperspeed />
+        </div>
+      )}
 
       <div className="relative min-h-screen z-10">
         <div className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-white/10">

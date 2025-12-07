@@ -20,7 +20,7 @@ export async function GET() {
     const userId = session.user.id
 
     console.log(`🔍 Checking subscription for user ${userId}`)
-    
+
     const subscriptionData = await db
       .select()
       .from(subscription)
@@ -38,22 +38,25 @@ export async function GET() {
 
     // Prioritize Dodo Payments subscription
     const dodoSub = subscriptionData.find(
-      sub => sub.status === 'active' && !!sub.dodoPaymentsSubscriptionId
+      (sub) => sub.status === 'active' && !!sub.dodoPaymentsSubscriptionId
     )
-    
+
     if (dodoSub) console.log('Found active Dodo subscription:', dodoSub.id)
     else console.log('No active Dodo subscription found')
 
     // Fallback to any active subscription (or just the first one if none active)
     const sub = dodoSub || subscriptionData[0]
-    
+
     const isActive = sub.status === 'active'
     const isDodo = !!sub.dodoPaymentsSubscriptionId
-    
-    console.log(`Selected sub: ${sub.id}, isActive: ${isActive}, isDodo: ${isDodo}`)
+
+    console.log(
+      `Selected sub: ${sub.id}, isActive: ${isActive}, isDodo: ${isDodo}`
+    )
 
     return NextResponse.json({
       hasSubscription: isActive && isDodo,
+      isPro: isActive && isDodo,
       subscription: {
         id: sub.id,
         plan: sub.plan,

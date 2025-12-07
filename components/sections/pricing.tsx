@@ -6,7 +6,10 @@ import { StarIcon, Tick02Icon, ZapIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
-import { getCreditPack, type CreditPackType } from '@/lib/billing/credit-products'
+import {
+  type CreditPackType,
+  getCreditPack
+} from '@/lib/billing/credit-products'
 import ElectricBorder from '../ElectricBorder'
 import { PricingCard } from '../pricing-card'
 
@@ -19,8 +22,8 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
 
   const handleCreditPurchase = async (packType: CreditPackType) => {
     if (!session?.user?.id) {
-        window.location.href = '/auth/sign-in'
-        return
+      window.location.href = '/auth/sign-in'
+      return
     }
 
     try {
@@ -39,18 +42,18 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
       const { data, error } = await authClient.dodopayments.checkout({
         slug: slugMap[packType],
         billing: {
-            city: 'New York',
-            country: 'US',
-            state: 'NY',
-            street: '123 Main St',
-            zipcode: '10001'
+          city: 'New York',
+          country: 'US',
+          state: 'NY',
+          street: '123 Main St',
+          zipcode: '10001'
         },
         customer: {},
         metadata: {
-            purchaseType: 'credits',
-            userId: session.user.id,
-            credits: pack.credits.toString(),
-            packType
+          purchaseType: 'credits',
+          userId: session.user.id,
+          credits: pack.credits.toString(),
+          packType
         }
       })
 

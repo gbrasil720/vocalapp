@@ -163,8 +163,11 @@ function getRetentionDays(
   // Normalize plan name for comparison (handle case variations)
   const plan = userSubscription.plan?.toLowerCase().trim()
 
-  if (plan === 'pro') {
-    console.log(`✓ Pro plan detected: ${userSubscription.plan} -> 90 days retention`)
+  // Check for Pro plan (handles both 'pro' and 'frequency-plan' from Dodo Payments)
+  if (plan === 'pro' || plan === 'frequency-plan' || plan === 'frequency') {
+    console.log(
+      `✓ Pro plan detected: ${userSubscription.plan} -> 90 days retention`
+    )
     return 90
   }
 
