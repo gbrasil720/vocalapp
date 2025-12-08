@@ -10,34 +10,34 @@ import {
 
 const faqData = [
   {
-    question: 'Who can join the closed beta?',
+    question: 'How accurate is the transcription?',
     answer:
-      'Right now we’re onboarding teams from our waitlist who have active transcription workflows and are willing to give regular feedback. If that sounds like you, request access through the waitlist and we’ll reach out.'
+      'Our AI-powered transcription delivers industry-leading accuracy of over 95% for clear audio. The system continuously learns and improves, handling accents, industry terminology, and multiple speakers with ease.'
   },
   {
-    question: 'How long does it take to get approved?',
+    question: 'What audio formats are supported?',
     answer:
-      'We review new requests every Friday. You’ll get an email letting you know if you’re approved for the next cohort or if we need additional details to prioritize your team.'
+      'We support all major audio and video formats including MP3, M4A, WAV, WEBM, FLAC, OGG, and MP4. Simply upload your file and our system handles the rest—no conversion needed.'
   },
   {
-    question: 'What features are available during beta?',
+    question: 'How does the credit system work?',
     answer:
-      'Closed beta users get early access to our core transcription engine, real-time streaming, and collaboration tools. Some enterprise features are still in development, so we’ll invite you to try them as they unlock.'
+      "1 credit equals 1 minute of transcription. You receive 30 free credits when you sign up, and you can purchase credit packs anytime—they never expire. No monthly subscription required unless you want one."
   },
   {
-    question: 'Is there a cost to participate?',
+    question: 'What languages do you support?',
     answer:
-      'Access is free during the closed beta. We’ll share pricing options ahead of general availability so you can plan ahead—no charges will be made without your opt-in.'
+      'We support over 50 languages and dialects including English, Spanish, French, German, Portuguese, Mandarin, Japanese, Arabic, and many more. Our AI automatically detects the spoken language.'
   },
   {
-    question: 'How should I share feedback or report issues?',
+    question: 'How long does transcription take?',
     answer:
-      'Every beta workspace includes an in-app feedback panel and a direct line to our product team. You can also reply to any onboarding email and we’ll jump into a call if needed.'
+      'Most transcriptions complete in real-time or faster! A 10-minute audio file typically processes in under 2 minutes. You can upload multiple files and work on other tasks while we process them.'
   },
   {
-    question: 'Can I invite my teammates?',
+    question: 'Is my audio data secure?',
     answer:
-      'Yes! Each beta account can add up to five teammates so you can test real workflows. Just send us their emails when you’re approved and we’ll arrange access.'
+      "Absolutely. We use enterprise-grade encryption for all uploads and storage. Your audio files are automatically deleted after your chosen retention period (7 days for free, 90 days for Pro). We never use your data to train our models."
   }
 ]
 
@@ -51,11 +51,14 @@ export function FAQ() {
           </h2>
         </div>
         <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
-          The essentials for teams joining our closed beta. Still curious?{' '}
-          <span className="text-[#d856bf] cursor-pointer hover:underline">
-            Reply to your invite email
-          </span>{' '}
-          and we’ll help out personally.
+          Everything you need to know about getting started.{' '}
+          <Link
+            href="/support"
+            className="text-[#d856bf] cursor-pointer hover:underline"
+          >
+            Contact support
+          </Link>{' '}
+          if you need more help.
         </p>
       </div>
 
@@ -70,7 +73,7 @@ export function FAQ() {
             <AccordionItem
               key={`faq-${faq.question.slice(0, 20)}`}
               value={`item-${index}`}
-              className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl px-6 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-[#03b3c3]/10"
+              className="bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-2xl px-6 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-[#03b3c3]/10"
             >
               <AccordionTrigger className="text-left text-lg font-semibold text-white hover:text-[#03b3c3] transition-colors duration-200 py-6 [&[data-state=open]]:text-[#03b3c3]">
                 <span className="flex items-start gap-4">
@@ -91,26 +94,26 @@ export function FAQ() {
       </div>
 
       <div className="text-center mt-16">
-        <div className="bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
+        <div className="bg-gradient-to-r from-[#03b3c3]/10 via-transparent to-[#d856bf]/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
           <h3 className="text-2xl font-bold text-white mb-4 font-['Satoshi']">
-            Still have questions?
+            Ready to get started?
           </h3>
           <p className="text-gray-300 mb-6">
-            We’re building the beta with you—let us know what you need next.
+            Join our waitlist for early access and exclusive launch pricing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/dashboard/feedback"
+              href="#waitlist"
               className="px-8 py-3 bg-[#d856bf] text-white font-semibold rounded-full hover:bg-[#d856bf]/90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-[#d856bf]/25"
             >
-              Join the Conversation
+              Join the Waitlist
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/support"
               className="px-8 py-3 bg-transparent border border-white/20 text-white font-semibold rounded-full hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
             >
-              Join the Waitlist
-            </button>
+              Contact Support
+            </Link>
           </div>
         </div>
       </div>

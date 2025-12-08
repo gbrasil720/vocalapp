@@ -1,86 +1,95 @@
 'use client'
 
 import {
-  Building02Icon,
-  CompassIcon,
-  PuzzleIcon
+  CloudIcon,
+  CpuIcon,
+  LinkSquare02Icon,
+  StarIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import Link from 'next/link'
 
-const partnerHighlights = [
+const partners = [
   {
-    title: 'Ship features with us',
+    name: 'CloudScale AI',
+    category: 'AI Infrastructure',
     description:
-      'Pick up an issue, ship a PR, and shape the roadmap for accessible voice tooling. We celebrate every contribution publicly.',
-    icon: CompassIcon
+      'Powering our neural network processing with cutting-edge GPU clusters for blazing-fast transcription.',
+    icon: CpuIcon
   },
   {
-    title: 'Join the maintainer crew',
+    name: 'SecureVault',
+    category: 'Cloud Security',
     description:
-      'Collaborators who return often get early feature previews, design reviews, and a seat in our contributor syncs.',
-    icon: Building02Icon
+      'Enterprise-grade encryption and compliance ensuring your audio data remains private and protected.',
+    icon: CloudIcon
   },
   {
-    title: 'Show up on the wall',
+    name: 'WorkflowHub',
+    category: 'Integrations',
     description:
-      'Merge something meaningful and we’ll spotlight you on this page, release notes, and inside the app once we launch.',
-    icon: PuzzleIcon
+      'Seamless connections to your favorite tools—Notion, Slack, Zapier, and 100+ other platforms.',
+    icon: LinkSquare02Icon
   }
 ]
 
-export function Contributors() {
+export function Partners() {
   return (
-    <section className="relative z-10 py-20 px-6" id="contributors">
+    <section className="relative z-10 py-20 px-6" id="partners">
       <div className="text-center mb-16 max-w-4xl mx-auto">
+        <div className="inline-flex items-center gap-2 bg-[#d856bf]/10 border border-[#d856bf]/30 rounded-full px-4 py-2 mb-6">
+          <HugeiconsIcon icon={StarIcon} color="#d856bf" size={18} />
+          <span className="text-sm font-medium text-[#d856bf]">
+            Trusted Technology Stack
+          </span>
+        </div>
         <h2 className="font-['Satoshi'] text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight mb-6">
-          Community Contributors
+          Powered by Industry Leaders
         </h2>
         <p className="text-xl text-primary/90 leading-relaxed max-w-2xl mx-auto">
-          Vocal is open source. This space highlights the builders who keep the
-          project moving—your name can live here next.
+          We partner with best-in-class technology providers to deliver
+          enterprise-grade transcription at scale.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {partnerHighlights.map((highlight) => (
+        {partners.map((partner) => (
           <div
-            key={highlight.title}
-            className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-8 transition-transform duration-300 hover:-translate-y-2 hover:border-white/20"
+            key={partner.name}
+            className="bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl p-8 transition-all duration-300 hover:-translate-y-2 hover:border-[#03b3c3]/40 hover:shadow-lg hover:shadow-[#03b3c3]/10 group"
           >
-            <div className="mb-6 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#E5E5E5] border border-white/10">
-              <HugeiconsIcon icon={highlight.icon} color="#1f1f1f" size={28} />
+            <div className="mb-6 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#03b3c3]/20 to-[#d856bf]/10 border border-white/10 group-hover:scale-110 transition-transform duration-300">
+              <HugeiconsIcon icon={partner.icon} color="#03b3c3" size={28} />
+            </div>
+            <div className="mb-2">
+              <span className="text-xs font-semibold text-[#d856bf] uppercase tracking-wider">
+                {partner.category}
+              </span>
             </div>
             <h3 className="text-2xl font-semibold text-white mb-4">
-              {highlight.title}
+              {partner.name}
             </h3>
             <p className="text-gray-300 leading-relaxed">
-              {highlight.description}
+              {partner.description}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="mt-16 max-w-3xl mx-auto text-center">
-        <div className="bg-transparent backdrop-blur-2xl border border-white/10 rounded-3xl p-10">
-          <p className="text-lg text-gray-300 mb-6">
-            Want to see your avatar here? Dive into an issue, open a pull
-            request, or share improvements—we review contributions every week.
+      <div className="mt-16 max-w-4xl mx-auto">
+        <div className="bg-gradient-to-r from-[#03b3c3]/10 via-transparent to-[#d856bf]/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 text-center">
+          <p className="text-lg text-gray-300 mb-2">
+            Want to become a technology partner?
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="https://github.com/gbrasil720/vocalapp/issues"
-              className="px-8 py-3 rounded-full bg-[#d856bf] text-white font-semibold transition-transform duration-300 hover:scale-105"
-            >
-              Browse Open Issues
-            </Link>
-            <Link
-              href="https://github.com/gbrasil720/vocalapp"
-              className="px-8 py-3 rounded-full border border-white/20 text-white font-semibold hover:bg-white/10 transition-transform duration-300 hover:scale-105"
-            >
-              Contribute on GitHub
-            </Link>
-          </div>
+          <p className="text-sm text-gray-500">
+            We're always looking to integrate with tools that help our users
+            work smarter.
+          </p>
+          <a
+            href="mailto:partnerships@vocalapp.io"
+            className="inline-flex items-center gap-2 mt-6 px-8 py-3 rounded-full bg-transparent border border-white/20 text-white font-semibold hover:bg-white/10 transition-all duration-300 hover:scale-105"
+          >
+            Get in Touch
+          </a>
         </div>
       </div>
     </section>

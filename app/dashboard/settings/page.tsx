@@ -80,62 +80,62 @@ export default function SettingsPage() {
     }
   }, [session?.user.name, session?.user.image, session?.user.email])
 
-  useEffect(() => {
-    const checkHasPassword = async () => {
-      if (!session?.user?.id) return
+  // useEffect(() => {
+  //   const checkHasPassword = async () => {
+  //     if (!session?.user?.id) return
 
-      try {
-        // Check if user has a credential account (password account)
-        const response = await fetch('/api/user/has-password')
-        if (response.ok) {
-          const data = await response.json()
-          setHasPassword(data.hasPassword ?? true)
-        } else {
-          // Default to true if check fails
-          setHasPassword(true)
-        }
-      } catch (error) {
-        console.error('Error checking password status:', error)
-        // Default to true if check fails
-        setHasPassword(true)
-      }
-    }
+  //     try {
+  //       // Check if user has a credential account (password account)
+  //       const response = await fetch('/api/user/has-password')
+  //       if (response.ok) {
+  //         const data = await response.json()
+  //         setHasPassword(data.hasPassword ?? true)
+  //       } else {
+  //         // Default to true if check fails
+  //         setHasPassword(true)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking password status:', error)
+  //       // Default to true if check fails
+  //       setHasPassword(true)
+  //     }
+  //   }
 
-    const checkTwoFactorStatus = async () => {
-      if (!session?.user?.id) return
+  //   const checkTwoFactorStatus = async () => {
+  //     if (!session?.user?.id) return
 
-      try {
-        // Check actual 2FA status from database (more reliable than session)
-        const response = await fetch('/api/user/two-factor-status')
-        if (response.ok) {
-          const data = await response.json()
-          setTwoFactorEnabled(data.twoFactorEnabled ?? false)
-        } else {
-          // Fallback to session data
-          setTwoFactorEnabled(session?.user?.twoFactorEnabled ?? false)
-        }
-      } catch (error) {
-        console.error('Error checking 2FA status:', error)
-        // Fallback to session data
-        setTwoFactorEnabled(session?.user?.twoFactorEnabled ?? false)
-      }
-    }
+  //     try {
+  //       // Check actual 2FA status from database (more reliable than session)
+  //       const response = await fetch('/api/user/two-factor-status')
+  //       if (response.ok) {
+  //         const data = await response.json()
+  //         setTwoFactorEnabled(data.twoFactorEnabled ?? false)
+  //       } else {
+  //         // Fallback to session data
+  //         setTwoFactorEnabled(session?.user?.twoFactorEnabled ?? false)
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking 2FA status:', error)
+  //       // Fallback to session data
+  //       setTwoFactorEnabled(session?.user?.twoFactorEnabled ?? false)
+  //     }
+  //   }
 
-    if (session?.user) {
-      checkHasPassword()
-      checkTwoFactorStatus()
-    }
+  //   if (session?.user) {
+  //     checkHasPassword()
+  //     checkTwoFactorStatus()
+  //   }
 
-    // Listen for 2FA status changes
-    const handleTwoFactorChanged = () => {
-      checkTwoFactorStatus()
-    }
-    window.addEventListener('two-factor-changed', handleTwoFactorChanged)
+  //   // Listen for 2FA status changes
+  //   const handleTwoFactorChanged = () => {
+  //     checkTwoFactorStatus()
+  //   }
+  //   window.addEventListener('two-factor-changed', handleTwoFactorChanged)
 
-    return () => {
-      window.removeEventListener('two-factor-changed', handleTwoFactorChanged)
-    }
-  }, [session?.user])
+  //   return () => {
+  //     window.removeEventListener('two-factor-changed', handleTwoFactorChanged)
+  //   }
+  // }, [session?.user])
 
   // Reset image error when image URL changes
   const handleImageChange = (newImage: string) => {
@@ -244,12 +244,8 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAccount = async () => {
-    // For mobile (text confirmation), validate the input
-    // For desktop (hold button), we skip this check as the hold action is the confirmation
-    const isMobile = window.innerWidth < 768 // Simple check, but we'll rely on the UI state mostly
+    const isMobile = window.innerWidth < 768
 
-    // If we're using the text input (which is visible on mobile), validate it
-    // We can check if the deleteConfirmation state is being used
     if (deleteConfirmation !== '' && deleteConfirmation !== 'DELETE') {
       toast.error('Please type DELETE to confirm')
       return
@@ -257,12 +253,10 @@ export default function SettingsPage() {
 
     setIsDeletingAccount(true)
     try {
-      // Get the base URL for the callback
       const baseUrl = window.location.origin
 
-      // Call Better Auth's deleteUser to initiate the deletion process
       const result = await authClient.deleteUser({
-        callbackURL: baseUrl // Redirect to landing page after deletion
+        callbackURL: baseUrl
       })
 
       if (result.error) {
@@ -627,7 +621,7 @@ export default function SettingsPage() {
               <h2 className="text-xl font-bold text-white">Security</h2>
             </div>
             <div className="space-y-6">
-              <SpotlightCard className="bg-transparent backdrop-blur-xl">
+              {/* <SpotlightCard className="bg-transparent backdrop-blur-xl">
                 {hasPassword === null ? (
                   // Password card skeleton while loading
                   <div className="space-y-4">
@@ -667,9 +661,9 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 )}
-              </SpotlightCard>
+              </SpotlightCard> */}
 
-              <TwoFactorSection twoFactorEnabled={twoFactorEnabled ?? false} />
+              {/* <TwoFactorSection twoFactorEnabled={twoFactorEnabled ?? false} /> */}
 
               <ActiveSessionsSection />
             </div>

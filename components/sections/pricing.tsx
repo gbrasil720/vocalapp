@@ -22,7 +22,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
 
   const handleCreditPurchase = async (packType: CreditPackType) => {
     if (!session?.user?.id) {
-      window.location.href = '/auth/sign-in'
+      window.location.href = '/sign-in'
       return
     }
 
@@ -92,32 +92,31 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
         <PricingCard
-          title="Starter"
-          description="Perfect to test the waters"
-          price="Free"
-          priceUnit="30 credits (1 credit = 1 minute of transcription)"
+          title="Free"
+          description="Perfect for trying out Vocalapp"
+          price="$0"
+          priceUnit="forever"
           benefits={[
-            '30 minutes of transcription',
-            '7-day audio history',
-            'Real-time transcription',
-            '10+ languages',
-            'Basic email support'
+            '30 credits on signup',
+            '7-day audio retention',
+            '50+ languages supported',
+            'SRT, VTT, TXT exports',
+            'Community support'
           ]}
           buttonText="Get Started"
           waitlistMode={waitlistMode}
         />
         <PricingCard
           mostPopular
-          title="Pro"
-          description="Ideal for creator and growing businesses"
-          price="$TBD"
+          title="Frequency"
+          description="For creators and growing teams"
+          price="$12"
           priceUnit="/month"
           benefits={[
-            'Everything on Starter',
-            '90-day audio history',
-            '10 hours of transcription per month',
-            'Multiple files processing',
-            '50+ languages',
+            '600 credits per month',
+            '90-day audio retention',
+            'Multiple file uploads',
+            'All export formats',
             'Priority support'
           ]}
           buttonText="Subscribe Now"
@@ -125,22 +124,22 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
         />
         <PricingCard
           title="Enterprise"
-          description="For large organizations with high transcription needs"
+          description="For organizations with custom needs"
           price="Custom"
           priceUnit=""
           benefits={[
-            'Everything on Pro',
-            'Unlimited hours and resources',
+            'Unlimited credits',
+            'Unlimited audio retention',
             'Dedicated account manager',
             'Custom integrations',
-            '24/7 phone support'
+            'SLA & 24/7 support'
           ]}
           buttonText="Contact Sales"
           waitlistMode={waitlistMode}
         />
       </div>
 
-      {!waitlistMode && (
+      {!waitlistMode && session && (
         <div className="mt-16 max-w-6xl mx-auto">
           <div className="relative group">
             <div className="block md:hidden">
@@ -180,7 +179,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                            Basic
+                            Echo
                           </div>
                           <div className="flex items-baseline justify-center mb-2">
                             <span className="text-3xl font-bold text-white">
@@ -229,7 +228,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                            Popular
+                            Reverb
                           </div>
                           <div className="flex items-baseline justify-center mb-2">
                             <span className="text-3xl font-bold text-white">
@@ -273,7 +272,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                       >
                         <div className="text-center">
                           <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                            Premium
+                            Amplify
                           </div>
                           <div className="flex items-baseline justify-center mb-2">
                             <span className="text-3xl font-bold text-white">
@@ -358,7 +357,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                              Basic
+                              Echo
                             </div>
                             <div className="flex items-baseline justify-center mb-2">
                               <span className="text-3xl font-bold text-white">
@@ -407,7 +406,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                              Popular
+                              Reverb
                             </div>
                             <div className="flex items-baseline justify-center mb-2">
                               <span className="text-3xl font-bold text-white">
@@ -451,7 +450,7 @@ export function Pricing({ waitlistMode = false }: PricingProps = {}) {
                         >
                           <div className="text-center">
                             <div className="text-sm text-[#03b3c3] font-semibold mb-2">
-                              Premium
+                              Amplify
                             </div>
                             <div className="flex items-baseline justify-center mb-2">
                               <span className="text-3xl font-bold text-white">
