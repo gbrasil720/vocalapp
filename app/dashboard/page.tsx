@@ -84,7 +84,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null)
   const [loadingStats, setLoadingStats] = useState(true)
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
-  const [showPasswordAlert, setShowPasswordAlert] = useState(true)
+  // const [showPasswordAlert, setShowPasswordAlert] = useState(true)
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -179,7 +179,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {stats.hasPassword === false && showPasswordAlert && (
+          {/* {stats.hasPassword === false && showPasswordAlert && (
             <div className="mb-8">
               <Alert
                 variant="destructive"
@@ -214,10 +214,10 @@ export default function DashboardPage() {
                 </button>
               </Alert>
             </div>
-          )}
+          )} */}
 
           {hyperspeedEnabled && (
-            <div className="mb-6 flex items-center justify-center">
+            <div className="hidden md:flex mb-6 flex items-center justify-center">
               <p className="text-xs text-gray-500">
                 <span className="opacity-70">💡 Tip:</span> You can disable the background effect in{' '}
                 <Link href="/dashboard/settings" className="text-gray-400 hover:text-white underline underline-offset-2">

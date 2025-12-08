@@ -40,10 +40,7 @@ export function PricingCard({
 
   const handleUpgradeToPro = async () => {
     if (!session?.user?.id) {
-      // If not logged in, the plugin might handle it or we can redirect to login
-      // For now, let's assume the user needs to be logged in.
-      // We can redirect to login page or show a toast.
-      window.location.href = '/auth/sign-in'
+      window.location.href = '/sign-in'
       return
     }
 

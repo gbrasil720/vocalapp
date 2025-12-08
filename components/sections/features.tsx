@@ -2,7 +2,7 @@ import {
   AiBrain05Icon,
   DocumentAttachmentIcon,
   EarthIcon,
-  Github01Icon,
+  SecurityLockIcon,
   Tick02Icon,
   UserIcon,
   ZapIcon
@@ -28,6 +28,7 @@ export function Features() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 w-full max-w-7xl mx-auto">
+        {/* Hero Card - AI Powered Transcription */}
         <SpotlightCard className="md:col-span-2 lg:col-span-2 lg:row-span-2 bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full justify-between">
             <div>
@@ -53,6 +54,7 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* 100% Accurate */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
@@ -70,6 +72,7 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* Easy to Use */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
@@ -84,6 +87,7 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* Multi-Language */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
@@ -100,6 +104,7 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* No Manual Work */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
@@ -121,6 +126,7 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* Smart AI */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
@@ -135,17 +141,24 @@ export function Features() {
           </div>
         </SpotlightCard>
 
+        {/* Secure & Private */}
         <SpotlightCard className="bg-transparent backdrop-blur-xl">
           <div className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-xl bg-[#E5E5E5]">
-                <HugeiconsIcon icon={Github01Icon} color="#1f1f1f" size={22} />
+                <HugeiconsIcon
+                  icon={SecurityLockIcon}
+                  color="#1f1f1f"
+                  size={22}
+                />
               </div>
-              <h3 className="text-lg font-semibold text-white">Open Source</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Secure & Private
+              </h3>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Built in public with transparent development. Community-driven and
-              open for contributions.
+              Enterprise-grade encryption protects your audio files and
+              transcriptions at all times.
             </p>
           </div>
         </SpotlightCard>
